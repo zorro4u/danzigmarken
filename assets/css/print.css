@@ -1,0 +1,230 @@
+/*
+<link rel="stylesheet" media="print" type="text/css" href="path/to/css/print.css" />
+
+https://wiki.selfhtml.org/wiki/Print-CSS
+
+visibility: hidden;
+display: none;
+
+text-indent: 100%;
+white-space: nowrap;
+overflow: hidden;
+
+font: 0/0 serif;
+z-index: -1;
+font: inherit;
+z-index: auto; 
+*/
+
+/*** Seiten-Einrichtung ***
+    * erste Seite *
+@page :first { 
+    margin-top: 4cm; 
+}
+    * linke Seite *
+@page :left  { 
+    margin-right: 2.5cm; 
+}
+    * rechte Seite *
+@page :right { 
+    margin-left: 2.5cm; 
+}
+    * Leerseite *
+@page :blank {
+    body { content: "Diese Seite wurde absichtlich leer gelassen." }
+}
+*/
+
+
+/* @media print {} */
+@media print {
+
+/**************************************************/
+/* A4 Hochformat, Ränder: oben rechts unten links */
+@page { 
+    size: A4 landscape;
+    size: A4 portrait;
+    margin: 1.5cm 1cm 1cm 1cm; 
+}
+
+/* Hintergrund ausblenden, Schrift schwarz */
+* {
+    background-color: transparent;
+    Xcolor: black;
+}
+
+/* Elemente ausblenden */
+.noprint,
+tfoot,
+nav,
+footer {
+    display: none;
+}
+
+/* Elemente einblenden */
+.onlyprint {
+    display: block;
+}
+
+/* Linkziel ausblenden, wird durch bootstrap angezeigt */
+a[href]:after {
+    content: none !important;
+}
+a:hover, a:active, a:link, a:visited {
+    color: black;
+}
+
+/* Hauptfenster zwei-spaltig, ein-zeilig */
+div.main-detail {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1;
+    justify-self: unset;
+    justify-content: center;
+    justify-items: center;
+    align-self: unset;
+    align-content: unset;
+    align-items: flex-start;
+    gap: 1em;
+    padding: 12px;
+    padding-bottom: 0;
+}
+
+/* Hintergrund/Umrandung entfernen */
+table.detail-pic,
+div.detail-pic,
+div.detail-thumb,
+div.detail-thumb_akt {
+    background-color: unset;
+    border: unset;
+    border-radius: unset;
+}
+
+/* aktives Bild */
+div.detail-pic {
+    border: 1px solid hsl(0,0%,65%);
+    border-radius: .2em;
+}
+
+/* Markierung aktiver Thumb */
+div.detail-thumb_akt {
+    border-bottom: 1px dashed hsl(0, 0%, 65%);
+}
+
+/* Bild-Hover Effekte entfernen */
+div.detail-pic:hover, 
+div.detail-pic:focus,
+div.detail-pic:active,
+div.detail-thumb:hover, 
+div.detail-thumb:focus,
+div.detail-thumb:active {
+    background-color: unset;
+    box-shadow: none;
+    transition: none;
+}
+
+
+/*
+.btn {
+    margin-top: 30px;
+    background-color: #f0f0f0;
+}
+
+
+div.fuss {
+    display: grid;
+    grid-template-rows: unset;
+    grid-template-columns: auto auto;
+    justify-self: right;
+    justify-content: unset;
+    justify-items: unset;
+    align-self: unset;
+    align-content: unset;
+    align-items: unset;
+    gap: 4em;
+    padding: 12px 12px;
+    text-wrap: nowrap;
+}
+*/
+
+
+/* CSS2 selector to add visible href after links. */
+/*
+#content a:link:after, #content a:visited:after {
+    content: " (" attr(href) ") ";
+    font-size: 0.8em;
+    font-weight: normal;
+}
+*/
+
+td.fid {
+    color:hsl(0, 0%, 80%); 
+    font-size: 80%;
+    font-style: italic; 
+    padding-top: 15px;
+}
+
+/*** Übersichts-Seite ***/
+
+/* Elemente ausblenden */
+div.navi {
+    display: none;
+}
+/* Tabellen-Navi einzeilig halten */
+/*
+div.navi {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: min-content auto min-content auto;
+    gap: 1em;
+    padding: 18px 12px;
+    padding-left: 0px;
+    margin-bottom: 40px;
+}*/
+div.navi_seitenwahl {
+    order: 1;
+}
+div.navi_seitenanzeige {
+    order: 2;
+}
+div.navi_themenwahl {
+    order: 3;
+}
+div.navi_suche {
+    order: 4;
+}
+
+tr.row-body:hover,
+tr.row-body:focus, 
+tr.row-body:active {
+    background-color: unset;
+    border-left: unset;
+    border-right: unset;
+    border-radius: unset;
+}
+
+tr.row-body:nth-child(even) {
+    background-color: unset;
+}
+
+[href]:hover,
+[href]:focus,
+[href]:active {
+    background-color: transparent;
+}
+
+.idx {
+    display: none;
+}
+
+div.thumb-grid, div.detail-thumb-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 0.5em;
+    justify-items: center;
+    align-items: center;
+}
+
+
+}

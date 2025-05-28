@@ -1,0 +1,157 @@
+<?php
+require_once __DIR__.'/Auth.php';
+require_once __DIR__.'/Header.php';
+require_once __DIR__.'/Footer.php';
+
+
+class Logout
+{
+    /***********************
+     * Anzeige der Webseite
+     */
+    public static function show()
+    {
+        // Datenbank öffnen
+        if (!is_object(self::$pdo)) {
+            self::$pdo = Database::connect_mariadb();
+        }
+
+        self::data_preparation();
+
+        Header::show();
+        self::site_output();
+        Footer::show("auth");
+
+        // Datenbank schließen
+        self::$pdo = Null;
+    }
+
+
+    /***********************
+     * Klassenvariablen / Eigenschaften
+     */
+    public static $pdo;
+    private static $showForm;
+    private static $root_site;
+    private static string $status_message;
+
+
+    private static function data_preparation()
+    {
+        $pdo = self::$pdo;
+        $success_msg = "";
+
+        // Herkunftsseite speichern
+        $return2 = ['index', 'index2', 'details', 'login', 'email'];
+        if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
+            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
+            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
+            $fn_referer = pathinfo($referer)['filename'];
+            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
+            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
+                ? $referer
+                : $_SESSION['main'];
+        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
+            // wenn nix gesetzt ist, auf Standard index.php verweisen
+            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
+        }
+        unset($return2, $referer, $fn_referer);
+
+
+        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
+
+        // Nutzer nicht angemeldet? Dann weg hier ...
+        if (!Auth::is_checked_in()) {
+            #Auth::check_user();
+            #if (!Auth::is_checked_in()) {
+                header("location: {$_SESSION['lastsite']}");
+                exit;
+            #}
+        }
+
+        $showForm = True;
+        $root_site = $_SESSION['rootdir'].'/'.basename($_SESSION['main']);
+        $userid = (int)$_SESSION['userid'];
+        $identifier = (!empty($securitytoken_row['identifier'])) ? htmlspecialchars($securitytoken_row['identifier'], ENT_QUOTES) : '';
+
+        // Logoutformular empfangen
+        if(isset($_GET['logout']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
+
+            if(isset($_POST['logout_all'])) {
+                $stmt0 = "UPDATE site_login SET login=NULL, autologin = NULL
+                    WHERE userid = :userid AND (login = 1 && autologin = 1) AND identifier != :ident";
+                try {
+                    $qry = $pdo->prepare($stmt0);
+                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                    $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
+                    $qry->execute();
+                } catch(PDOException $e) {die($e->getMessage().': settings.inc_del-autologin');}
+                $success_msg = "Alle meine anderen Autologins beendet.";
+            }
+            else {}
+
+            Auth::logout($_SESSION['lastsite']);
+            #logout();
+
+            $success_msg = "Du bist abgemeldet";
+            $showForm = False;
+
+            #header("location: {$_SESSION['lastsite']}");
+            #exit;
+
+        endif;
+
+
+        self::$root_site = $root_site;
+        #$error_msg = (!empty($error_arr))
+        #    ? implode("<br>", $error_arr)
+        #    : "";
+        #self::$showForm = ($error_msg === "") ? True : False;
+        self::$showForm = $showForm;
+        self::$status_message = status_out($success_msg, $error_msg);
+    }
+
+
+
+    private static function site_output()
+    {
+        $showForm = self::$showForm;
+        $root_site = self::$root_site;
+        $status_message = self::$status_message;
+
+        $output = "
+            <div class='container small-container-330 form-signin'>
+            <h2 class='form-signin-heading'>Abmelden</h2>";
+
+        #$output .= statusmeldung_ausgeben();
+        $output .= $status_message;
+
+        // Seite anzeigen
+        if ($showForm):
+            $output .= "
+                <form action='?logout' method='POST'>
+                <br>";
+
+            if (!empty($_SESSION['autologin'])):
+                $output .= "
+                    <div class='checkbox' style='padding-top: 15px;'>
+                    <label>
+                    <input type='checkbox' name='logout_all' value='1' autocomplete='off'> geräteübergreifend alle meine Anmeldungen beenden (Grand Logout)
+                    </label>
+                    </div>";
+            endif;
+            $output .= "
+                <button class='btn btn-lg btn-primary btn-block' style='margin-top: 20px;' type='submit'>Logout</button>
+                </form>";
+        else:
+            $output .= "
+                <br><br><hr><br>
+                <div><form action=".$root_site." method='POST'>
+                <button class='btn btn-lg btn-primary btn-block' type='submit'>Startseite</button>
+                </form></div>";
+        endif;
+        $output .= "</div>";
+
+        echo $output;
+    }
+}

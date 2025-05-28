@@ -1,0 +1,193 @@
+/* Header-Menü allgemein
+*/
+
+/* noch zu überarbeiten.. Farbe in Farbschemas */
+.navbar-inverse .navbar-brand {
+    font-size: 2em;
+    color: #fff;
+    Xcolor: #9d9d9d;
+    Xcolor: #ccc;
+    font-size: 20px;
+    letter-spacing:.05em;
+    font-weight:200px;
+}
+.navbar-inverse .navbar-brand:hover {
+    Xcolor: #ccc;
+    color: #fff;
+    text-decoration: none;
+}
+.navbar-inverse .navbar-nav>li>
+a.active,
+a.active:link,
+a.active:visited,
+a.active:active,
+a.active:focus {
+    color: #ccc;
+    text-decoration: overline #337ab7;
+}
+.navbar-inverse .navbar-nav>li>
+a.active:hover,
+a.change:hover {
+    color: #fff;
+}
+
+/* a.change,
+a.change:link,
+a.change:visited,
+a.change:active,
+a.change:focus,
+a>*.change */
+.navbar-inverse .navbar-nav>li>
+*.change {
+    color: khaki;
+}
+.navbar-brand .logo {
+    color: #5cb85c;
+}
+.navbar-inverse {
+    margin-bottom: 0px;
+}
+
+.menu-content {
+    max-height: 0;
+    overflow: hidden;
+    Xfont-family: 'Oswald', sans-serif;
+    Xpadding: 0px;
+}
+.collapsible-menu {
+    background-color: rgb(255, 255, 255);
+    background-color: transparent;
+    Xpadding: 0px 30px;
+    Xborder-bottom: 3px solid #CDE700;
+    Xbox-shadow: 1px 2px 3px rgba(0,0,0,0.2);
+    color: #d9d9d9;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .25);
+}
+.collapsible-menu label {
+    Xfont-family: 'Sedgwick Ave Display', cursive;
+    Xfont-size: 56px;
+    display: block;
+    cursor: pointer;
+    margin: 0;
+    padding: 10px 15px;
+    max-width: 50%;
+    Xbackground: url(menu.png) no-repeat left center;
+}
+.collapsible-menu label,
+.navbar-inverse .navbar-nav>li>a{
+letter-spacing: .05em
+}
+.collapsible-menu label:hover {
+    color: #fff;
+}
+
+.menu-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+.menu-content a {
+    display:block;
+    padding: 0px 0px 10px 40px;
+    line-height: 20px;
+    text-decoration: none;
+    color: #d9d9d9;
+}
+.menu-content a:active,
+.menu-content a:focus {
+    color: #ccc;
+    background-color: transparent;
+    border-radius: 2px;
+    outline-offset: 2px;
+    outline: thin dotted;
+    outline: none;
+}
+.navbar-inverse .navbar-nav>li>a:hover,
+.menu-content a:hover {
+    color: #fff;
+    background-color: transparent;
+}
+
+input#menu {
+    display: none;
+}
+
+/* Toggle Effect */
+input#menu:checked ~ label {
+    font-style: italic;
+    color: #ccc;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+input#menu:checked ~ .menu-content {
+    max-height: 100%;
+}
+
+.collapsible-menu label::after {
+    content: "Konto";
+    padding-left: 10px;
+}
+.menu-content .konto::after{
+    content: "Einstellungen";
+}
+a .login_self::after{
+    content: "Anmelden";
+}
+a .login_link::after{
+    content: "Anmelden";
+}
+
+/* 768px */
+@media (min-width: 768px) {
+.collapsible-menu label {
+    padding: 15px 10px 0 10px;
+    margin: 0 10px;
+}
+input#menu:checked ~ label {
+    padding-bottom: 0px;
+}
+.menu-content {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.menu-content li {
+    float: left;
+    margin-right: 20px;
+}
+.menu-content a {
+    padding: 5px 0px;
+}
+
+.collapsible-menu label::after {
+    content: '';
+}
+.menu-content .konto::after{
+    content: "Konto";
+}
+a .login_self::before{
+    content: "Anmelden";
+    padding: 0 10px 0 0;
+}
+a .login_self::after{
+    content: "";
+}
+a .login_link::after{
+    content: '';
+}
+}
+
+
+
+
+/* Button als <a href=''> (statt $_GET dann $_POST)
+     a:link, button.class {}, and a:hover, button.class:hover {}
+*/
+button.lnk {
+    border: 0;
+    padding: 0;
+    display: inline;
+    background: transparent;
+    text-decoration: none;
+}
+button.lnk:hover {
+    cursor: pointer;
+}

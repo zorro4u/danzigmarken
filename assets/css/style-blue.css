@@ -1,0 +1,162 @@
+/* Header-Menü umstylen
+    anthrazit -> dunkelblau
+*/
+/*
+# - hsl
+265a88 208 56 34 1
+337ab7 208 56 46
+245580 208 56 32
+204d74 208 57 29
+2e6da4 208 56 41
+203165 225 52 26
+b0b0b0 0 0 69
+950000 0 100 29
+9d9d9d 0 0 62  -->  d9d9d9 0 0 85
+
+203165 225 52 26
+3450a3 225 52 42
+2b479b 225 57 39
+
+
+0044cc 220 100 40
+003399 220 100 30
+ccddff 220 100 90
+f0f5ff 220 100 97
+004ce6 220 100 45
+
+
+a.upArrow::after color
+a.active color
+[href].site:hover color
+td.site:hover bg-color
+tr.row-body:hover bg-color, border
+a. color
+div.detail-thumb_akt border
+*/
+
+
+.navbar-inverse {
+background-image: linear-gradient(to bottom, hsl(225,52%,42%) 0, hsl(225,52%,26%) 100%);
+border-color: hsl(225,52%,26%);
+}
+.navbar-inverse .navbar-toggle {
+border-color: hsl(225,52%,38%);
+border: 1px solid transparent;
+}
+.navbar-inverse .navbar-toggle:focus {
+background-color: transparent;
+}
+.navbar-inverse .navbar-toggle:hover {
+background-color: hsl(225,57%,39%);
+border-color: hsl(225,57%,37%);
+}
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+border-color: hsl(225,52%,26%);
+}
+.navbar-inverse .navbar-nav>li>a,
+.collapsible-menu label {
+color: hsl(0,0%,85%);
+}
+.navbar-inverse .navbar-nav>li>a.active {
+    color: #fff;
+    text-decoration: overline hsl(0,100%,40%);
+    text-shadow: none;
+}
+.navbar-inverse .navbar-nav>li>a:hover,
+.collapsible-menu label:hover,
+.menu-content a:hover {
+    color: khaki;
+    background-color: transparent;
+}
+
+/* die großen Buttons */
+.btn-primary {
+background-image: linear-gradient(to bottom, hsl(225,52%,55%) 0, hsl(225,52%,35%) 100%);
+background-color: hsl(225,52%,42%);
+border-color: hsl(225,52%,50%);
+}
+.btn-primary:focus,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:active:focus,
+.btn-primary:active:hover {
+background-color: hsl(225,52%,35%);
+border-color: hsl(225,52%,40%);
+}
+
+a {
+    color: hsl(225,52%,50%);
+}
+a:active,
+a:focus,
+a:hover {
+    color: hsl(225,52%,35%);
+    text-decoration: none;
+}
+.navbar div a i {
+    Xcolor: hsl(0,0%,80%);
+}
+.navbar div a i:hover {
+    Xcolor: #fff;
+}
+a.upArrowX::after {
+    color: hsl(225,52%,45%);
+}
+a.dnArrowX::after {
+    color: hsl(225,52%,45%);
+}
+/* Seitenzahl aktuelle */
+a.active {
+    color: hsl(225,52%,45%);
+}
+a.active:active,
+a.active:focus,
+a.active:hover {
+    color: hsl(225,52%,45%);
+    text-decoration: none;
+}
+/* Seitenzahl andere, Link */
+[href].site:active,
+[href].site:focus,
+[href].site:hover {
+    color: hsl(225,52%,35%);
+}
+/* aktueller Thumb im Thumb-Grid */
+div.detail-thumb_akt {
+    border-color: hsl(225,100%,45%);
+}
+/*
+
+td.site:hover {
+    bg-color:
+}
+tr.row-body:hover {
+    bg-color:
+    border:
+}
+
+*/
+
+
+/* Druck Demo */
+button.print_version {
+    padding: 8px 14px;
+    background-color: #000000;
+    border: 1px solid #000000;
+    border-radius: 0;
+    color: #ffffff;
+    transition: background-color .5s, color .5s;
+}
+button.print_version:hover,
+button.print_version:active,
+button.print_version:focus {
+    background-color: transparent;
+    color: #000000;
+}
+
+td.fid {
+    color:hsl(0, 0%, 80%);
+    font-size: 80%;
+    padding-top: 8px;
+}
