@@ -10,7 +10,7 @@
 
 Eine `php` `html/css` - 'self made' - Seite.
 Es wird größtenteils auf `js` verzichtet.
-Die Bilder liegen im Pfad `/data` jeweils in verschiedlichen Web-Größen vor.
+Die Bilder liegen im Pfad `/data` jeweils in verschiedenen Web-Größen vor.
 
 Projekt entwickelt sich im 'lerning-by-doing' Modus.
 Nächster Akt ist vielleicht ein Framework auszuprobieren.
