@@ -1,12 +1,19 @@
 <?php
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->RegSeite-->email(AktLink)-->dieseSeite:ActivateSeite-->Login */
+namespace Dzg\Cls;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
+// Datenbank- & Auth-Funktionen laden
+#require_once __DIR__.'/Database.php';
+#require_once __DIR__.'/Auth.php';
+#require_once __DIR__.'/Tools.php';
+require_once __DIR__.'/Header.php';
+require_once __DIR__.'/Footer.php';
 
-
+use PDO, PDOException;
+use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
 
 /***********************
  * Summary of Activate
@@ -72,7 +79,7 @@ class Activate
 
         // Übergabewert auf Plausibilität prüfen
         if (isset($_GET['code'])) {
-            $input_code = htmlspecialchars(clean_input($_GET['code']));
+            $input_code = htmlspecialchars(Tools::clean_input($_GET['code']));
             $error_msg = "";
 
             // Code prüfen (nur alphanumerisch)
@@ -128,7 +135,7 @@ class Activate
         }
 
         $showForm = ($success_msg !== "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

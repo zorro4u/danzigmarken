@@ -1,11 +1,12 @@
 <?php
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+namespace Dzg\Mail;
 
 require __DIR__.'/PHPMailer/PHPMailer.php';
 require __DIR__.'/PHPMailer/Exception.php';
-require __DIR__.'/PHPMailer/SMTP.php';
+#require __DIR__.'/PHPMailer/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 
 /***********************

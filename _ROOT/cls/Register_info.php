@@ -1,5 +1,6 @@
 <?php
 /* Prozess: dieseSeite:RegInfo-->email(Admin)-->email(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
+namespace Dzg\Cls;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -14,6 +15,10 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Kontakt.php';
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
+
+use Dzg\Cls\{Database, Auth, Tools, Kontakt, Header, Footer};
+use Dzg\Mail\{Mailcfg, Smtp};
+use PDO, PDOException;
 
 
 
@@ -114,7 +119,7 @@ class Register_info
                 $regex_name = "/^[a-zA-ZäüößÄÜÖ]+([a-zA-ZäüößÄÜÖ]|[ -](?=[a-zA-ZäüößÄÜÖ])){0,50}$/";
                 $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^a-zA-ZäüößÄÜÖ -]+|[- ]{2,}|[^a-zA-ZäüößÄÜÖ]+$/";
 
-                $input_name = isset($_POST['name']) ? htmlspecialchars(clean_input($_POST['name'])) : "";
+                $input_name = isset($_POST['name']) ? htmlspecialchars(Tools::clean_input($_POST['name'])) : "";
                 if ($input_name !== "" && preg_match_all($regex_name_no, $input_name, $match))
                     $error_msg []= 'nur Buchstaben im Namen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
                 else {
@@ -130,7 +135,7 @@ class Register_info
                     }
                 }
                 // Email
-                $input_email = isset($_POST['email']) ? htmlspecialchars(clean_input($_POST['email'])) : "";
+                $input_email = isset($_POST['email']) ? htmlspecialchars(Tools::clean_input($_POST['email'])) : "";
                 if ($input_email === "")
                     $error_msg []= 'Email angeben.';
                 elseif (!filter_var($input_email, FILTER_VALIDATE_EMAIL))
@@ -141,7 +146,7 @@ class Register_info
                 $regex_mess_no = "/[^\w\s\t\r\n ×÷=<>:;,!@#€%&§`´~£¥₩₽° •○●□■♤♡◇♧☆▪︎¤《》¡¿♠︎♥︎◆♣︎★±≈≠≡【〔「『】〕」』¡№٪‰–—‽· \\\\\^\$\.\|\?\*\+\-\(\)\[\]\{\}\/\"\']/mu";
 
                 $input_message_first = $_POST['message'];   // wird nicht weiter verwendet
-                $input_message = isset($_POST['message']) ? clean_input($_POST['message']) : "";
+                $input_message = isset($_POST['message']) ? Tools::clean_input($_POST['message']) : "";
                 $input_message = preg_replace("/\r\r|\r\n|\n\r|\n\n|<br>/","\n", $input_message);
                 if ($input_email !== "" && preg_match_all($regex_mess_no, $input_message, $match))
                     $error_msg []= 'Die Nachricht verwendet unzulässige Zeichen: "'.htmlentities(implode(" ", $match[0])).'"';
@@ -164,7 +169,7 @@ class Register_info
                 $pwcode_endtime = time() + 3600*24*30;  // 4 Woche gültig
 
                 // Links für Email-Versand erzeugen
-                $reg_url = getSiteURL().'register.php?code='.$reg_code;
+                $reg_url = Tools::getSiteURL().'register.php?code='.$reg_code;
                 $reg_link = 'register.php?code='.$reg_code;     // intern
 
                 $input_usr_temp = $input_vor."_dummy_";
@@ -308,18 +313,18 @@ class Register_info
         $pre_email = "";
         $pre_usr = "";
         if (isset($_GET['email']))
-            $pre_email = htmlspecialchars(clean_input($_GET['email']));
+            $pre_email = htmlspecialchars(Tools::clean_input($_GET['email']));
         elseif ($input_email != "")
             $pre_email = $input_email;
         elseif(isset($_GET['usr']))
-            $pre_usr = htmlspecialchars(clean_input($_GET['usr']));
+            $pre_usr = htmlspecialchars(Tools::clean_input($_GET['usr']));
         elseif ($input_name != "")
             $pre_usr = $input_name;
 
 
 
         $showForm = ($error_msg === "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

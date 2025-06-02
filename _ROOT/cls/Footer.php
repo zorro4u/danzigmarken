@@ -1,6 +1,9 @@
 <?php
+namespace Dzg\Cls;
+
 include_once __DIR__.'/../inc/logged.inc.php';
 require_once __DIR__.'/Database.php';
+use Dzg\Cls\Database;
 
 /***********************
  * Summary of Footer

@@ -1,7 +1,12 @@
 <?php
-require_once __DIR__.'/Auth.php';
+namespace Dzg\Cls;
+
+#require_once __DIR__.'/includes/login.inc.php';
+#require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
+use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
+use PDO, PDOException;
 
 
 class Logout
@@ -108,7 +113,7 @@ class Logout
         #    : "";
         #self::$showForm = ($error_msg === "") ? True : False;
         self::$showForm = $showForm;
-        self::$status_message = status_out($success_msg, $error_msg);
+        self::$status_message = Tools::status_out($success_msg, $error_msg);
     }
 
 

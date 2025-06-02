@@ -1,4 +1,5 @@
 <?php
+namespace Dzg\Cls;
 
 class Starter
 {

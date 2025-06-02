@@ -1,15 +1,18 @@
 <?php
+namespace Dzg\Cls;
+
 // Datenbank- & Auth-Funktionen laden
-require_once __DIR__.'/Auth.php';
+#require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
+use Dzg\Cls\{Tools, Header, Footer};
 
 require __DIR__.'/../mail/Mailcfg.php';
 require __DIR__.'/../mail/Smtp.php';
 require __DIR__.'/../mail/AntiSpam.php';
-require __DIR__.'/../mail/rate_limiting.php';
-#require $_SERVER['DOCUMENT_ROOT'].'/kontakt/rate_limiting.php';
+require __DIR__.'/../mail/RateLimiting.php';
 #include $_SERVER['DOCUMENT_ROOT'].'/kontakt/PHPMailer/Secureimage.php';   // ?? dawid.golunski@outlook.com
+use Dzg\Mail\{Mailcfg, SMTP, AntiSpam, RateLimiting};
 
 
 /***********************
@@ -216,7 +219,7 @@ class Kontakt
                 $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^0-9a-zA-ZäüößÄÜÖ -._]+|[_.- ]{2,}|[^0-9a-zA-ZäüößÄÜÖ]+$/";
 
                 $input_name = isset($_POST['name'])
-                    ? htmlspecialchars(clean_input($_POST['name']))
+                    ? htmlspecialchars(Tools::clean_input($_POST['name']))
                     : "";
 
                 $regex = !preg_match($regex_name, $input_name, $match);
@@ -244,7 +247,7 @@ class Kontakt
 
                 // Email
                 $input_email = isset($_POST['email'])
-                    ? htmlspecialchars(clean_input($_POST['email']))
+                    ? htmlspecialchars(Tools::clean_input($_POST['email']))
                     : "";
                 if ($input_email !== "" &&
                     !filter_var($input_email, FILTER_VALIDATE_EMAIL))
@@ -258,7 +261,7 @@ class Kontakt
 
                 $input_message_first = $_POST['message'];   // wird nicht weiter verwendet
                 $input_message = isset($_POST['message'])
-                    ? clean_input($_POST['message'])
+                    ? Tools::clean_input($_POST['message'])
                     : "";
                 $input_message = preg_replace("/\r\r|\r\n|\n\r|\n\n|<br>/","\n", $input_message);
                 if ($input_email !== "" &&
@@ -290,7 +293,7 @@ class Kontakt
 
             // Anzahl der Seiten-Aufrufe begrenzen --> kontakt/rate_limiting/login.php
             if ($cfg['Aufrufe_limitieren']) {
-                rate_limiting();
+                RateLimiting::execute();
             }
 
 
@@ -491,7 +494,7 @@ class Kontakt
 
 
         $showForm = ($error_msg === "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

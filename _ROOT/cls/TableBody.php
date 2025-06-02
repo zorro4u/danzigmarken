@@ -1,6 +1,10 @@
 <?php
+namespace Dzg\Cls;
+
 require_once __DIR__.'/Table.php';
 require_once __DIR__.'/TableData.php';
+use Dzg\Cls\{Table, TableData};
+
 
 /***********************
  * Summary of TableBody
@@ -41,6 +45,7 @@ class TableBody
 
         if (empty($_SESSION['su'])) {
             unset($spaltennamen['gid']);
+            unset($spaltennamen['print']);
         }
 
         // Tabelle-Spaltenreihenfolge entspr. $spaltennamen
@@ -124,8 +129,6 @@ class TableBody
                             </a></th>";
                         }
 
-
-
                     // nicht aktiviert, initial aufsteigend, ohne Symbol
                     } else {
                         $link_up = "?col={$spalte_db}&dir=ASC";
@@ -146,7 +149,6 @@ class TableBody
 </form>
                             </a></th>";
                         }
-
                     }
 
                 } else {
@@ -184,7 +186,12 @@ class TableBody
         $is_checked_in = Auth::is_checked_in();
 
         if (!$is_checked_in) {
-            unset($spaltennamen['print'], $spaltennamen['fid']);
+            unset($spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
+        }
+
+        if (empty($_SESSION['su'])) {
+            unset($spaltennamen['gid']);
+            unset($spaltennamen['print']);
         }
 
         $output = "<tbody>";
@@ -229,31 +236,29 @@ class TableBody
                             <a class='akt-link2 box2 idx'
                             href=./details.php?id={$stamp[$id]}>{$stamp[$spalte_db]}</a></td>";
 
-                    // Druckoption
+                    // Druckoption, startet JS: prn_toogle()
                     } elseif ($spalte_db === 'print') {
                         $data = $stamp[$spalte_db];
                         $data_rev = ($data == 1) ? 0 : 1;      # switchen
                         $checked = ($data == 1) ? "checked" : "";
-                        # onclick='return false;' .. disabled='disabled'
+                        # onclick='return false;' .. disabled='disabled'  onclick='prn_toogle(".$stamp[$id].",".$data_rev.")'
+                        if (!empty($_SESSION['su'])) {
+                            $output .= "
+                                    <td class='data-cell' title='druck ja/nein'
+                                        style='text-align:center;'>
+                                    <input type='checkbox' name='{$spalte_db}' value='1'
+                                        id='print' class='chkbx' {$checked} onclick='prn_toogle(".$stamp[$id].",".$data_rev.")' />
+                                    <label for='print'></label></td>";
+                        } else {
+                            $output .= "
+                                    <td class='data-cell' title='druck ja/nein'
+                                        style='text-align:center;'>
+                                    <a class='akt-link2 box2' href=./details.php?id={$stamp[$id]}>
+                                    <input type='checkbox' name='{$spalte_db}' value='1'
+                                        id='print' class='chkbx0' {$checked} disabled='disabled'/>
+                                    <label for='print'></label></a></td>";
 
-                        $output .= "
-                                <td class='data-cell' title='druck ja/nein'
-                                    style='text-align:center;'>
-                                <input type='checkbox' name='{$spalte_db}' value='1'
-                                    id='print' class='chkbx' {$checked} onclick='prn_toogle(".$stamp[$id].",".$data_rev.")' />
-                                <label for='print'></label></td>";
-
-                        $output .= "
-                            <script>
-                            function prn_toogle(ID, PRN) {
-                                jQuery.ajax({
-                                    type: 'POST',
-                                    url: '/assets/tools/printoption.php',
-                                    data: {id: ID, prn: PRN}
-                                })
-                            }
-                            </script>
-                            ";
+                        }
 
                     // Ansicht
                     } elseif ($spalte_db == 'kat20') {
@@ -349,6 +354,19 @@ class TableBody
         if (count($stamps_db) > 10000) {
             $output .= "&nbsp;";  # Leerzeile, wird am Anfang statt Ende eingefügt ???
         }
+
+        // Script für PrintOption
+        $output .= "
+            <script>
+            function prn_toogle(ID, PRN) {
+                jQuery.ajax({
+                    type: 'POST',
+                    url: '/assets/inc/printoption.php',
+                    data: {id: ID, prn: PRN}
+                })
+            }
+            </script>
+            ";
 
         return $output;
     }

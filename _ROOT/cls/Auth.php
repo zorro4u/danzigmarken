@@ -1,4 +1,6 @@
 <?php
+namespace Dzg\Cls;
+
 /****************************
  * Funktionscontainer für den Anmelde- und Verifizierungsprozess
  *
@@ -19,6 +21,9 @@ require_once __DIR__.'/Database.php';
 include_once __DIR__.'/../inc/auth.password.func.php';
 include_once __DIR__.'/Tools.php';
 
+use PDO, PDOException;
+use Dzg\Cls\{Database, Tools};
+
 /*
  * Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
  * sonst Probleme zB. mit css Aufruf
@@ -30,51 +35,51 @@ $_SESSION['rootdir'] = Tools::rootdir();
 
 /* Funktionswrapper, wegen Kompatibilität zur alten Struktur
 */
-function login($userid) {
+function X_login($userid) {
     return Auth::login($userid);
 }
 
-function logout($target = '') {
+function X_logout($target = '') {
     Auth::logout($target);
 }
 
-function delete_autocookies() {
+function X_delete_autocookies() {
     Auth::delete_autocookies();
 }
 
-function delete_security_token() {
+function X_delete_security_token() {
     Auth::delete_security_token();
 }
 
-function plausi_check_autocookie(){
+function X_plausi_check_autocookie(){
     return Auth:: plausi_check_autocookie();
 }
 
-function securitytoken_holen($identifier, $token_hash){
+function X_securitytoken_holen($identifier, $token_hash){
     return Auth::securitytoken_holen($identifier, $token_hash);
 }
 
-function refresh_token($identifier, $token_hash, $token_timer) {
+function X_refresh_token($identifier, $token_hash, $token_timer) {
     Auth::refresh_token($identifier, $token_hash, $token_timer);
 }
 
-function check_user() {
+function X_check_user() {
     return Auth::check_user();
 }
 
-function is_checked_in() {
+function X_is_checked_in() {
     return Auth::is_checked_in();
 }
 
-function random_string() {
+function X_random_string() {
     return Auth::random_string();
 }
 
-function getSiteURL() {
+function X_getSiteURL() {
     return Tools::getSiteURL();
 }
 
-function arr2str($array){
+function X_arr2str($array){
     return Auth::arr2str($array);
 }
 
@@ -82,15 +87,15 @@ function remote_addr() {
     return Auth::remote_addr();
 }
 
-function clean_input($data) {
+function X_clean_input($data) {
     return Tools::clean_input($data);
 }
 
-function statusmeldung_ausgeben(){
+function X_statusmeldung_ausgeben(){
     return Tools::statusmeldung_ausgeben();
 }
 
-function status_out($msg_success, $msg_error, $exit_true=false) {
+function X_status_out($msg_success, $msg_error, $exit_true=false) {
     return Tools::status_out($msg_success, $msg_error, $exit_true);
 }
 

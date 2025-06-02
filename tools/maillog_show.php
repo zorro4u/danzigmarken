@@ -1,6 +1,7 @@
 <?php
 session_start();
 require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/Mailcfg.php";
+use Dzg\Mail\Mailcfg;
 
 // Überprüfen, ob der Benutzer eingeloggt ist
 if (isset($_SESSION['loggedin'])

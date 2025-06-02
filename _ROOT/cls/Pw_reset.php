@@ -1,5 +1,6 @@
 <?php
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
+namespace Dzg\Cls;
 
 // TODO: alle Autologins beenden
 
@@ -7,12 +8,14 @@ session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
-require_once __DIR__.'/includes/auth.func.php';
-require_once __DIR__.'/includes/register-info.inc.php';
+#require_once __DIR__.'/includes/auth.func.php';
+#require_once __DIR__.'/includes/register-info.inc.php';
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 
+use Dzg\Cls\{Database, Tools, Header, Footer};
+use PDO, PDOException;
 
 
 /***********************
@@ -92,7 +95,7 @@ class Pw_reset
 
         // Passcode prüfen
         } else {
-            $input_code = htmlspecialchars(clean_input($_GET['pwcode']));
+            $input_code = htmlspecialchars(Tools::clean_input($_GET['pwcode']));
 
             // Werte auf Plausibilität prüfen
             if ($input_code === "")
@@ -194,7 +197,7 @@ class Pw_reset
 
 
         $showForm = ($error_msg === "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

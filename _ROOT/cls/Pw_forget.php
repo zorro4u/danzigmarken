@@ -1,5 +1,6 @@
 <?php
 /* Prozess: dieseSeite:Forget-->email(Admin)/email(Code)-->ResetSeite-->Login */
+namespace Dzg\Cls;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -13,6 +14,9 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Kontakt.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 
+use Dzg\Cls\{Database, Auth, Tools, Kontakt, Header, Footer};
+use Dzg\Mail\{Mailcfg, Smtp};
+use PDO, PDOException, Exception;
 
 
 /***********************
@@ -85,7 +89,7 @@ class Pw_forget
 
             // Eingabeformular hat Daten mit $_POST gesendet
             if(isset($_POST['email'])) {
-                $input_email = htmlspecialchars(clean_input($_POST['email']));
+                $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
 
                 // Email auf Plausibilität prüfen
                 if (!filter_var($input_email, FILTER_VALIDATE_EMAIL))
@@ -114,7 +118,7 @@ class Pw_forget
                     $pwcode_hash = sha1($pwcode);
                     $pwcode_endtime = time() + 3600*24*2;  // gültig für 2 Tage
                     $pwcode_endtime_str = date("d.m.y H:i", $pwcode_endtime);
-                    $pwcode_url = getSiteURL().'pwreset.php?pwcode='.$pwcode;
+                    $pwcode_url = Tools::getSiteURL().'pwreset.php?pwcode='.$pwcode;
 
                     $stmt = "UPDATE site_users
                         SET pwcode_hash = :pwcode_hash, pwcode_endtime = :pwcode_endtime, notiz = :notiz
@@ -243,12 +247,12 @@ class Pw_forget
         // Wert für das Vorausfüllen des Login-Formulars
         $pre_email = "";
         if (isset($_GET['email']))
-            $pre_email = htmlspecialchars(clean_input($_GET['email']));
+            $pre_email = htmlspecialchars(Tools::clean_input($_GET['email']));
         elseif (!empty($input_email))
             $pre_email = $input_email;
 
         $showForm = ($error_msg === "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

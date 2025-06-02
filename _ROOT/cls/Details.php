@@ -1,8 +1,13 @@
 <?php
+namespace Dzg\Cls;
+
 // Datenbank- & Auth-Funktionen laden
-require_once __DIR__.'/Auth.php';
+#require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
+
+use PDO, PDOException;
+#use Dzg\Cls\{Database, Auth Header, Footer};
 
 /*
 -- MVC Design --
@@ -694,7 +699,7 @@ class Details
             : "";
 
         self::$showForm = ($error_msg === "") ? True : False;
-        self::$status_message = status_out($success_msg, $error_msg);
+        self::$status_message = Tools::status_out($success_msg, $error_msg);
 
     }
 
@@ -797,18 +802,6 @@ class Details
                         <label for='print' ></label></td></tr></tfoot>"
                     : "";
 
-                $output .= "
-                    <script>
-                    function prn_toogle(ID, PRN) {
-                        jQuery.ajax({
-                            type: 'POST',
-                            url: '/assets/tools/printoption.php',
-                            data: {id: ID, prn: PRN}
-                        })
-                    }
-                    </script>
-                    ";
-
             // ab hier die Infos für alle zugänglich
             // Ansicht, mit Linie oberhalb
             } elseif ($spalte_web === 'Ansicht') {
@@ -855,7 +848,7 @@ class Details
                     htmlspecialchars($stamps[$akt_file_idx]['medium']).
                     "' title='größere Ansicht'><img src='/".
                     htmlspecialchars($stamps[$akt_file_idx]['small']).
-                    "' width='300' height='' alt='/".
+                    "' width='300' height='' alt='".
                     htmlspecialchars($stamps[$akt_file_idx]['name'])."'></a>";
 
         #    } elseif ($_SESSION['userid']!=3 && empty($_SESSION['su'])) {
@@ -864,7 +857,7 @@ class Details
                     htmlspecialchars($stamps[$akt_file_idx]['large']).
                     "' title='große Ansicht'><img src='/".
                     htmlspecialchars($stamps[$akt_file_idx]['small']).
-                    "' width='300' height='' alt='/".
+                    "' width='300' height='' alt='".
                     htmlspecialchars($stamps[$akt_file_idx]['name'])."'></a>";
 
             }
@@ -1030,7 +1023,20 @@ class Details
         $output .= '</div>';   # ende < /content detail >
         $output .= '</div>';   # ende < /grid-container-detail >
 
+        $output .= "
+            <script>
+            function prn_toogle(ID, PRN) {
+                jQuery.ajax({
+                    type: 'POST',
+                    url: '/assets/inc/printoption.php',
+                    data: {id: ID, prn: PRN}
+                })
+            }
+            </script>
+            ";
+            
         endif;  // Seite anzeigen
+
 
 
         ///////////////////////////////////////////////////

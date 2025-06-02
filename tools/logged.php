@@ -5,18 +5,22 @@ error_reporting(E_ERROR | E_PARSE);
 
 header('Content-type: text/html; charset=utf-8');
 
+
 // das Log-Protokoll anzeigen, ggf kürzen
 // wird in admin.php aufgerufen
 // wurde in assets/inc/logged.inc.php via functions/Footer.php angelegt
 
 #require_once __DIR__.'/../auth/includes/auth.database.func.php';     // log-Database: $pdo
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Database.php';     // log-Database
+use Dzg\Cls\Database;
 
 // Nutzer nicht angemeldet? Dann weg hier ...
 if (!isset($_SESSION['userid'])) {
     header("location: /auth/login.php");
     exit;
 }
+
+$pdo = Database::connect_mariadb();
 
 // nur bei Seitenaufruf über admin.php anzeigen
 //

@@ -3,9 +3,9 @@ session_start();
 date_default_timezone_set('Europe/Berlin');
 
 // Datenbank- & Auth-Funktionen laden
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Auth.php";
+#require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Auth.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Header.php";
-
+use Dzg\Cls\{Database, Auth, Tools, Header};
 
 // Seite anzeigen
 PrintView::show();
@@ -334,7 +334,7 @@ class PrintView
             : "";
 
         self::$showForm = ($error_msg === "") ? True : False;
-        self::$status_message = status_out($success_msg, $error_msg);
+        self::$status_message = Tools::status_out($success_msg, $error_msg);
     }
 
 

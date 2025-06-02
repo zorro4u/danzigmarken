@@ -1,9 +1,9 @@
 <?php
 // wird in Footer.php aufgerufen
+date_default_timezone_set('Europe/Berlin');
 
 require_once __DIR__.'/../cls/Database.php';
-#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
-date_default_timezone_set('Europe/Berlin');
+use Dzg\Cls\Database;
 
 // Test auf Heimnetz
 $remaddr = $_SERVER['REMOTE_ADDR'];
@@ -28,6 +28,8 @@ $debug = (strpos($workingpath, "/_prepare") !== False) ? True : False;
 
 // SQL-Abfrage geht nicht bei MariaDB.NAS
 if ($debug === False) {
+
+    $pdo = Database::connect_mariadb();
 
     $ip = $_SERVER['REMOTE_ADDR'];
     #$datum = date('Y-m-d H:i:s');  // wird in der DB gesetzt
@@ -87,4 +89,6 @@ if ($debug === False) {
 
         $qry->execute($data);
     } catch(PDOException $e) {die($e->getMessage().': logged.inc');}
+
+    $pdo = Null;
 }

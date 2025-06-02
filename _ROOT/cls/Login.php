@@ -1,8 +1,12 @@
 <?php
+namespace Dzg\Cls;
+
 #require_once __DIR__.'/includes/login.inc.php';
-require_once __DIR__.'/Auth.php';
+#require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
+use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
+use PDO, PDOException, Exception;
 
 
 class Login
@@ -92,7 +96,7 @@ class Login
             if(isset($_POST['email'], $_POST['passwort'])) {
 
                 // Eingabeformular hat Daten mit $_POST gesendet
-                $input_email1 = htmlspecialchars(clean_input($_POST['email']));
+                $input_email1 = htmlspecialchars(Tools::clean_input($_POST['email']));
                 $input_pwNEU1 = $_POST['passwort'];
                 $input_usr = "";
 
@@ -238,7 +242,7 @@ class Login
                             if ($usr_data['status'] === "activated") $_SESSION['status'] = "activ"; else unset($_SESSION['status']);
                             */
                             // Hole Datensatz und logge ein
-                            [$usr_data, $autologin, $error_msg] = login($userid);
+                            [$usr_data, $autologin, $error_msg] = Auth::login($userid);
                             # [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();  // zentrale Werte-Array setzen
 
                             $success_msg = "Du bist angemeldet";
@@ -267,7 +271,7 @@ class Login
         $user_value = "";
         if(isset($_GET['usr']) || $input_usr !== "") {
             isset($_GET['usr'])
-                ? $user_value = htmlspecialchars(clean_input($_GET['usr']))
+                ? $user_value = htmlspecialchars(Tools::clean_input($_GET['usr']))
                 : $user_value = $input_usr;
         } else {
             if($input_email1 !== "")
@@ -282,7 +286,7 @@ class Login
         #self::$showForm = $showForm;
         #self::$showForm = ($error_msg === "") ? True : False;
         self::$showForm = ($success_msg === "") ? True : False;
-        self::$status_message = status_out($success_msg, $error_msg);
+        self::$status_message = Tools::status_out($success_msg, $error_msg);
         self::$user_value = $user_value;
         self::$input_email1 = $input_email1;
         self::$input_usr = $input_usr;

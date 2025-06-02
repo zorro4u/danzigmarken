@@ -1,14 +1,17 @@
 <?php
+/* Prozess: admin:-->dieseSeite:RegPre (statt:RegInfo) [-->(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login] */
+
+namespace Dzg\Cls;
+
 session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
+#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
-
-
-/* Prozess: admin:-->dieseSeite:RegPre (statt:RegInfo) [-->(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login] */
+use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
+use PDO, PDOException, Exception;
 
 
 Register_pre::show();
@@ -111,7 +114,7 @@ class Register_pre
             $input_email = $reg_code."@dummy.de";
 
             // Links für Email-Versand erzeugen
-            $reg_url = getSiteURL().'register.php?code='.$reg_code;
+            $reg_url = Tools::getSiteURL().'register.php?code='.$reg_code;
             $reg_link = 'register.php?code='.$reg_code;     // intern
 
             $status = $reg_code;
@@ -142,7 +145,7 @@ class Register_pre
 
         $showForm = ($showForm === True && $_SESSION['su'] === True) ? True : False;
         #$showForm = ($error_msg === "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

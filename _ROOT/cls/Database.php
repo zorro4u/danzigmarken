@@ -1,4 +1,7 @@
 <?php
+namespace Dzg\Cls;
+use PDO, PDOException, Exception;
+
 date_default_timezone_set('Europe/Berlin');
 
 // Unterverzeichnis für debug- / Entwicklungs-Mode / NAS-Server
@@ -12,10 +15,10 @@ if (strpos(__DIR__, $debug) !== False) {
 /***********************
  * global: Datenbankverbindung aufbauen
  */
-$pdo = Database::connect_mariadb();   // PW-DB
+#$pdo = Database::connect_mariadb();
 
 
-function version() {return Database::version();}
+function X_version() {return Database::version();}
 
 
 

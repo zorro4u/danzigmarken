@@ -1,4 +1,6 @@
 <?php
+namespace Dzg\Mail;
+
 date_default_timezone_set('Europe/Berlin');
 
 Mailcfg::load();

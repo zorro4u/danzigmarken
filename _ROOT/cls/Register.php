@@ -1,16 +1,19 @@
 <?php
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->dieseSeite:RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
+namespace Dzg\Cls;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
+#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Kontakt.php';
-
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 
+use Dzg\Cls\{Database, Auth, Tools, Kontakt, Header, Footer};
+use Dzg\Mail\{Mailcfg, Smtp};
+use PDO, PDOException, Exception;
 
 
 /***********************
@@ -81,7 +84,7 @@ class Register
         }
         unset($return2, $referer, $fn_referer);
 
-        
+
         /*
         * Seitenaufruf mit Registrierungscode
         */
@@ -97,7 +100,7 @@ class Register
         if (!isset($_GET['code'])) {
             $error_msg = "Es fehlt ein gültiger Registrierungs-Link. <br>Wende dich dafür an den Seitenbetreiber.";
         } else {
-            $input_code = htmlspecialchars(clean_input($_GET['code']));
+            $input_code = htmlspecialchars(Tools::clean_input($_GET['code']));
 
             // Plausi-Check
             if ($input_code === "")
@@ -148,8 +151,8 @@ class Register
                 $regex_email = "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
                 $regex_pw = "/^[\w<>()?!,.:_=$%&#+*~^ @€µäüößÄÜÖ]{1,100}$/";
 
-                $input_usr = strtolower(htmlspecialchars(clean_input($_POST['username'])));
-                $input_email = htmlspecialchars(clean_input($_POST['email']));
+                $input_usr = strtolower(htmlspecialchars(Tools::clean_input($_POST['username'])));
+                $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
                 $input_pw1 = $_POST['passwort'];
                 $input_pw2 = $_POST['passwort2'];
 
@@ -249,7 +252,7 @@ class Register
                     $pwcode_endtime = time() + 3600*24*30;  // 4 Woche Frist für Code
 
                     // Links für Email-Versand erzeugen
-                    $activate_url = getSiteURL().'activate.php?code='.$act_code;
+                    $activate_url = Tools::getSiteURL().'activate.php?code='.$act_code;
                     $activate_link = 'activate.php?code='.$act_code;  // intern
 
                     $status = $act_code;
@@ -389,7 +392,7 @@ class Register
 
 
         #$showForm = ($error_msg === "") ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         self::$showForm = $showForm;

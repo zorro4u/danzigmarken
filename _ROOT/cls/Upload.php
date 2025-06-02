@@ -1,10 +1,11 @@
 <?php
+namespace Dzg\Cls;
 
 // IN ARBEIT \\
 
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-
+use Dzg\Cls\{Database, Auth, Tools, Kontakt, Header, Footer};
 
 /***********************
  * Summary of Upload
@@ -575,7 +576,7 @@ class Upload
     protected static function site_output()
     {
 
-        $ausgabe = statusmeldung_ausgeben();
+        $ausgabe = Tools::statusmeldung_ausgeben();
         if ($showForm):
 
         $ausgabe .= '<div class="grid-container-detail">';

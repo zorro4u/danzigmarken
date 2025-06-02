@@ -1,5 +1,10 @@
 <?php
+namespace Dzg\Cls;
+
 require_once __DIR__.'/Table.php';
+use Dzg\Cls\Table;
+use PDO, PDOException;
+
 
 /***********************
  * Summary of TableData

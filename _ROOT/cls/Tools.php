@@ -1,5 +1,9 @@
 <?php
+namespace Dzg\Cls;
+
 require_once __DIR__.'/Database.php';
+use Dzg\Cls\Database;
+use PDO, PDOException, Exception;
 
 function vardump(mixed ...$params)
 {
@@ -121,7 +125,7 @@ class Tools
     public static function rootdir(): string
     {
         // mögliche root_Dir: "/" bei externem Aufruf, "stamps" bei internem Aufruf, "_prepare" debug-Mode
-        $root_dir = ['stamps', '_prepare'];
+        $root_dir = ['stamps', '_prepare', 'localhost'];
         $act_pth = explode('/', dirname($_SERVER['REQUEST_URI']));  // array aus den Dir-Ebenen des Aufrufs
         $pth_len = count($act_pth)-1;  // Anzahl der Dir-Ebenen
 
@@ -130,7 +134,7 @@ class Tools
             if (in_array($act_pth[$i], $root_dir)) break;
 
         $dir = implode('/', array_slice($act_pth, 0, $i+1));
-        if ($dir==='/') $dir = '';
+        if ($dir==='/' || $dir==='\\') $dir = '';
 
         return $dir;
     }

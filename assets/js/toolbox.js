@@ -4,7 +4,7 @@
 function prn_toogle(ID, PRN) {
     jQuery.ajax({
         type: 'POST',
-        url: '/assets/tools/printoption.php',
+        url: '/assets/inc/printoption.php',
         data: {id: ID, prn: PRN}
     })
 }

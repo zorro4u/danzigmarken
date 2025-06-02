@@ -1,9 +1,15 @@
 <?php
-// Datenbank- & Auth-Funktionen laden
-require_once __DIR__."/Auth.php";
-require_once __DIR__."/Header.php";
-require_once __DIR__."/Footer.php";
+namespace Dzg\Cls;
 
+// Datenbank- & Auth-Funktionen laden
+#require_once __DIR__.'/Database.php';
+#require_once __DIR__.'/Auth.php';
+#require_once __DIR__.'/Tools.php';
+require_once __DIR__.'/Header.php';
+require_once __DIR__.'/Footer.php';
+
+use PDO, PDOException;
+use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
 
 /****************************
  * Summary of Admin
@@ -380,7 +386,7 @@ class Admin
         }
 
         if ($error_msg) {
-            delete_autocookies();
+            Auth::delete_autocookies();
             $usr_data = [];
             echo $error_msg;
         }
@@ -494,7 +500,7 @@ class Admin
         if (isset($_GET['save']) &&
             strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
 
-            $save = htmlspecialchars(clean_input($_GET['save']));
+            $save = htmlspecialchars(Tools::clean_input($_GET['save']));
             switch ($save):
 
                 // --- Änderung TAB: Autologin ---
@@ -760,7 +766,7 @@ class Admin
         }
 
 
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
         self::$status_message = $status_message;
         self::$active = $active;
@@ -915,12 +921,13 @@ class Admin
     </table>
 
     <br><hr>
-    <form action='../assets/tools/logged' method='POST'>
+    <form action='../tools/logged' method='POST'>
         <button class='btn btn-primary' type=''>Log-Protokoll</button>&emsp;&emsp;
-        <button formaction='../assets/tools/maillog_show' class='btn btn-primary' type='' value='' name=''>Mail-Log</button>&emsp;&emsp;
-        <button formaction='../assets/tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
-        <button formaction='../assets/tools/pdf_down' class='btn btn-primary' type='' value='' name=''>PDF_Download</button>&emsp;&emsp;
-        <button formaction='../assets/tools/printview.php?sub2=100' class='btn btn-primary' type='' value='' name=''>PDF anzeigen</button>
+        <button formaction='../tools/maillog_show' class='btn btn-primary' type='' value='' name=''>Mail-Log</button>&emsp;&emsp;
+        <button formaction='../tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
+        <button formaction='../tools/pdf_down' class='btn btn-primary' type='' value='' name=''>PDF_Download</button>&emsp;&emsp;
+        <button formaction='../tools/printview.php?sub2=100' class='btn btn-primary' type='' value='' name=''>PDF anzeigen</button>&emsp;&emsp;
+        <button formaction='https://www.danzigmarken.de/yiisite/web/index.php' class='btn btn-primary' type='' value='' name=''>Yii_Site</button>
     </form>
 </div>
 ";

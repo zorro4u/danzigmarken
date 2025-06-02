@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__.'/Auth.php';
-require_once __DIR__.'/Tools.php';
+namespace Dzg\Cls;
 
+require_once __DIR__.'/Auth.php';
+use Dzg\Cls\Auth;
 
 /***********************
  * Summary of Header
@@ -15,7 +16,7 @@ class Header
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private const HEAD_TEMPLATE = "/assets/templates/html-head-meta.php";
+    private const HEAD_TEMPLATE = "/assets/inc/html-head-meta.php";
 
     private const
         PAGE_SETUP = [

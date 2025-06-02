@@ -1,9 +1,12 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
+namespace Dzg\Cls;
+
+#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once __DIR__.'/Details.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-
+use Dzg\Cls\{Database, Auth, Tools, Details, Header, Footer};
+use PDO, PDOException, Exception;
 
 /***********************
  * Summary of Change
@@ -380,7 +383,7 @@ class Change extends Details
                     // html-tags, Blackslash, Leerzeichen anfangs/ende entfernen
                     // auth.func.php: clean_input($data) = strip_tags(stripslashes(trim($data)));
 
-                    $input_wert = clean_input($input_wert);
+                    $input_wert = Tools::clean_input($input_wert);
                     $input_wert = preg_replace($regex_wrapper, "", $input_wert);
 
                     $regex = ($spalte === "gid") ? $regex_digi_no : $regex_wert_no;
@@ -606,7 +609,7 @@ class Change extends Details
         } ---*/
 
         $showForm = ($error_msg === "" OR $error2) ? True : False;
-        $status_message = status_out($success_msg, $error_msg);
+        $status_message = Tools::status_out($success_msg, $error_msg);
 
 
         // globale Variablen setzen
