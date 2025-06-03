@@ -1023,18 +1023,6 @@ class Details
         $output .= '</div>';   # ende < /content detail >
         $output .= '</div>';   # ende < /grid-container-detail >
 
-        $output .= "
-            <script>
-            function prn_toogle(ID, PRN) {
-                jQuery.ajax({
-                    type: 'POST',
-                    url: '/assets/inc/printoption.php',
-                    data: {id: ID, prn: PRN}
-                })
-            }
-            </script>
-            ";
-            
         endif;  // Seite anzeigen
 
 

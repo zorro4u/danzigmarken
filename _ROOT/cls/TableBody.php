@@ -346,19 +346,6 @@ class TableBody
             $output .= "&nbsp;";  # Leerzeile, wird am Anfang statt Ende eingefügt ???
         }
 
-        // Script für PrintOption
-        $output .= "
-            <script>
-            function prn_toogle(ID, PRN) {
-                jQuery.ajax({
-                    type: 'POST',
-                    url: '/assets/inc/printoption.php',
-                    data: {id: ID, prn: PRN}
-                })
-            }
-            </script>
-            ";
-
         return $output;
     }
 }

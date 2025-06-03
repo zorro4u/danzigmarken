@@ -102,7 +102,9 @@ class Footer
 
     // Bootstrap core JavaScript
     // Placed at the end of the document so the pages load faster
+
     private const BOOTSTRP = "
+            <script src=\"/assets/js/toolbox.js\"></script>
             <!-- Bootstrap core JavaScript -->
             <script src=\"/assets/bootstrap3/js/jquery.min.js\"></script>
             <script>

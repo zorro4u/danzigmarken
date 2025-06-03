@@ -1,18 +1,20 @@
 /**
- * Druckoption bei Tabelle, Details, Bearbeiten
+ * Druckoption bei Tabelle, Details
  */
 function prn_toogle(ID, PRN) {
     jQuery.ajax({
         type: 'POST',
-        url: '/assets/inc/printoption.php',
+        url: '/assets/inc/set_printoption.php',
         data: {id: ID, prn: PRN}
     })
 }
 
 
+
 /**
  * Settings
  */
+/*
 'use strict';
 document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener('resize', messen);
@@ -46,6 +48,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .textContent = window.matchMedia().media;
     }
 });
+*/
+
 
 
 /**
@@ -54,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // href mit ?Parameter und #Sprungmarke
 // -> class = "anchor_extended"
 //
+/*
 window.addEventListener("load", function () {
 
 // Falls der Browser nicht automatisch zum gewünschten Element springt
@@ -107,3 +112,4 @@ for (var i = 0; i < anchors.length; i++) {
 }
 
 });
+*/
