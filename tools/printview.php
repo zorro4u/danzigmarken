@@ -113,11 +113,15 @@ class PrintView
         $pdo_db = self::$pdo;
         $col = "ort.id oid, dat.id did, sta.id sid";
         $col = "dat.id";
+        $idlist = [];
 
-        $filter = (!empty($_SESSION['filter']))
-            ? "{$_SESSION['filter']}"
-            : "the.sub2='{$sub2}' AND ort.deakt=0";
-            #"the.id<>0 AND sta.deakt=0 AND dat.deakt=0";
+        if (!empty($_SESSION['filter'])) {
+            $filter = (str_contains($_SESSION['filter'], "the.sub2"))
+                ? "{$_SESSION['filter']}"
+                : "{$_SESSION['filter']} AND the.sub2='{$sub2}'";
+        } else {
+            $filter = "the.sub2='{$sub2}' AND ort.deakt=0";
+        }
 
         $sort = (!empty($_SESSION['sort']))
             ? "{$_SESSION['sort']}, "
@@ -141,7 +145,7 @@ class PrintView
             LEFT JOIN dzg_filesuffix suf ON suf.id=ort.id_suffix
             LEFT JOIN dzg_dirsub1 sub1 ON sub1.id
             LEFT JOIN dzg_fileprefix pre ON pre.id_sub1=sub1.id
-            WHERE {$filter} AND pre.prefix='t_'
+            WHERE {$filter} AND pre.prefix='t_' AND dat.print=1
             ORDER BY {$sort}";
 
         $result = Database::db_fetch($sql, "all", $pdo_db);
@@ -504,6 +508,7 @@ class PrintView
         // kontinuierliche Einzelseitenausgabe
         foreach ($sub2_liste as $thema) {
             $id_liste = self::idliste_holen($thema);
+            if (!$id_liste) continue;
 
             echo "<br><hr><center>{$thema}</center><hr><br>";
 
