@@ -35,7 +35,7 @@ requirements.txt
 
 # yii #
 #######
-assets/*
+#assets/*
 !assets/.gitignore
 protected/runtime/*
 !protected/runtime/.gitignore

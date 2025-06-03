@@ -239,26 +239,17 @@ class TableBody
                     // Druckoption, startet JS: prn_toogle()
                     } elseif ($spalte_db === 'print') {
                         $data = $stamp[$spalte_db];
+                        $fid = $stamp[$id];
                         $data_rev = ($data == 1) ? 0 : 1;      # switchen
                         $checked = ($data == 1) ? "checked" : "";
                         # onclick='return false;' .. disabled='disabled'  onclick='prn_toogle(".$stamp[$id].",".$data_rev.")'
-                        if (!empty($_SESSION['su'])) {
-                            $output .= "
-                                    <td class='data-cell' title='druck ja/nein'
-                                        style='text-align:center;'>
-                                    <input type='checkbox' name='{$spalte_db}' value='1'
-                                        id='print' class='chkbx' {$checked} onclick='prn_toogle(".$stamp[$id].",".$data_rev.")' />
-                                    <label for='print'></label></td>";
-                        } else {
-                            $output .= "
-                                    <td class='data-cell' title='druck ja/nein'
-                                        style='text-align:center;'>
-                                    <a class='akt-link2 box2' href=./details.php?id={$stamp[$id]}>
-                                    <input type='checkbox' name='{$spalte_db}' value='1'
-                                        id='print' class='chkbx0' {$checked} disabled='disabled'/>
-                                    <label for='print'></label></a></td>";
 
-                        }
+                        $output .= "
+                                <td class='data-cell' title='druck ja/nein'
+                                    style='text-align:center;'>
+                                <input type='checkbox' name='{$spalte_db}'
+                                    id='prn_".$fid."' class='chkbx' {$checked} onclick='prn_toogle(".$fid.",".$data_rev.")' />
+                                <label for='prn_".$fid."'></label></td>";
 
                     // Ansicht
                     } elseif ($spalte_db == 'kat20') {
