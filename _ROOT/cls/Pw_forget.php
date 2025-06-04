@@ -114,7 +114,7 @@ class Pw_forget
 
                 // okay... temporären Passwort-Code in DB schreiben
                 } else {
-                    $pwcode = random_string();
+                    $pwcode = Auth::random_string();
                     $pwcode_hash = sha1($pwcode);
                     $pwcode_endtime = time() + 3600*24*2;  // gültig für 2 Tage
                     $pwcode_endtime_str = date("d.m.y H:i", $pwcode_endtime);

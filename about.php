@@ -2,7 +2,7 @@
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
+#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 use Dzg\Cls\{Auth, Header, Footer};
@@ -14,7 +14,7 @@ Header::show();
 <br /><br />
 
 <p><span style='font-style:italic;text-decoration:underline'>
-Herausgeber:</span><br />
+verantwortlich:</span><br />
 Heinz Vierling<br />
 15518 Rauen<br />
 Deutschland</p>

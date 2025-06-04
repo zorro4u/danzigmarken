@@ -44,6 +44,7 @@ class Login
     private static string $input_usr;
 
 
+
     private static function data_preparation()
     {
         $pdo = self::$pdo;
@@ -53,7 +54,7 @@ class Login
         $input_usr = "";
         $input_email1 = "";
         $input_pwNEU1 = "";
-        $ip = remote_addr();
+        $ip = Auth::remote_addr();
 
         if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
 
@@ -165,8 +166,8 @@ class Login
 
                             // Nutzer möchte angemeldet bleiben (1 Jahr)
                             if(isset($_POST['angemeldet_bleiben'])) {
-                                $identifier = random_string();
-                                $token_hash = sha1(random_string());
+                                $identifier = Auth::random_string();
+                                $token_hash = sha1(Auth::random_string());
                                 $token_timer = time() + 3600*24*365;  // gültig für 1 Jahr
                                 $token_endtime = date('Y-m-d H:i:s', $token_timer);
 

@@ -365,9 +365,6 @@ class Header
         $debug = (strpos($rootdir, "/_prepare") !== False)
             ? $color : "";
 
-        if (empty($_SESSION['fileid']))     $_SESSION['fileid']     = 0;
-        if (empty($_SESSION['prev']))       $_SESSION['prev']       = -1;
-        if (empty($_SESSION['lastsite']))   $_SESSION['lastsite']   = -1;
 
         // Startseite festlegen, $_SESSION['main'], siehe auch: list-func
         $main_pages = self::MAIN_PAGES;
@@ -380,9 +377,13 @@ class Header
         }
         $_SESSION['main'] = $main_page;
 
-
         $main = ['site' => $main_page, 'name' => 'Übersicht'];
         $stepout = ['site' => $main_page, 'name' => '<i class="fas fa-home"></i>Übersicht'];
+
+
+        if (empty($_SESSION['lastsite'])) $_SESSION['lastsite'] = $main_page;
+        if (empty($_SESSION['fileid'])) $_SESSION['fileid'] = 0;
+        if (empty($_SESSION['prev']))   $_SESSION['prev']   = -1;
 
 
         switch ($siteid):
@@ -428,12 +429,14 @@ class Header
 
             // impressum.php
             case 6:
-                $main = ['site' => $rootdir.'/about/impressum', 'name' => 'Impressum'];
+                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
+                $main = ['site' => $rootdir.'/impressum', 'name' => 'Impressum'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // login.php
             case 7:
+                Tools::lastsite();
                 $main = ['site' => $rootdir.'/auth/login', 'name' => 'Anmelden'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -470,12 +473,14 @@ class Header
 
             // kontakt.php
             case 13:
+                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
                 $main = ['site' => $rootdir.'/kontakt/kontakt', 'name' => 'Kontakt'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // logout.php
             case 14:
+                Tools::lastsite();
                 $main = ['site' => $rootdir.'/auth/logout', 'name' => 'Abmelden'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -488,23 +493,27 @@ class Header
 
             // about.php
             case 16:
-                $main = ['site' => $rootdir.'/about/about', 'name' => 'About'];
+                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
+                $main = ['site' => $rootdir.'/about.php', 'name' => 'About'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // setting.php
             case 100:
+                Tools::lastsite(["index", "index2", "details"]);
                 #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // admin.php
             case 101:
+                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
                 #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             default:
+                Tools::lastsite();
                 $stepout['site'] = $_SESSION['lastsite'];
 
         endswitch;

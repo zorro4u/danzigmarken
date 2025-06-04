@@ -44,7 +44,7 @@ class Footer
      * Klassenvariablen / Eigenschaften
      */
     private const PROJECT_DIRS = ['',
-        '/about', '/account', '/assets/css',
+        '/', '/account', '/assets/css',
         '/auth'];
     private const PROJECT_EXT = ['php', 'html', 'css'];
 
@@ -58,11 +58,11 @@ class Footer
 
     #<i class='fa-regular fa-address-card'></i>&ensp;
     private const IMPRESSUM =
-        "<a class='foot-link' href='/about/impressum'
+        "<a class='foot-link' href='/impressum'
         title='Impressum'>Impressum</a>
     ";
     private const ABOUT =
-        "<a class='foot-link' href='/about/about'
+        "<a class='foot-link' href='/about.php'
         title='About'>About</a>
     ";
     private const CC_COPY0 =
@@ -122,6 +122,14 @@ class Footer
     // HTML Dokumenten-Ende
     private const HTML_END = "</body></html>";
 
+
+
+    private static function mato()
+    {
+        return (empty($_SESSION['su']))
+            ? self::MATOMO
+            : "";
+    }
 
     // die neueste/letzte Änderungszeit einer Projektdatei
     private static string $lastchanged;
@@ -199,7 +207,7 @@ class Footer
             </footer>";
 
         $output .= self::BOOTSTRP;
-        $output .= self::MATOMO;
+        $output .= self::mato();
         $output .= self::HTML_END;
 
         echo $output;
@@ -210,7 +218,7 @@ class Footer
     {
         $output = "<footer class='container'></footer>";
         $output .= self::BOOTSTRP;
-        $output .= self::MATOMO;
+        $output .= self::mato();
         $output .= self::HTML_END;
 
         echo $output;
@@ -242,7 +250,7 @@ class Footer
             </footer>";
 
         $output .= self::BOOTSTRP;
-        $output .= self::MATOMO;
+        $output .= self::mato();
         $output .= self::HTML_END;
 
         echo $output;
@@ -274,7 +282,7 @@ class Footer
             </footer>";
 
         $output .= self::BOOTSTRP;
-        $output .= self::MATOMO;
+        $output .= self::mato();
         $output .= self::HTML_END;
 
         echo $output;
@@ -305,7 +313,7 @@ class Footer
             </footer>";
 
         $output .= self::BOOTSTRP;
-        $output .= self::MATOMO;
+        $output .= self::mato();
         $output .= self::HTML_END;
 
         echo $output;
@@ -317,7 +325,8 @@ class Footer
         $mitte = self::CC_COPY0 . self::CC_COM . self::CC_PIC . self::CC_ICO;
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
-        $project_dirs = ['/about'];
+        #$project_dirs = ['/about'];
+        $project_dirs = ['/'];
         $lastchanged = self::get_lastchanged($project_dirs, self::PROJECT_EXT);
 
         $output = "
@@ -330,13 +339,13 @@ class Footer
                     <i class='fa fa-pencil'></i>&emsp;<i>{$lastchanged}</i></a></div>
                 <div class='mitte kleingrau cc'>{$mitte}</div>
                 <div class='rechts kleingrau'>
-                    <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
-                    <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a></div>
+                    <a class='foot-link' href='/index' title='Startseite www.danzigmarken.de'>
+                    <i class='fas fa-home'></i>&ensp;danzigmarken.de</a></div>
             </div>
             </footer>";
 
         $output .= self::BOOTSTRP;
-        $output .= self::MATOMO;
+        $output .= self::mato();
         $output .= self::HTML_END;
 
         echo $output;

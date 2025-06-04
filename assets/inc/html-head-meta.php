@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <?php include_once __DIR__."/mato.php"; ?>
+    <?php if (empty($_SESSION['su'])) include_once __DIR__."/mato.php"; ?>
 
     <meta http-equiv="cache-control" content="<?=$cache?>" >
     <meta http-equiv="Expires" content="<?=$expires?>" >

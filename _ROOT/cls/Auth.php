@@ -33,74 +33,6 @@ $_SESSION['rootdir'] = Tools::rootdir();
 
 
 
-/* Funktionswrapper, wegen Kompatibilität zur alten Struktur
-*/
-function X_login($userid) {
-    return Auth::login($userid);
-}
-
-function X_logout($target = '') {
-    Auth::logout($target);
-}
-
-function X_delete_autocookies() {
-    Auth::delete_autocookies();
-}
-
-function X_delete_security_token() {
-    Auth::delete_security_token();
-}
-
-function X_plausi_check_autocookie(){
-    return Auth:: plausi_check_autocookie();
-}
-
-function X_securitytoken_holen($identifier, $token_hash){
-    return Auth::securitytoken_holen($identifier, $token_hash);
-}
-
-function X_refresh_token($identifier, $token_hash, $token_timer) {
-    Auth::refresh_token($identifier, $token_hash, $token_timer);
-}
-
-function X_check_user() {
-    return Auth::check_user();
-}
-
-function X_is_checked_in() {
-    return Auth::is_checked_in();
-}
-
-function X_random_string() {
-    return Auth::random_string();
-}
-
-function X_getSiteURL() {
-    return Tools::getSiteURL();
-}
-
-function X_arr2str($array){
-    return Auth::arr2str($array);
-}
-
-function remote_addr() {
-    return Auth::remote_addr();
-}
-
-function X_clean_input($data) {
-    return Tools::clean_input($data);
-}
-
-function X_statusmeldung_ausgeben(){
-    return Tools::statusmeldung_ausgeben();
-}
-
-function X_status_out($msg_success, $msg_error, $exit_true=false) {
-    return Tools::status_out($msg_success, $msg_error, $exit_true);
-}
-
-
-
 /****************************
  * Summary of Auth
  * Funktionscontainer für den Anmelde- und Verifizierungsprozess
@@ -594,6 +526,18 @@ class Auth
             echo '--> auth.functions.inc.php -> func -> random_string() -> (Zeile 353)';
         }
         return $str;
+    }
+
+    function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+
+        return $randomString;
     }
 }
 

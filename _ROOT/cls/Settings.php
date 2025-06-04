@@ -61,30 +61,8 @@ class Settings
 
         if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
 
-
-        // Herkunftsseite speichern
-        $return2 = ['index', 'index2', 'details'];
-        if (isset($_SERVER['HTTP_REFERER']) &&
-            (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
-        {
-            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
-            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
-            $fn_referer = pathinfo($referer)['filename'];
-
-            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
-                ? $referer
-                : $_SESSION['main'];
-
-        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
-            // wenn nix gesetzt ist, auf Standard index.php verweisen
-            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-
-        } elseif (empty($_SERVER['HTTP_REFERER']) && !empty($_SESSION['lastsite'])) {
-        }
-
-        unset($return2, $referer, $fn_referer);
-
+        $return2 = ["index", "index2", "details"];
+        Tools::lastsite($return2);
 
         [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
         if ($error_msg !== '') echo $error_msg;
@@ -694,7 +672,9 @@ class Settings
     }
     $file = "/download/dzg_90.pdf";
     $ffn = $_SERVER["DOCUMENT_ROOT"].$file;
-    $size = filesize($ffn);
+    $size = (file_exists($ffn))     # is_file()
+        ? filesize($ffn)
+        : 0;
     $filesize = human_filesize($size, 0);
     $output .= "
 

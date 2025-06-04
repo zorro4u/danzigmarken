@@ -141,6 +141,37 @@ class Tools
 
 
     /***********************
+     * Summary of lastsite
+     * @return void
+     */
+    public static function lastsite($return2=[])
+    {
+        // Herkunftsseite speichern
+        if (empty($return2)) $return2 = ["index", "index2", "details"];
+        if (isset($_SERVER['HTTP_REFERER']) &&
+            (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
+        {
+            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
+            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
+            $fn_referer = pathinfo($referer)['filename'];
+
+            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
+            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
+                ? $referer
+                : $_SESSION['main'];
+
+        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
+            // wenn nix gesetzt ist, auf Standard index.php verweisen
+            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
+
+        } elseif (empty($_SERVER['HTTP_REFERER']) && !empty($_SESSION['lastsite'])) {
+        }
+
+        unset($return2, $referer, $fn_referer);
+    }
+
+
+    /***********************
      * Returns the URL to the site without the script name    (-> passwortvergessen.php)
      */
     public static function getSiteURL(): string
