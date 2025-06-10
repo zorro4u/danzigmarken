@@ -148,6 +148,8 @@ class Tools
     {
         // Herkunftsseite speichern
         if (empty($return2)) $return2 = ["index", "index2", "details"];
+        if (!isset($_SESSION['main'])) $_SESSION['main'] = $_SESSION['rootdir'].'/index.php';
+        
         if (isset($_SERVER['HTTP_REFERER']) &&
             (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
         {
@@ -166,8 +168,6 @@ class Tools
 
         } elseif (empty($_SERVER['HTTP_REFERER']) && !empty($_SESSION['lastsite'])) {
         }
-
-        unset($return2, $referer, $fn_referer);
     }
 
 

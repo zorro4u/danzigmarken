@@ -32,6 +32,11 @@ use Dzg\Cls\{Database, Tools};
 $_SESSION['rootdir'] = Tools::rootdir();
 
 
+// Startseite festlegen, $_SESSION['main']
+if (!isset($_SESSION['main'])) {
+    $_SESSION['main'] = $_SESSION['rootdir'].'/index.php';
+}
+
 
 /****************************
  * Summary of Auth

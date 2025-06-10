@@ -41,15 +41,15 @@
 }
 
 /* Signin */
-.form-signin input[type="email"] {
+.form-signin input[type="email_X"] {
     margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+    X_border-bottom-right-radius: 0;
+    X_border-bottom-left-radius: 0;
 }
-.form-signin input[type="password"] {
+.form-signin input[type="password_X"] {
     margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    X_border-top-left-radius: 0;
+    X_border-top-right-radius: 0;
 }
 .login td {
     padding-right: 2px;
@@ -60,3 +60,60 @@
     color: #fff;
 }
 
+
+
+.user-box {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.user-box input {
+  width: 100%;
+  X_padding: 10px 0;
+  X_font-size: 16px;
+  X_color: #333;
+  X_margin-bottom: 30px;
+  X_border: none;
+  X_border-bottom: 2px solid #333;
+  outline: none;
+  background: transparent;
+}
+/*
+.user-box label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #333;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.user-box input:focus ~ label,
+.user-box input:valid ~ label {
+  transform: translateY(-20px);
+  font-size: 14px;
+  color: #333;
+}
+*/
+
+.password-toggle-icon {
+  position: absolute;
+  top: 80%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.password-toggle-icon i {
+  font-size: 16px;
+  line-height: 1;
+  color: #555;
+  transition: color 0.3s ease-in-out;
+  margin-bottom: 20px;
+}
+
+.password-toggle-icon i:hover {
+  color: #000;
+}
