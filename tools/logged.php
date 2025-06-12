@@ -98,8 +98,8 @@ if (isset($_SERVER['HTTP_REFERER']) && basename($_SERVER['HTTP_REFERER']) === "a
             echo '<hr>';
         }
 
-        // abschließend: Einträge älter als 180 Tage löschen, oder userid=2 (admin)
-        $time_cut = date('Y-m-d H:i:s', (time() - 3600*24*180));
+        // abschließend: Einträge älter als 100 Tage löschen, oder userid=2 (admin)
+        $time_cut = date('Y-m-d H:i:s', (time() - 3600*24*100));
         $stmt = "DELETE FROM site_log WHERE
             date < :cut OR
             ip IN (SELECT log.ip FROM site_log AS log JOIN site_login AS login ON log.ip=login.ip WHERE login.userid = 2 GROUP BY log.ip)";

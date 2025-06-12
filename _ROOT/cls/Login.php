@@ -437,9 +437,9 @@ class Login
             $output .= "
                 <table style='display: block; width: 100%; margin-top: 20px;'><tr>
                 <td width='70%' style='padding-right:20px; '>
-                    <a href='".$forget_link."'>Passwort vergessen?</a></td>
+                    <a href='{$forget_link}'>Passwort vergessen?</a></td>
                 <td width='30%' align=right style='padding-left:20px;'>
-                    <a href='".$reg_link."'>Registrieren</a></td>
+                    <a href='{$reg_link}'>Registrieren</a></td>
                 </tr></table>
                 </form>";
 

@@ -25,15 +25,16 @@ E-Mail:
     <a href='/kontakt' title='Kontaktformular' style='background-color:transparent'>
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>
 
+
+<?php if (Auth::is_checked_in()): ?>
 <br />
 <p><span style='font-style:italic;text-decoration:underline'>
 realisiert:</span><br />
 <a href='https://keys.openpgp.org/search?q=viele%40gmx.net'
     title='email/pgp @ keys.openpgp.org' rel='noopener noreferrer nofollow' target='_blank' style='background-color:transparent'>
-SteV.it</a>&nbsp;
+Zorro4U</a>&nbsp;
 <img src='/assets/pic/extlink.png' width='12' height='12'>
 
-<?php if (Auth::is_checked_in()): ?>
 &emsp;|&emsp;
 <a href='https://github.com/zeroby1/danzigmarken'
     title='Code @ github.com' rel='noopener noreferrer nofollow'
@@ -41,6 +42,7 @@ SteV.it</a>&nbsp;
 GitHub</a>&nbsp;
 <img src='/assets/pic/extlink.png' width='12' height='12'></p>
 <?php endif; ?>
+
 
 <br />
 <p><span style='font-style:italic;text-decoration:underline'>

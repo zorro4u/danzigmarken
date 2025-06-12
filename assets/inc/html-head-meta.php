@@ -9,7 +9,7 @@
     <?php if (empty($_SESSION['su'])) include_once __DIR__."/mato.php"; ?>
 
     <meta http-equiv="cache-control" content="<?=$cache?>" >
-    <meta http-equiv="Expires" content="<?=$expires?>" >
+    <meta http-equiv="expires" content="<?=$expires?>" >
     <meta http-equiv="language" content="DE">
 
     <!-- Favicons -->

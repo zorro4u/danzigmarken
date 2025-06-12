@@ -20,15 +20,21 @@ class Header
 
     private const
         PAGE_SETUP = [
-            'cache1' => "max-age=3600, must-revalidate",
-            'expires1' => "3600",                 # 1 Std Cache
-            'cache2' => "no-cache",
-            'expires2' => "-1",
-            'robots1' => "index, nofollow,",      # indiziert
-            'robots2' => "noindex, nofollow,",
-            'robots3' => "noindex, follow,",      # Seitenlinks folgen
+            'cache_no' => "must-revalidate, no-store", #, no-cache, max-age=0, private",
+            'cache_0'  => "no-cache, max-age=0, must-revalidate, private",
+            'cache_1h' => "max-age=3600, stale-if-error=86400, private",    # 1h+1d
+            'cache_1w' => "max-age=604800, stale-if-error=86400, private",  # 7+1Tage
+
+            'expires_0'  => "0",                  # no-cache
+            'expires_1h' => "3600",               # 1 Std Cache
+
+            'robots_index'  => "index, nofollow,",      # indiziert
+            'robots_no'     => "noindex, nofollow,",
+            'robots_follow' => "noindex, follow,",      # Seitenlinks folgen
+
             'google0' => "",
             'google1' => "nopagereadaloud",
+
             'canonical0' => "",
             'canonical1' => '<link rel="canonical" href="https://www.danzigmarken.de/index">',
             'canonical2' => '<link rel="canonical" href="https://www.danzigmarken.de/details.php?id=10">',
@@ -39,9 +45,9 @@ class Header
                 'id' => 1,
                 'meta' => [
                     'title' => "Briefmarken und Paketkarten der Stadt Danzig (1889-1920-1939-1945)",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots1'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_index'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical1'],
                 ],
@@ -50,9 +56,9 @@ class Header
                 'id' => 2,
                 'meta' => [
                     'title' => "Briefmarken und Paketkarten der Stadt Danzig (1889-1920-1939-1945)",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots1'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_index'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical1'],
                 ],
@@ -61,9 +67,9 @@ class Header
                 'id' => 3,
                 'meta' => [
                     'title' => "Detailansicht - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache2'],
-                    'expires' => self::PAGE_SETUP['expires2'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google0'],
                     'canonical' => self::PAGE_SETUP['canonical2'],
                 ],
@@ -72,9 +78,9 @@ class Header
                 'id' => 4,
                 'meta' => [
                     'title' => "Bearbeiten - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache2'],
-                    'expires' => self::PAGE_SETUP['expires2'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_1h'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical2'],
                 ],
@@ -83,9 +89,9 @@ class Header
                 'id' => 5,
                 'meta' => [
                     'title' => "Upload - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_1w'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -94,9 +100,9 @@ class Header
                 'id' => 6,
                 'meta' => [
                     'title' => "Impressum - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_1w'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -105,9 +111,9 @@ class Header
                 'id' => 7,
                 'meta' => [
                     'title' => "Anmelden - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google0'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -116,9 +122,9 @@ class Header
                 'id' => 8,
                 'meta' => [
                     'title' => "PW-Vergessen - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -127,9 +133,9 @@ class Header
                 'id' => 9,
                 'meta' => [
                     'title' => "PW-Reset - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google0'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -138,9 +144,9 @@ class Header
                 'id' => 10,
                 'meta' => [
                     'title' => "Registrieren-Info - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -149,9 +155,9 @@ class Header
                 'id' => 11,
                 'meta' => [
                     'title' => "Registrieren - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google0'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -160,9 +166,9 @@ class Header
                 'id' => 12,
                 'meta' => [
                     'title' => "Aktivieren - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -171,9 +177,9 @@ class Header
                 'id' => 13,
                 'meta' => [
                     'title' => "Kontakt - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots3'],
+                    'cache' => self::PAGE_SETUP['cache_1w'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_follow'],
                     'google' => self::PAGE_SETUP['google0'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -182,9 +188,9 @@ class Header
                 'id' => 14,
                 'meta' => [
                     'title' => "Abmelden - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots3'],
+                    'cache' => self::PAGE_SETUP['cache_1w'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_follow'],
                     'google' => self::PAGE_SETUP['google0'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -193,9 +199,9 @@ class Header
                 'id' => 15,
                 'meta' => [
                     'title' => "Download - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_1h'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -204,9 +210,9 @@ class Header
                 'id' => 16,
                 'meta' => [
                     'title' => "About - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_1w'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -215,9 +221,9 @@ class Header
                 'id' => 100,
                 'meta' => [
                     'title' => "Konto - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -226,9 +232,9 @@ class Header
                 'id' => 101,
                 'meta' => [
                     'title' => "erweiterte Einstellungen - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_no'],
+                    'expires' => self::PAGE_SETUP['expires_0'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -237,9 +243,9 @@ class Header
                 'id' => 500,
                 'meta' => [
                     'title' => "danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache1'],
-                    'expires' => self::PAGE_SETUP['expires1'],
-                    'robots' => self::PAGE_SETUP['robots2'],
+                    'cache' => self::PAGE_SETUP['cache_1h'],
+                    'expires' => self::PAGE_SETUP['expires_1h'],
+                    'robots' => self::PAGE_SETUP['robots_no'],
                     'google' => self::PAGE_SETUP['google1'],
                     'canonical' => self::PAGE_SETUP['canonical0'],
                 ],
@@ -602,11 +608,11 @@ class Header
                 // aktiv: Details     < detail_bearbeiten_login >
                 case 3:
                     // Bearbeiten
-                    // (nur für Admin und Heinz (id.3) zugänglich)
+                    //
+                    # (nur für Admin und Heinz (id.3) zugänglich)
+                    # <li><a href='{$rootdir}/auth/login' title='erst Anmelden dann Bearbeiten'><i class='fas fa-edit'></i>Bearbeiten **&emsp;</a></li>
                     $output .= "
-                    <li><a class='active'>".$main['name']."</a></li>
-                    <li><a href='{$rootdir}/auth/login' title='erst Anmelden dann Bearbeiten'>
-                        <i class='fas fa-edit'></i>Bearbeiten **&emsp;</a></li>";
+                    <li><a class='active'>".$main['name']."</a></li>";
                     break;
 
                 // aktiv: Kontakt     < kontakt_login >
