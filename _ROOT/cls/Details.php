@@ -38,6 +38,7 @@ class Details
     protected static int $gid;
     protected static int $prev;
     protected static int $next;
+    protected static array $error_arr;
     protected static bool $showForm;
     protected static string $status_message;
 
@@ -52,6 +53,7 @@ class Details
             self::$pdo = Database::connect_mariadb();
         }
 
+        self::site_entry_check();
         self::data_preparation();
 
         Header::show();
@@ -75,26 +77,58 @@ class Details
     }
 
 
-    protected static function site_entry_check(int $gid=0)
+    protected static function site_entry_check()
+    {
+        // Plausi-Check der ID, bevor weiter gemacht wird !!
+        $error_arr = [];
+        $status = true;
+        $akt_file_id = 0;
+
+        if (!isset($_GET['id'])) {
+            $error_msg = 'Seite ohne ID-Angabe funktioniert nicht.';
+
+        } else {
+            // Zahl mit 1 bis 19 Ziffern, 10*10^18-1, in php aber nur 9*10^18 möglich
+            $get_id = $_GET['id'];
+            $regex_digi    = "/^\d{1,19}$/";
+            if (!preg_match($regex_digi, $get_id)
+                || $get_id != (int)$get_id)
+            {
+                $error_arr []= 'a wrong ID transmitted ...';
+                $status = false;
+
+            } else {
+                $akt_file_id = (int)$get_id;
+            }
+        }
+        unset($_GET['id']);
+
+        // globale Variablen setzen
+        $_SESSION['fileid'] = $akt_file_id;
+        self::$akt_file_id = $akt_file_id;
+        self::$error_arr = $error_arr;
+        self::$showForm = $status;
+    }
+
+
+    protected static function groupID_check(int $gid=0)
     {
         // Nutzer nicht angemeldet?
         if (!Auth::is_checked_in()) {
-            Auth::check_user();
-            if (!Auth::is_checked_in()) {
 
-                // wenn nicht angemeldet und nicht von der Hauptseite kommend,
-                // und aktuelles Bild nicht der letzten Gruppe angehört,
-                // dann unregulärer Seitenaufruf -> Startseite
-                if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
+            // wenn nicht angemeldet und nicht von der Hauptseite kommend,
+            // und aktuelles Bild nicht der letzten Gruppe angehört,
+            // dann unregulärer Seitenaufruf -> Startseite
+            if (empty($_SESSION['main']))
+                $_SESSION['main'] = "/";
 
-                $return2 = ['index', 'index2'];
-                if (!isset($_SERVER['HTTP_REFERER']) OR
-                    !in_array(pathinfo($_SERVER['HTTP_REFERER'])['filename'], $return2))
-                {
-                    if (empty($_SESSION['groupid']) || $gid <> $_SESSION['groupid']) {
-                        header("location: {$_SESSION['main']}");
-                        exit;
-                    }
+            $return2 = ['index', 'index2'];
+            if (!isset($_SERVER['HTTP_REFERER']) OR
+                !in_array(pathinfo($_SERVER['HTTP_REFERER'])['filename'], $return2))
+            {
+                if (empty($_SESSION['groupid']) || $gid <> $_SESSION['groupid']) {
+                    header("location: {$_SESSION['main']}");
+                    exit;
                 }
             }
         }
@@ -297,72 +331,12 @@ class Details
     }
 
 
-    protected static function plausi_check_OLD(): array
-    {
-        // Plausi-Check der ID, bevor weiter gemacht wird !!
-        $error_arr = [];
-
-        if (!isset($_GET['id'])) {
-            if (!isset($_POST['fid'])) {
-                $error_arr []= 'Seite ohne ID-Angabe funktioniert nicht.';
-                self::$akt_file_id = 0;
-            } else {
-                $_GET['id'] = $_POST['fid'];
-                $error_arr = self::plausi_check();
-            }
-
-        } else {
-            $get_id = $_GET['id'];
-            $regex_digi    = "/^\d{1,20}$/";    // Bereich: 1 - 20stellig _ (abs)BIGINT: 18*10^18
-            $regex_digi_no = "/\D/";
-            #if (preg_match_all($regex_digi_no, $get_id, $match))
-            #    $error_arr []= 'too funny characters for an ID: " '.
-            #    htmlentities(implode(" ", $match[0])).' "';
-            if (!preg_match($regex_digi, $get_id)) {
-                $error_arr []= 'a wrong ID transmitted ...';
-                self::$akt_file_id = 0;
-            } else {
-                self::$akt_file_id = (int)$_GET['id'];
-            }
-        }
-        $_SESSION['fileid'] = self::$akt_file_id;
-        return $error_arr;
-    }
-
-    protected static function plausi_check(): array
-    {
-        // Plausi-Check der ID, bevor weiter gemacht wird !!
-        $error_arr = [];
-
-        if (!isset($_GET['id'])) {
-            $error_arr []= 'Seite ohne ID-Angabe funktioniert nicht.';
-            self::$akt_file_id = 0;
-
-        } else {
-            $get_id = $_GET['id'];
-            $regex_digi    = "/^\d{1,20}$/";    // Bereich: 1 - 20stellig _ (abs)BIGINT: 18*10^18
-            $regex_digi_no = "/\D/";
-            #if (preg_match_all($regex_digi_no, $get_id, $match))
-            #    $error_arr []= 'too funny characters for an ID: " '.
-            #    htmlentities(implode(" ", $match[0])).' "';
-            if (!preg_match($regex_digi, $get_id)) {
-                $error_arr []= 'a wrong ID transmitted ...';
-                self::$akt_file_id = 0;
-            } else {
-                $_SESSION['fileid'] = self::$akt_file_id = (int)$_GET['id'];
-            }
-        }
-        unset($_GET['id']);
-        return $error_arr;
-    }
-
     /***********************
      *
      */
     protected static function data_preparation()
     {
         // Initialisierung
-        self::$akt_file_id = 0;
         self::$akt_file_idx = 0;
         self::$spaltennamen = [];
         self::$stamps = [];
@@ -370,18 +344,15 @@ class Details
         self::$gid = 0;
         self::$prev = -1;
         self::$next = -1;
-        self::$showForm = false;
         self::$status_message = "";
 
         $pdo_db = self::$pdo;
+        $showForm = self::$showForm;
+        $error_arr = self::$error_arr;
         $success_msg = "";
 
-
-        // Plausi-Check der ID, bevor weiter gemacht wird !!
-        $error_arr = self::plausi_check();
-
-        // Plausi-Check okay, Seite starten
-        if (empty($error_arr)):
+        // Seiten-Check okay, Seite starten
+        if ($showForm):
 
         $akt_file_id = self::$akt_file_id;
         if (!isset($_SESSION['start'])) $_SESSION['start'] = 0;
@@ -415,12 +386,12 @@ class Details
             'kat14',  // 'Michel',
             'kat15',  // 'Frankatur',
             'kat16',  // 'Zielort',
-            'kat17',  // 'Notiz.1',
+            'kat17',  // 'Notiz.1', # Gruppe
             #'kat18',  // '',
             #'kat19',  // '',
             'kat20',  // 'Ansicht',
             'kat21',  // 'Attest',
-            'kat22',  // 'Notiz.2',
+            #'kat22',  // 'Notiz.2', # Bild
             #'kat23',  // 'Bildherkunft',
             #'kat24',  // '',
             'created', // 'erfasst',
@@ -439,6 +410,7 @@ class Details
             'fid'   => 'Bild.ID',
             'thema' => 'Thema',
             'datum' => 'Datum',
+            'kat17' => 'Notiz',
             'kat23' => 'Bildherkunft',
         ];
 
@@ -528,13 +500,14 @@ class Details
         //
         if (empty($results)) {
             $error_arr []= "ID not found ... #{$akt_file_id}";
+            self::$error_arr = $error_arr;
 
         } else {
             // Gruppen-ID
             $gid = (int)$results[0]['gid'];
 
             // auf regulären Seitenzugriff prüfen, ggf Exit
-            self::site_entry_check($gid);
+            self::groupID_check($gid);
 
             // Gruppen-ID global setzen
             $_SESSION['groupid'] = self::$gid = $gid;
@@ -689,18 +662,15 @@ class Details
                 if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
                 $_SESSION['lastsite'] = $_SESSION['main'];
             }
-
         }       # ID gefunden
-        endif;  # Plausi-Check okay
-
+        endif;  # Seiten-Check okay
 
         $error_msg = (!empty($error_arr))
             ? implode("<br>", $error_arr)
             : "";
 
-        self::$showForm = ($error_msg === "") ? True : False;
+        self::$showForm = ($error_msg === "") ? true : false;
         self::$status_message = Tools::status_out($success_msg, $error_msg);
-
     }
 
 
@@ -709,9 +679,17 @@ class Details
      */
     protected static function site_output()
     {
-        // globale Klassen-Variablen laden
-        $status_message = self::$status_message;
         $showForm = self::$showForm;
+        $status_message = self::$status_message;
+        $output = "<div class='container'>";
+        #$output = "<div class='grid-container-detail'>";
+        #$output .= '<div class="content detail">';
+
+        if (!$showForm):
+            $output .= $status_message;
+        else:
+
+        // Seiten-Check okay, Seite starten
         $spaltennamen = self::$spaltennamen;
         $stamps = self::$stamps;
         $akt_file_id = self::$akt_file_id;
@@ -721,13 +699,7 @@ class Details
         $prev = self::$prev;
         $next = self::$next;
 
-
-        $output = $status_message;
-        if ($showForm):
-
-        $output .= '<div class="grid-container-detail">';
-        $output .= '<div class="content detail">';
-
+        $output .= $status_message;
         $output .= "<div class='center-detail'>";
         $output .= "<div class='main-detail'>";
 
@@ -745,6 +717,8 @@ class Details
         foreach ($spaltennamen as $spalte_db => $spalte_web) {
 
             // Fussnoten zeigen, nur wenn angemeldet
+            //
+            // erstellt
             if ($spalte_db === 'created') {
                 // Zeit-String (yyyy-mm-dd hh:mm) in (dd.mm.yyyy hh:mm) wandeln
                 $data = ($stamps[$akt_file_idx][$spalte_db])
@@ -757,6 +731,7 @@ class Details
                         {$data}</td></tr>"
                     : "</tbody><tfoot></tfoot>";
 
+            // bearbeitet
             } elseif ($spalte_db === 'changed') {
                 $data = ($stamps[$akt_file_idx][$spalte_db])
                     ? date("d.m.Y", strtotime($stamps[$akt_file_idx][$spalte_db]))
@@ -768,6 +743,7 @@ class Details
                         {$data}</td></tr>"
                     : "";
 
+            // Gruppen-ID
             } elseif ($spalte_db === 'gid') {
                 $data = $gid;
                 $output .= (Auth::is_checked_in())
@@ -777,6 +753,7 @@ class Details
                         {$data}</td></tr>"
                     : "";
 
+            // Bild-ID
             } elseif ($spalte_db === 'fid') {
                 $data = $akt_file_id;
                 $output .= (Auth::is_checked_in())
@@ -786,6 +763,7 @@ class Details
                         {$data}</td></tr>"
                     : "";
 
+            // Druckoption
             } elseif ($spalte_db === 'print') {
                 $data = $stamps[$akt_file_idx][$spalte_db];
                 $data_rev = ($data == 1) ? 0 : 1;      # switchen
@@ -797,7 +775,7 @@ class Details
                         {$spalte_web}</td>
                         <td class='detail-val' style='".$tfoot."padding-top: 0px;'
                         title='in Druckauswahl ja/nein'>
-                        <input type='checkbox' name='{$spalte_db}' id='print' class=''
+                        <input type='checkbox' name='{$spalte_db}' id='print' class='chkbx'
                         {$checked} onclick='prn_toogle(".$akt_file_id.",".$data_rev.")' />
                         <label for='print' ></label></td></tr></tfoot>"
                     : "";
@@ -1020,11 +998,9 @@ class Details
         </div>";   # ende < /LAST >
         */
 
-        $output .= '</div>';   # ende < /content detail >
+        endif;                 # showForm
+        #$output .= '</div>';   # ende < /content detail >
         $output .= '</div>';   # ende < /grid-container-detail >
-
-        endif;  // Seite anzeigen
-
 
 
         ///////////////////////////////////////////////////

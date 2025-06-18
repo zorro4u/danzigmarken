@@ -45,6 +45,7 @@ class Logout
     {
         $pdo = self::$pdo;
         $success_msg = "";
+        $error_msg = "";
 
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details', 'login', 'email'];
@@ -63,40 +64,63 @@ class Logout
         unset($return2, $referer, $fn_referer);
 
 
-        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
+        # [$usrdata_X, $logindata_X, $error_msg] = Auth::check_user();
 
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!Auth::is_checked_in()) {
-            #Auth::check_user();
-            #if (!Auth::is_checked_in()) {
-                header("location: {$_SESSION['lastsite']}");
-                exit;
-            #}
+            header("location: {$_SESSION['lastsite']}");
+            exit;
         }
+
 
         $showForm = True;
         $root_site = $_SESSION['rootdir'].'/'.basename($_SESSION['main']);
-        $userid = (int)$_SESSION['userid'];
-        $identifier = (!empty($securitytoken_row['identifier'])) ? htmlspecialchars($securitytoken_row['identifier'], ENT_QUOTES) : '';
+        $userid = $_SESSION['userid'];
+        $identifier = (!empty($_COOKIE['auto_identifier']))
+            ? htmlspecialchars($_COOKIE['auto_identifier'], ENT_QUOTES)
+            : "";
 
         // Logoutformular empfangen
-        if(isset($_GET['logout']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
+        if (isset($_GET['logout'])
+            && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
 
+            // alle Logins beenden
             if(isset($_POST['logout_all'])) {
-                $stmt0 = "UPDATE site_login SET login=NULL, autologin = NULL
-                    WHERE userid = :userid AND (login = 1 && autologin = 1) AND identifier != :ident";
+
+                // alle anderen Autologins beenden, wenn mit Autologin auch angemeldet
+                $stmt0 = "UPDATE site_login
+                    SET login = NULL, autologin = NULL
+                    WHERE userid = :userid AND (login = 1 && autologin = 1)
+                    AND identifier != :ident";
+
+                // alle anderen Logins beenden, wenn mit Autologin angemeldet
+                $stmt = "UPDATE site_login
+                    SET login = NULL, autologin = NULL
+                    WHERE userid = :userid AND (login = 1)
+                    AND identifier != :ident";
+
+                // alle Autologins beenden
+                $stmt1 = "UPDATE site_login
+                    SET login = NULL, autologin = NULL
+                    WHERE userid = :userid AND (login = 1 && autologin = 1)";
+
+                // alle Logins beenden
+                $stmt2 = "UPDATE site_login
+                    SET login = NULL, autologin = NULL
+                    WHERE userid = :userid AND (login = 1)";
+
                 try {
-                    $qry = $pdo->prepare($stmt0);
+                    $qry = $pdo->prepare($stmt);
                     $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
                     $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
                     $qry->execute();
+
                 } catch(PDOException $e) {die($e->getMessage().': settings.inc_del-autologin');}
                 $success_msg = "Alle meine anderen Autologins beendet.";
             }
-            else {}
 
+            // aktuelle Anmeldung beenden
             Auth::logout($_SESSION['lastsite']);
-            #logout();
 
             $success_msg = "Du bist abgemeldet";
             $showForm = False;

@@ -11,10 +11,11 @@ if (isset($_POST['id']) && isset($_POST['prn'])) :
     $id = (int)$_POST['id'];
     $prn = (int)$_POST['prn'];
     $ip = $_SERVER['REMOTE_ADDR'];
+    $userid = $_SESSION['userid'];
 
-    $sql = "UPDATE dzg_file SET print=?, ip=? WHERE id=?";
+    $sql = "UPDATE dzg_file SET print=?, chg_ip=?, chg_by=? WHERE id=?";
 
-    Database::db_fetch($sql, [$prn, $ip, $id]);
+    Database::db_fetch($sql, [$prn, $ip, $userid, $id]);
 
 endif;
 
@@ -134,7 +135,7 @@ mit JAVA, AJAX $_POST['print'] 1/0 an PHP senden, dann in DB eintragen
 $id = (int)$_GET['id'];
 $prn = (int)$_GET['prn'];
 $ip = $_SERVER['REMOTE_ADDR'];
-$sql = "UPDATE dzg_file SET print=?, ip=? WHERE id=?";
+$sql = "UPDATE dzg_file SET print=?, chg_ip=? WHERE id=?";
 Database::db_fetch($sql, [$prn,$ip,$id]);
 
 <script>

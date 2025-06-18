@@ -43,9 +43,10 @@ class TableBody
             unset($spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
         }
 
+        # Gruppen.ID nur bei admin ausgeben
         if (empty($_SESSION['su'])) {
             unset($spaltennamen['gid']);
-            unset($spaltennamen['print']);
+            #unset($spaltennamen['print']);
         }
 
         // Tabelle-Spaltenreihenfolge entspr. $spaltennamen
@@ -189,9 +190,10 @@ class TableBody
             unset($spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
         }
 
+        # Gruppen.ID nur bei admin ausgeben
         if (empty($_SESSION['su'])) {
             unset($spaltennamen['gid']);
-            unset($spaltennamen['print']);
+            #unset($spaltennamen['print']);
         }
 
         $output = "<tbody>";
@@ -237,6 +239,7 @@ class TableBody
                             href=./details.php?id={$stamp[$id]}>{$stamp[$spalte_db]}</a></td>";
 
                     // Druckoption, startet JS: prn_toogle()
+                    // Symbol per CSS
                     } elseif ($spalte_db === 'print') {
                         $data = $stamp[$spalte_db];
                         $fid = $stamp[$id];
@@ -248,8 +251,8 @@ class TableBody
                                 <td class='data-cell' title='druck ja/nein'
                                     style='text-align:center;'>
                                 <input type='checkbox' name='{$spalte_db}'
-                                    id='prn_".$fid."' class='chkbx' {$checked} onclick='prn_toogle(".$fid.",".$data_rev.")' />
-                                <label for='prn_".$fid."'></label></td>";
+                                    id='prn_{$fid}' class='chkbx' {$checked} onclick='prn_toogle({$fid},{$data_rev})' />
+                                <label for='prn_{$fid}'></label></td>";
 
                     // Ansicht
                     } elseif ($spalte_db == 'kat20') {

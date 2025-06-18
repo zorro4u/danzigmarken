@@ -163,15 +163,12 @@ input#menu:checked ~ label {
 .menu-content .konto::after{
     content: "Konto";
 }
-a .login_self::before{
-    content: "Anmelden";
+
+a .login_self::after{
     padding: 0 10px 0 0;
 }
-a .login_self::after{
-    content: "";
-}
 a .login_link::after{
-    content: '';
+    content: "";
 }
 }
 

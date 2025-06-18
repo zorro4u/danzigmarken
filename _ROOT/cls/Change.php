@@ -33,8 +33,9 @@ class Change extends Details
             self::$pdo = Database::connect_mariadb();
         }
 
-        #self::site_entry_check();
+        self::site_entry_check();
         self::data_preparation();
+        self::form_evaluation();
 
         Header::show();
         self::site_output();
@@ -45,7 +46,7 @@ class Change extends Details
     }
 
 
-    protected static function site_entry_check($gid=0)
+    protected static function site_entry_check()
     {
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!Auth::is_checked_in()) {
@@ -53,19 +54,25 @@ class Change extends Details
             header("location: /auth/login.php");
             exit;
         }
+
+        // PlausiCheck Seiten-ID
+        parent::site_entry_check();
     }
 
 
     public static function data_preparation()
     {
+        // Details Hauptroutine ausführen
         parent::data_preparation();
+
+        // Seiten-Check bisher okay
+        if (self::$showForm):
 
         # self:: kommt hier von Details
         $pdo_db = self::$pdo;
-        $spaltennamen = self::$spaltennamen;
         $max_file = self::$max_file;
-
-
+        $spaltennamen = self::$spaltennamen;
+        $abfrage_db = [];
 
         // diese Einträge nicht anzeigen
         unset($spaltennamen['created']);
@@ -107,7 +114,6 @@ class Change extends Details
             }
         }
 
-        $abfrage_db = [];
         // doppelte Einträge in den Spalten aufgrund der kombinerten DB-Abfrage löschen
         // [$theme_db, $franka_db, $ansicht_db, $attest_db] = $abfrage_db;
         foreach ($qry_arr AS $col) {
@@ -121,42 +127,41 @@ class Change extends Details
         self::$spaltennamen = $spaltennamen;
         self::$abfrage_db = $abfrage_db;
 
-
-        // Formular-Eingabe verarbeiten
-        self::data_evaluation();
+        endif;      # Seiten-Check okay
     }
 
 
-    public static function data_evaluation()
+    /***********************
+     * Formular-Eingabe verarbeiten
+     * und an DB schicken
+     */
+    public static function form_evaluation()
     {
-        // ===========================================
-        // ===========================================
-        // Formular-Eingabe auswerten und an DB schicken
-        //
         // kat10-kat17, datum -> dzg_group
         // kat21-24           -> dzg_file
         // kat20              -> kat20(kat20)
         // kat21              -> kat21(kat21)
         // kat15              -> kat15(kat15)
         // thema              -> dzg_dirsub2(sub2)
-        //
+
+        $userid = $_SESSION['userid'];
+        $stamps = self::$stamps;
+        $showForm = self::$showForm;
+        $status_message = self::$status_message;
+        $error_arr = self::$error_arr;
+        $success_msg = "";
+        $error2 = False;
+
+
+        // Seiten-Check bisher okay, Formularauswertung starten
+        if ($showForm):
 
         $pdo_db = self::$pdo;
-        $stamps = self::$stamps;
         $max_file = self::$max_file;
         $akt_file_id = self::$akt_file_id;
         $akt_file_idx = self::$akt_file_idx;
         $gid = self::$gid;
-        $showForm = self::$showForm;
-        $status_message = self::$status_message;
         $remaddr = $_SERVER['REMOTE_ADDR'];     # abfragende Adresse
-        $success_msg = "";
-        $error_arr = [];
-        $error2 = False;
-
-
-        // Plausi-Check bisher okay, weitere Datenvorbereitung starten
-        if ($showForm):
 
 
         // ABBRUCH - Button
@@ -186,28 +191,31 @@ class Change extends Details
             unset($_POST['restore']);
             $_POST = [];
 
-            $stmt1 = "UPDATE dzg_file SET deakt=1, ip=? WHERE id=?";
-            $stmt2 = "UPDATE dzg_fileplace SET deakt=1, ip=? WHERE id=?";
-            $stmt3 = "UPDATE dzg_group SET deakt=1, ip=? WHERE id=?";
+            $stmt1 = "UPDATE dzg_file SET deakt=1, chg_ip=?, chg_by=? WHERE id=?";
+            $stmt2 = "UPDATE dzg_fileplace SET deakt=1, chg_ip=?, chg_by=? WHERE id=?";
+            $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=?, chg_by=? WHERE id=?";
 
 
             try {
 
                 $qry = $pdo_db->prepare($stmt1);
                 $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $akt_file_id, PDO::PARAM_INT);
+                $qry->bindParam(2, $userid, PDO::PARAM_INT);
+                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
                 $qry->execute();
 
                 $qry = $pdo_db->prepare($stmt2);
                 $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $akt_file_id, PDO::PARAM_INT);
+                $qry->bindParam(2, $userid, PDO::PARAM_INT);
+                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
                 $qry->execute();
 
                 // wenn nur 1 Datei, dann auch Gruppeneintrag löschen
                 if ($max_file < 2) {
                     $qry = $pdo_db->prepare($stmt3);
                     $qry->bindParam(1, $remaddr);
-                    $qry->bindParam(2, $gid, PDO::PARAM_INT);
+                    $qry->bindParam(2, $userid, PDO::PARAM_INT);
+                    $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
                     $qry->execute();
                 }
 
@@ -246,26 +254,29 @@ class Change extends Details
             unset($_POST['delete']);
             $_POST = [];
 
-            $stmt1 = "UPDATE dzg_file SET deakt=0, ip=? WHERE id=?";
-            $stmt2 = "UPDATE dzg_fileplace SET deakt=0, ip=? WHERE id=?";
-            $stmt3 = "UPDATE dzg_group SET deakt=0, ip=? WHERE id=?";
+            $stmt1 = "UPDATE dzg_file SET deakt=0, chg_ip=?, chg_by=? WHERE id=?";
+            $stmt2 = "UPDATE dzg_fileplace SET deakt=0, chg_ip=?, chg_by=? WHERE id=?";
+            $stmt3 = "UPDATE dzg_group SET deakt=0, chg_ip=?, chg_by=? WHERE id=?";
 
             try {
                 $qry = $pdo_db->prepare($stmt1);
                 $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $akt_file_id, PDO::PARAM_INT);
+                $qry->bindParam(2, $userid, PDO::PARAM_INT);
+                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
                 $qry->execute();
 
                 $qry = $pdo_db->prepare($stmt2);
                 $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $akt_file_id, PDO::PARAM_INT);
+                $qry->bindParam(2, $userid, PDO::PARAM_INT);
+                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
                 $qry->execute();
 
                 // wenn nur 1 Datei, dann auch Gruppe wieder aktivieren
                 if ($max_file < 2) {
                     $qry = $pdo_db->prepare($stmt3);
                     $qry->bindParam(1, $remaddr);
-                    $qry->bindParam(2, $gid, PDO::PARAM_INT);
+                    $qry->bindParam(2, $userid, PDO::PARAM_INT);
+                    $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
                     $qry->execute();
                 }
 
@@ -294,9 +305,9 @@ class Change extends Details
 
                 // neuen Datensatz 'Marke' anlegen
                 $stmt1 = "INSERT INTO dzg_group (id_thema, datum, kat10, kat11, kat12, kat13,
-                                kat14, kat15, kat16, kat17, ip, mirror)
+                                kat14, kat15, kat16, kat17, chg_ip, chg_by, mirror)
                     VALUES (:id_thema, :datum, :kat10, :kat11, :kat12, :kat13, :kat14, :kat15,
-                            :kat16, :kat17, :ip, 1)";
+                            :kat16, :kat17, :ip, :uid, 1)";
 
                 $data1 = [
                     ':id_thema' => (int)$stamps[$akt_file_idx]['id_sub2'],
@@ -309,7 +320,8 @@ class Change extends Details
                     ':kat15'    => $stamps[$akt_file_idx]['kat15'],
                     ':kat16'    => $stamps[$akt_file_idx]['kat16'],
                     ':kat17'    => $stamps[$akt_file_idx]['kat17'],
-                    ':ip'       => $remaddr
+                    ':ip'       => $remaddr,
+                    ':uid'      => $userid
                 ];
 
                 try {
@@ -330,11 +342,12 @@ class Change extends Details
                 }
 
                 // Datei mit neuer Marke verknüpfen
-                $stmt2 = "UPDATE dzg_file SET id_stamp=:new_gid, ip=:remaddr
+                $stmt2 = "UPDATE dzg_file SET id_stamp=:new_gid, chg_ip=:ip, chg_by=:uid
                             WHERE id=:akt_file_id";
                 $data2 = [
                         'new_gid' => $new_gid,
-                        'remaddr' => $remaddr,
+                        'ip'      => $remaddr,
+                        'uid'     => $userid,
                         'akt_file_id' => $akt_file_id];
                 try {
                     $qry = $pdo_db->prepare($stmt2);
@@ -484,7 +497,7 @@ class Change extends Details
                 }
 
 
-                // update stamps
+                // update gruppe
                 if (!empty($s)) {
                     $s['ip'] = $remaddr;
                     $set = '';
@@ -510,6 +523,9 @@ class Change extends Details
                             }
                         }
                         $qry->execute();
+
+                        $success_msg = 'Änderung ausgeführt.';
+
                     } catch(PDOException $e) {
                         $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
                     }
@@ -592,9 +608,9 @@ class Change extends Details
             }
         } # ende Ändern-Button
 
+
         // Formularseite trotz Fehler bei der Änderungseingabe anzeigen
         $error2 = !empty($error_arr) ? true : false;
-
 
         endif;  // Plausi-Check okay
 
@@ -608,9 +624,8 @@ class Change extends Details
             $error_msg = "Diese Seite wird überarbeitet und funktioniert im Augenblick nicht.";
         } ---*/
 
-        $showForm = ($error_msg === "" OR $error2) ? True : False;
+        $showForm = ($error_msg === "" OR $error2) ? true : false;
         $status_message = Tools::status_out($success_msg, $error_msg);
-
 
         // globale Variablen setzen
         self::$stamps = $stamps;
@@ -624,17 +639,23 @@ class Change extends Details
      */
     protected static function site_output()
     {
+        $showForm = self::$showForm;
+        $status_message = self::$status_message;
         $output = "<div class='container'>";
-        $output .= self::$status_message;
-        if (self::$showForm):
+        if (!$showForm):
+            $output .= $status_message;
+        else:
 
-        // globale Klassen-Variablen laden
+        // Seiten-Check okay, Seite starten
         $spaltennamen = self::$spaltennamen;
         $stamps = self::$stamps;
         $akt_file_idx = self::$akt_file_idx;
         $max_file = self::$max_file;
+        $prev = self::$prev;
+        $next = self::$next;
         [$theme_db, $franka_db, $ansicht_db, $attest_db] = self::$abfrage_db;
 
+        $output .= $status_message;
         $output .= "<div class='center-detail'>";
         $output .= "<div class='main-detail'>";
 
@@ -765,22 +786,6 @@ class Change extends Details
                 }
                 $output .= "</select></td></tr>";
 
-            // bearbeitet (nicht verwendet)
-            } elseif ($spalte_db === 'changed') {
-                $changed =
-                    max($stamps[$akt_file_idx]['changed'], $stamps[$akt_file_idx]['s_changed']);
-                $data = ($changed)
-                    ? date("d.m.Y", strtotime($changed))
-                    : '';
-
-                if (!empty($changed)) {
-                    $output .= "";
-                    $output .= "<tr><td class='detail-key' style='color:hsl(0, 0%, 80%);
-                                font-size: 85%; padding-top: 12px;'>{$spalte_web}</td>";
-                    $output .= "<td class='detail-val' style='color:hsl(0, 0%, 80%);
-                                font-size: 85%; padding-top: 12px;'>{$data}</td></tr>";
-                }
-
             // Bild-ID
             } elseif ($spalte_db == 'fid') {
                 $output .= "<tr><td class='detail-key' style='color:hsl(0,0%,45%);'>
@@ -798,7 +803,7 @@ class Change extends Details
                 $output .= "<td class='detail-val' style='border: 0px solid black;
                             padding-left:12px;background-colorX:hsl(54,73%,97%)'>
                             <input type='checkbox' name='{$spalte_db}' value='1'
-                            id='print' {$checked} /><label for='print'></label></td></tr>";
+                            id='print' class='' {$checked} /><label for='print'></label></td></tr>";
 
             // gleiche Ausgabe-Formatierung, angepasste Daten-Generierung
             } else {
@@ -978,8 +983,6 @@ class Change extends Details
 
         // ZURÜCK .. VOR
         //
-        $prev = self::$prev;
-        $next = self::$next;
         $label = (empty($_SESSION['idx2'])) ? "Bild" : "Gruppe";
 
         $output .= "<br><div class='fuss noprint' style='padding-top:0; padding-bottom:0;'>";

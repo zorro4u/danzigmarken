@@ -14,15 +14,18 @@ use PDO, PDOException, Exception;
  */
 class Settings
 {
-    /**
+    /****************************
      * Klassenvariablen / Eigenschaften
      */
     public static $pdo;
     public static $active;
+    public static $userid;
     public static $usr_data;
     protected static $userliste;
     protected static $identifier;
     protected static $error_msg;
+    protected static $showForm;
+    protected static $status_message;
 
 
     /****************************
@@ -35,7 +38,9 @@ class Settings
             self::$pdo = Database::connect_mariadb();
         }
 
+        self::site_entry_check();
         self::data_preparation();
+        self::form_evaluation();
 
         Header::show();
         self::site_output();
@@ -47,7 +52,45 @@ class Settings
 
 
     /****************************
+     * Summary of site_entry_check
+     * CheckIn-Test
+     * Plausi-Test: userid, identifier, token_hash
+     * set identifier
+     * set last_site
+     * set showForm
+     */
+    public static function site_entry_check()
+    {
+        if (empty($_SESSION['main']))
+            $_SESSION['main'] = "/";
+
+        $return2 = ["index", "index2", "details"];
+        Tools::lastsite($return2);
+
+        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
+
+        // unberechtigter Seitenaufruf
+        $status = (empty($error_msg)) ? true : false;
+
+        // Nutzer nicht angemeldet? Dann weg hier ...
+        if (!Auth::is_checked_in()) {
+            header("location: /auth/login.php");
+            exit;
+        }
+
+        // globale Variablen setzen
+        if ($status) {
+            self::$identifier = $securitytoken_row['identifier'];
+            self::$userid = $usr_data['userid'];
+        }
+        self::$error_msg = $error_msg;
+        self::$showForm = $status;
+    }
+
+
+    /****************************
      * Summary of data_preparation
+     * set $usr_data, $userliste
      */
     public static function data_preparation()
     {
@@ -55,357 +98,345 @@ class Settings
         // Konto löschen per PW legitimieren
         // Konto löschen: logout nicht über die logout-Seite sondern per Funktion und Rücksprung zur Hauptseite
         //
+
+        // globale Variablen holen
+        $userid = self::$userid;
+        $identifier = self::$identifier;
+        $showForm = self::$showForm;
         $pdo = self::$pdo;
-        $error_msg = "";
-        $success_msg = "";
-
-        if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
-
-        $return2 = ["index", "index2", "details"];
-        Tools::lastsite($return2);
-
-        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
-        if ($error_msg !== '') echo $error_msg;
-
-        // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
-            #Auth::check_user();
-            #if (!Auth::is_checked_in()) {
-                header("location: /auth/login.php");
-                exit;
-            #}
-        }
-
         $usr_data = [];
         $userliste = [];
-        $userid = $_SESSION['userid'];
-        $identifier = (!empty($securitytoken_row['identifier']))
-            ? htmlspecialchars($securitytoken_row['identifier'], ENT_QUOTES)
-            : '';
-        $token_hash = (!empty($securitytoken_row['token_hash']))
-            ? htmlspecialchars($securitytoken_row['token_hash'], ENT_QUOTES)
-            : '';
 
+        // Seiten-Check okay, Seite starten
+        if ($showForm):
 
-        // Plausi-Check...
-        if (!preg_match('/^[0-9]{1,20}$/', $userid)) {
-            $error_msg = '- unzulässige Zeichen in Session-User-ID -';
+        // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
+        // alle aktiven Anmeldungen
+        $stmt = "SELECT site_users.userid, username, email, vorname, nachname, pw_hash, count3
+            FROM site_users
+            LEFT JOIN (
+                SELECT userid, COUNT(*) AS count3
+                FROM site_login
+                WHERE userid = :userid AND login=1 && autologin=1 AND identifier != :ident
+            ) AS ct1 ON ct1.userid = site_users.userid
+            ";
+
+        try {
+            $qry = $pdo->prepare($stmt);
+            $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+            $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
+            $qry->execute();
+            $results = $qry->fetchALL(PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {die($e->getMessage().': settings.inc_ct-autologins');}
+
+        // Daten separieren
+        foreach ($results as $user) {
+
+            // aktueller Nutzer (für Formular-Vorbelegung)
+            if ($user['userid'] == $userid) $usr_data = $user;
+
+            // die anderen (für Abgleich nach Änderung von name/email)
+            else {
+                $userliste []= [
+                    'username' => $user['username'],
+                    'email' => $user['email']
+                ];
+            }
         }
-        if (!preg_match("/^[a-zA-Z0-9]{0,1000}$/", $identifier)) {
-            $error_msg = '- unzulässige Zeichen im Identifier-Cookies -';
-        }
-        if (!preg_match("/^[a-zA-Z0-9]{0,1000}$/", $token_hash)) {
-            $error_msg = '- unzulässige Zeichen im Token-Cookie -';
-        }
+        endif;      # Seiten-Check okay
+
+        // globale Variablen setzen
+        self::$usr_data = $usr_data;
+        self::$userliste = $userliste;
+    }
 
 
-        // unberechtigter Seitenaufruf
-        if ($error_msg) {
-            Auth::delete_autocookies();
-            echo $error_msg;
+    /****************************
+     * Summary of form_evaluation
+     * Formular-Eingabe verarbeiten
+     */
+    public static function form_evaluation()
+    {
+        $pdo = self::$pdo;
+        $identifier = self::$identifier;
+        $usr_data = self::$usr_data;
+        $userliste = self::$userliste;
+        $userid = self::$userid;
+        $showForm = self::$showForm;
+        $error_msg = self::$error_msg;
+        $success_msg = "";
 
-        // alles okay, Seite starten
-        } else {
+        // Seiten-Check okay, Seite starten
+        if ($showForm):
 
-            // Zählerangaben für Autologin-Anzeige
-            //
-            // alle aktiven Anmeldungen des Nutzers holen
-            $stmt = "SELECT site_users.userid, username, email, vorname, nachname, count3
-                FROM site_users
-                    LEFT JOIN (
-                        SELECT userid, COUNT(*) AS count3
-                        FROM site_login
-                        WHERE userid = :userid AND login=1 && autologin=1 AND identifier != :ident
-                    ) AS ct1 ON site_users.userid = ct1.userid
-                ";
+        // Änderungsformular empfangen
+        if (isset($_GET['save']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
 
+        $regex_usr = "/^[\wäüößÄÜÖ\-]{3,50}$/";
+        $regex_email = "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
+        $regex_pw = "/^[\w<>()?!,.:_=$%&#+*~^ @€µäüößÄÜÖ]{1,100}$/";
+        // (Doppel-)Name mit Bindestrich/Leerzeichen, ohne damit zu beginnen oder zu enden und ohne doppelte Striche/Leerz., ist 0-50 Zeichen lang
+        $regex_name = "/^[a-zA-ZäüößÄÜÖ]+([a-zA-ZäüößÄÜÖ]|[ -](?=[a-zA-ZäüößÄÜÖ])){0,50}$/";
+        $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^a-zA-ZäüößÄÜÖ -]+|[- ]{2,}|[^a-zA-ZäüößÄÜÖ]+$/";
+
+        $save = htmlspecialchars(Tools::clean_input($_GET['save']));
+        switch ($save):
+
+        // Änderung Anmeldedaten
+        case 'email':
+            $update_username = False;
+            $update_email = False;
+
+            $input_usr = htmlspecialchars(Tools::clean_input($_POST['username']));    # strtolower()
+            $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
+            $input_email2 = htmlspecialchars(Tools::clean_input($_POST['email2']));
+            $input_pw = $_POST['passwort'];
+
+
+            // Eingabewerte auf Plausibilität prüfen
+
+            // Passwort-Check
+            if (!password_verify($input_pw, $usr_data['pw_hash']))
+                $error_msg = "Bitte korrektes Passwort eingeben.";
+
+
+            // Email-Check
+            elseif ($input_email === "" && $input_usr === "")
+                $error_msg = 'Name oder Email angeben.';
+
+            elseif ($input_email !== "" && ($input_email !== $input_email2))
+                $error_msg = 'Die Emailangaben müssen übereinstimmen.';
+
+            elseif ($input_email !== "" &&
+                (!filter_var($input_email, FILTER_VALIDATE_EMAIL)))
+            {
+                $error_msg = 'Keine gültige Email-Adresse.';
+
+            } elseif ($input_email !== "" &&
+                ($input_email !== $usr_data['email']))
+            {
+                foreach ($userliste AS $user_info) {
+                    // ist email schon vorhanden?
+                    if ($input_email == $user_info['email']) {
+                        $error_msg = "Die E-Mail-Adresse ist bereits registriert.";
+                        break;
+                    } else {
+                        $update_email = True;
+                    }
+                }
+
+            } elseif ($input_email === $usr_data['email'])
+                $success_msg = "E-Mail-Adressse unverändert.";
+
+
+            // Username-Check
+            elseif ($input_usr !== "" &&
+                preg_match("/\W/", $input_usr, $matches))
+            {
+                $error_msg = 'nur Buchstaben/Zahlen im Anmeldenamen zulässig: '.
+                    htmlspecialchars($matches[0]);
+
+            } elseif ($input_usr !== "" &&
+                ($input_usr !== $usr_data['username']))
+            {
+                foreach ($userliste AS $user_info) {
+                    // ist username schon vorhanden?
+                    if ($input_usr == $user_info['username']) {
+                        $error_msg = "Der Benutzername ist schon vergeben.";
+                        break;
+                    } else {
+                        $update_username = True;
+                    }
+                }
+            } elseif ($input_usr == $usr_data['username'])
+                $success_msg = "Benutzername unverändert.";
+
+            else {}  // Namen-Email-Check okay
+
+
+            // Daten in DB ändern
+            if ($error_msg === "" && $success_msg === "") {
+                if ($update_email && $update_username) {
+                    $stmt = "UPDATE site_users SET email = :email, username = :username  WHERE userid = :userid";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
+                        $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {
+                        die($e->getMessage().': settings.inc_update-email.name');
+                    }
+                    $usr_data['username'] = $input_usr;
+                    $usr_data['email'] = $input_email;
+                    $success_msg = "Benutzername und E-Mail-Adresse erfolgreich gespeichert.";
+
+
+                } elseif ($update_email) {
+                    $stmt = "UPDATE site_users SET email = :email WHERE userid = :userid";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {
+                        die($e->getMessage().': settings.inc_update-email');
+                    }
+                    $usr_data['email'] = $input_email;
+                    $success_msg = "E-Mail-Adresse erfolgreich gespeichert.";
+
+                } elseif ($update_username) {
+                    $stmt = "UPDATE site_users SET username = :username WHERE userid = :userid";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {
+                        die($e->getMessage().': settings.inc_update-usrname');
+                    }
+                    $usr_data['username'] = $input_usr;
+                    $success_msg = "Benutzername erfolgreich geändert.";
+                }
+                else {}   // keine Änderungen
+            }
+        break;
+
+
+        // Änderung Passwort
+        case 'passwort':
+            $input_pwALT = $_POST['passwortAlt'];
+            $input_pwNEU1 = $_POST['passwortNeu'];
+            $input_pwNEU2 = $_POST['passwortNeu2'];
+
+            // Eingabewerte auf Plausibilität prüfen
+            if ($input_pwNEU1 != $input_pwNEU2)
+                $error_msg = "Die eingegebenen Passwörter stimmten nicht überein.";
+
+            elseif (!password_verify($input_pwALT, $usr_data['pw_hash']))
+                $error_msg = "Bitte korrektes Passwort eingeben.";
+
+            elseif (strlen($input_pwNEU1) < 4 || strlen($input_pwNEU1) > 50)
+                $error_msg = "Passwort muss zwischen 4 und 50 Zeichen lang sein!";
+
+            elseif (!preg_match($regex_pw, $input_pwNEU1))
+                $error_msg = "Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>";
+
+            else {
+                $passwort_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
+                $stmt = "UPDATE site_users SET pw_hash = :pw_hash WHERE userid = :userid";
+                try {
+                    $qry = $pdo->prepare($stmt);
+                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                    $qry->bindParam(':pw_hash', $passwort_hash, PDO::PARAM_STR);
+                    $qry->execute();
+                } catch(PDOException $e) {
+                    die($e->getMessage().': settings.inc_update-pwhash');
+                }
+                $usr_data['pw_hash'] = $passwort_hash;
+                $success_msg = "Passwort erfolgreich gespeichert.";
+            }
+        break;
+
+
+        // Änderung Persönl. Daten
+        case 'data':
+            $error_msg = [];
+            $input_vor = isset($_POST['vorname']) ? htmlspecialchars(Tools::clean_input($_POST['vorname'])) : "";
+            $input_nach = isset($_POST['nachname']) ? htmlspecialchars(Tools::clean_input($_POST['nachname'])) : "";
+
+            // Plausi-Check
+            if ($input_vor !== "" && preg_match_all($regex_name_no, $input_vor, $match))
+                $error_msg []= 'nur Buchstaben im Vornamen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
+
+            if ($input_nach !== "" && preg_match_all($regex_name_no, $input_nach, $match))
+                $error_msg []= 'nur Buchstaben im Nachnamen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
+
+            // Eingabe okay
+            if (empty($error_msg)){
+                if ($input_vor != $usr_data['vorname'] || $input_nach != $usr_data['nachname']) {
+                    $stmt = "UPDATE site_users SET vorname = :vorname, nachname = :nachname WHERE userid = :userid";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->bindParam(':vorname', $input_vor, PDO::PARAM_STR);
+                        $qry->bindParam(':nachname', $input_nach, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {
+                        die($e->getMessage().': settings.inc_update-name');
+                    }
+                    $usr_data['vorname'] = $input_vor;
+                    $usr_data['nachname'] = $input_nach;
+                    $success_msg = "Persönliche Daten geändert.";
+                }
+            }
+            $error_msg = implode("", $error_msg);
+        break;
+
+
+        // Autologins abmelden, log=0
+        case 'autologin':
+            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
+                WHERE userid = :userid AND (login = 1 && autologin = 1) AND identifier != :ident";
+            #$stmt = "DELETE FROM site_login WHERE userid=:userid AND autologin=1";
             try {
                 $qry = $pdo->prepare($stmt);
                 $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
                 $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
                 $qry->execute();
-                $results = $qry->fetchALL(PDO::FETCH_ASSOC);
-            } catch(PDOException $e) {die($e->getMessage().': settings.inc_ct-autologins');}
-
-            // Daten separieren
-            foreach ($results as $user) {
-
-                // aktueller Nutzer (für Formular-Vorbelegung)
-                if ($user['userid'] == $userid) $usr_data = $user;
-
-                // die anderen (für Abgleich nach Änderung von name/email)
-                else $userliste []= $user;
+            } catch(PDOException $e) {
+                die($e->getMessage().': settings.inc_del-autologin');
             }
-        }
-
-        // globale Variablen setzen
-        self::$error_msg = $error_msg;
-        self::$usr_data = $usr_data;
-        self::$userliste = $userliste;
-        self::$identifier = $identifier;
+            $usr_data['count3'] = "";
+            $success_msg = "alle meine anderen Autologins beendet.";
+        break;
 
 
-        // Formular-Eingabe verarbeiten
-        self::data_evaluation();
-    }
+        // Konto löschen
+        case 'delete':
+            $input_pw3 = $_POST['pw_delete'];
 
+            // Passwort-Check
+            if (!password_verify($input_pw3, $usr_data['pw_hash']))
+                $error_msg = "Bitte korrektes Passwort eingeben.";
 
-    /****************************
-     * Summary of data_evaluation
-     * Formular-Eingabe verarbeiten
-     */
-    public static function data_evaluation()
-    {
-        $pdo = self::$pdo;
-        $error_msg = self::$error_msg;
-        $usr_data = self::$usr_data;
-        $userliste = self::$userliste;
-        $identifier = self::$identifier;
-        $userid = $_SESSION['userid'];
+            if ((isset($_SESSION['su']) && (int)$_SESSION['su'] === 1) )
+                $error_msg = "Ein Admin kann sich hier nicht löschen.";
 
+            if ($error_msg === "") {
+                $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
+                #$stmt = "DELETE FROM site_users WHERE userid=:userid";
+                try {
+                    $qry = $pdo->prepare($stmt);
+                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                    $qry->execute();
+                } catch(PDOException $e) {
+                    die($e->getMessage().': settings.inc_del-user-1');
+                }
 
-        // Plausi-Check okay, Seite starten
-        if (!$error_msg):
+                // wenn auf 'deaktiv' gesetzt, dann auch alle Anmeldungen löschen/beenden, (sonst bei DELETE automatisch per Verknüpfung gelöscht).
+                #$stmt = "DELETE FROM site_login WHERE userid = :userid";
+                $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
+                    WHERE userid = :userid AND (login = 1 || autologin = 1)";
+                try {
+                    $qry = $pdo->prepare($stmt);
+                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                    $qry->execute();
+                } catch(PDOException $e) {
+                    die($e->getMessage().': settings.inc_del-user-2');
+                }
+                $usr_data = [];
+                $success_msg = "Nutzer gelöscht.";
 
-            // Änderungsformular empfangen
-            if (isset($_GET['save']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
+                Auth::logout();
+                #header("location: /auth/logout.php");
+                exit;
+            }
+        break;
 
-                $regex_usr = "/^[\wäüößÄÜÖ\-]{3,50}$/";
-                $regex_email = "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
-                $regex_pw = "/^[\w<>()?!,.:_=$%&#+*~^ @€µäüößÄÜÖ]{1,100}$/";
-                // (Doppel-)Name mit Bindestrich/Leerzeichen, ohne damit zu beginnen oder zu enden und ohne doppelte Striche/Leerz., ist 0-50 Zeichen lang
-                $regex_name = "/^[a-zA-ZäüößÄÜÖ]+([a-zA-ZäüößÄÜÖ]|[ -](?=[a-zA-ZäüößÄÜÖ])){0,50}$/";
-                $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^a-zA-ZäüößÄÜÖ -]+|[- ]{2,}|[^a-zA-ZäüößÄÜÖ]+$/";
-
-                $save = htmlspecialchars(Tools::clean_input($_GET['save']));
-                switch ($save):
-
-                    // Änderung Anmeldedaten
-                    case 'email':
-                        $update_username = False;
-                        $update_email = False;
-
-                        $input_usr = htmlspecialchars(Tools::clean_input($_POST['username']));    # strtolower()
-                        $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
-                        $input_email2 = htmlspecialchars(Tools::clean_input($_POST['email2']));
-                        $input_pw = $_POST['passwort'];
-
-
-                        // Eingabewerte auf Plausibilität prüfen
-
-                        // Passwort-Check
-                        if (!password_verify($input_pw, $usr_data['pw_hash']))
-                            $error_msg = "Bitte korrektes Passwort eingeben.";
-
-
-                        // Email-Check
-                        elseif ($input_email === "" && $input_usr === "")
-                            $error_msg = 'Name oder Email angeben.';
-
-                        elseif ($input_email !== "" && ($input_email !== $input_email2))
-                            $error_msg = 'Die Emailangaben müssen übereinstimmen.';
-
-                        elseif ($input_email !== "" &&
-                            (!filter_var($input_email, FILTER_VALIDATE_EMAIL)))
-                        {
-                            $error_msg = 'Keine gültige Email-Adresse.';
-
-                        } elseif ($input_email !== "" &&
-                            ($input_email !== $usr_data['email']))
-                        {
-                            foreach ($userliste AS $user_info) {
-                                // ist email schon vorhanden?
-                                if ($input_email == $user_info['email']) {
-                                    $error_msg = "Die E-Mail-Adresse ist bereits registriert.";
-                                    break;
-                                } else {
-                                    $update_email = True;
-                                }
-                            }
-
-                        } elseif ($input_email === $usr_data['email'])
-                            $success_msg = "E-Mail-Adressse unverändert.";
-
-
-                        // Username-Check
-                        elseif ($input_usr !== "" &&
-                            preg_match("/\W/", $input_usr, $matches))
-                        {
-                            $error_msg = 'nur Buchstaben/Zahlen im Anmeldenamen zulässig: '.
-                                htmlspecialchars($matches[0]);
-
-                        } elseif ($input_usr !== "" &&
-                            ($input_usr !== $usr_data['username']))
-                        {
-                            foreach ($userliste AS $user_info) {
-                                // ist username schon vorhanden?
-                                if ($input_usr == $user_info['username']) {
-                                    $error_msg = "Der Benutzername ist schon vergeben.";
-                                    break;
-                                } else {
-                                    $update_username = True;
-                                }
-                            }
-                        } elseif ($input_usr == $usr_data['username'])
-                            $success_msg = "Benutzername unverändert.";
-
-                        else {}  // Namen-Email-Check okay
-
-
-                        // Daten in DB ändern
-                        if ($error_msg === "" && $success_msg === "") {
-                            if ($update_email && $update_username) {
-                                $stmt = "UPDATE site_users SET email = :email, username = :username  WHERE userid = :userid";
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                                    $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                                    $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                                    $qry->execute();
-                                } catch(PDOException $e) {die($e->getMessage().': settings.inc_update-email.name');}
-                                $success_msg = "Benutzername und E-Mail-Adresse erfolgreich gespeichert.";
-                            } elseif ($update_email) {
-                                $stmt = "UPDATE site_users SET email = :email WHERE userid = :userid";
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                                    $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                                    $qry->execute();
-                                } catch(PDOException $e) {die($e->getMessage().': settings.inc_update-email');}
-                                $success_msg = "E-Mail-Adresse erfolgreich gespeichert.";
-                            } elseif ($update_username) {
-                                $stmt = "UPDATE site_users SET username = :username WHERE userid = :userid";
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                                    $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                                    $qry->execute();
-                                } catch(PDOException $e) {die($e->getMessage().': settings.inc_update-usrname');}
-                                $success_msg = "Benutzername erfolgreich geändert.";
-                            }
-                            else {}  // keine Änderung
-                            $success_msg = "Anmeldedaten geändert.";
-                        }
-                        break;
-
-
-                    // Änderung Passwort
-                    case 'passwort':
-                        $input_pwALT = $_POST['passwortAlt'];
-                        $input_pwNEU1 = $_POST['passwortNeu'];
-                        $input_pwNEU2 = $_POST['passwortNeu2'];
-
-                        // Eingabewerte auf Plausibilität prüfen
-                        if ($input_pwNEU1 != $input_pwNEU2)
-                            $error_msg = "Die eingegebenen Passwörter stimmten nicht überein.";
-                        elseif (!password_verify($input_pwALT, $usr_data['pw_hash']))
-                            $error_msg = "Bitte korrektes Passwort eingeben.";
-                        elseif (strlen($input_pwNEU1) < 4 || strlen($input_pwNEU1) > 50)
-                            $error_msg = 'Passwort muss zwischen 4 und 50 Zeichen lang sein!';
-                        elseif (!preg_match($regex_pw, $input_pwNEU1))
-                            $error_msg = 'Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>';
-
-                        else {
-                            $passwort_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
-                            $stmt = "UPDATE site_users SET pw_hash = :pw_hash WHERE userid = :userid";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                                $qry->bindParam(':pw_hash', $passwort_hash, PDO::PARAM_STR);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().': settings.inc_update-pwhash');}
-                            $success_msg = "Passwort erfolgreich gespeichert.";
-                        }
-                        break;
-
-
-                    // Änderung Persönl. Daten
-                    case 'data':
-                        $error_msg = [];
-                        $input_vor = isset($_POST['vorname']) ? htmlspecialchars(Tools::clean_input($_POST['vorname'])) : "";
-                        $input_nach = isset($_POST['nachname']) ? htmlspecialchars(Tools::clean_input($_POST['nachname'])) : "";
-
-                        // Plausi-Check
-                        if ($input_vor !== "" && preg_match_all($regex_name_no, $input_vor, $match))
-                            $error_msg []= 'nur Buchstaben im Vornamen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
-                        if ($input_nach !== "" && preg_match_all($regex_name_no, $input_nach, $match))
-                            $error_msg []= 'nur Buchstaben im Nachnamen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
-
-                        if (empty($error_msg)){
-                            if ($input_vor != $usr_data['vorname'] || $input_nach != $usr_data['nachname']) {
-                                $stmt = "UPDATE site_users SET vorname = :vorname, nachname = :nachname WHERE userid = :userid";
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                                    $qry->bindParam(':vorname', $input_vor, PDO::PARAM_STR);
-                                    $qry->bindParam(':nachname', $input_nach, PDO::PARAM_STR);
-                                    $qry->execute();
-                                } catch(PDOException $e) {die($e->getMessage().': settings.inc_update-name');}
-                                $success_msg = "Persönliche Daten geändert.";
-                            }
-
-                        } else
-                            $error_msg = [implode("<br>", $error_msg)];
-
-                        $error_msg = implode("", $error_msg);
-                        break;
-
-
-                    // Autologins abmelden, log=0
-                    case 'autologin':
-                        $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                            WHERE userid = :userid AND (login = 1 && autologin = 1) AND identifier != :ident";
-                        #$stmt = "DELETE FROM site_login WHERE userid=:userid AND autologin=1";
-                        try {
-                            $qry = $pdo->prepare($stmt);
-                            $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                            $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                            $qry->execute();
-                        } catch(PDOException $e) {die($e->getMessage().': settings.inc_del-autologin');}
-                        $success_msg = "alle meine anderen Autologins beendet.";
-                        break;
-
-                    // Konto löschen
-                    case 'delete':
-                        $input_pw3 = $_POST['pw_delete'];
-
-                        // Passwort-Check
-                        if (!password_verify($input_pw3, $usr_data['pw_hash']))
-                            $error_msg = "Bitte korrektes Passwort eingeben.";
-
-                        if ((isset($_SESSION['su']) && (int)$_SESSION['su'] === 1) )
-                            $error_msg = "Ein Admin kann sich hier nicht löschen.";
-
-                        if ($error_msg === "") {
-                            $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
-                            #$stmt = "DELETE FROM site_users WHERE userid=:userid";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().': settings.inc_del-user-1');}
-
-                            // wenn auf 'deaktiv' gesetzt, dann auch alle Anmeldungen löschen/beenden, (sonst bei DELETE automatisch per Verknüpfung gelöscht).
-                            #$stmt = "DELETE FROM site_login WHERE userid = :userid";
-                            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                                WHERE userid = :userid AND (login = 1 || autologin = 1)";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().': settings.inc_del-user-2');}
-
-                            $success_msg = "Nutzer gelöscht.";
-
-                            header("location: /auth/logout.php");
-                            exit;
-                        }
-                        break;
-                endswitch;
-
-            endif;     // Formular empfangen
-
-        endif;  // no error_msg
+        endswitch;  # Speichern-Taste gedrückt
+        endif;      # Formular empfangen
+        endif;      # Seiten-Check okay
 
 
         // Marker setzen, um wieder auf den letzten Tab-Reiter zu springen
@@ -431,7 +462,14 @@ class Settings
             $active[$site_tabs[0]] = "active";
         }
 
+        $status_message = Tools::status_out($success_msg, $error_msg);
+
+        // globale Variablen setzen
+        self::$usr_data = $usr_data;
         self::$active = $active;
+        self::$error_msg = $error_msg;
+        self::$status_message = $status_message;
+
         unset($_REQUEST, $_POST, $_GET);
     }
 
@@ -441,15 +479,21 @@ class Settings
      */
     public static function site_output()
     {
+        $showForm = self::$showForm;
+        $status_message = self::$status_message;
+        $output = "<div class='container main-container'>";
+        if (!$showForm):
+            $output .= $status_message;
+        else:
+
+        // Seiten-Check okay, Seite starten
         $active = self::$active;
         $usr_data = self::$usr_data;
-        $output = "
-            <div class='container main-container'>
-            <h1>Einstellungen</h1>
-        ".
-        Tools::statusmeldung_ausgeben();
 
-        $output .= "<div> "; // -- START --
+        $output .= "<h1>Einstellungen</h1>";
+        $output .= $status_message;
+
+        $output .= "<div> "; # -- START --
 
         // -- Nav tabs --
         $output .= "
@@ -462,12 +506,9 @@ class Settings
 
             ";
             # wenn angemeldet als 'heinz' oder 'admin'
-            if ((int)$_SESSION['userid'] === 3 || (int)$_SESSION['su'] === 1):
+            if ($_SESSION['userid'] === 3333 || $_SESSION['su'] === 1111):
                 $output .= "
-
-            <li role='presentation' class='".$active['download']."'><a href='#download' aria-controls='download' role='tab' data-toggle='tab'>Download</a></li>
-
-            ";
+            <li role='presentation' class='".$active['download']."'><a href='#download' aria-controls='download' role='tab' data-toggle='tab'>Download</a></li>";
             endif;
             $output .= "
 
@@ -688,84 +729,16 @@ class Settings
                     <button class='btn btn-primary' type='submit'>anzeigen</button>&emsp;&emsp;&emsp;
                     <button formaction='/test/pdf_down'class='btn btn-primary' type='submit'>downloaden</button>
                 </form>
-                </div>
-
-        <br>
-        <h3>Viewportabmessungen</h3>
-        <h4>Breite</h4>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/ClientWidth\">Element.clientWidth</a>:
-            <span id=\"clientW\"></span>px</p>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/InnerWidth\">Window.innerWidth</a>:
-            <span id=\"innerW\"></span>px</p>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/OuterWidth\">Window.outerWidth</a>:
-            <span id=\"outerW\"></span>px</p>
-        <h4>Höhe</h4>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/ClientHeight\">Element.clientHeight</a>:
-            <span id=\"clientH\"></span>px</p>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/InnerHeight\">Window.innerHeight</a>:
-            <span id=\"innerH\"></span>px</p>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/OuterHeight\">Window.outerHeight</a>:
-            <span id=\"outerH\"></span>px</p>
-        <h3>Geräteabmessungen</h3>
-        <h4>Breite</h4>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Screen/width\">Screen.width</a>:
-            <span id=\"screenW\"></span>px</p>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/availWidth\">Screen.availWidth</a>:
-            <span id=\"availW\"></span>px</p>
-        <h4>Höhe</h4>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Screen/height\">Screen.height</a>:
-            <span id=\"screenH\"></span>px</p>
-        <p><a href=\"https://wiki.selfhtml.org/wiki/availHeight\">Screen.availHeight</a>:
-            <span id=\"availH\"></span>px</p>
-        <!--
-        <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Window/matchMedia\">matchMedia</a>:
-            <span id=\"matcMedia\"></span></p> -->
-
-                </div>
-            </div>
-        </div>
+                </div>";
 
 
-<script>
-'use strict';
-document.addEventListener(\"DOMContentLoaded\", function () {
-    document.addEventListener('resize', messen);
-    messen();
+    $output .= "</div></div></div>";    # -- Downloads
 
-    function messen() {
-        document.getElementById('clientW')
-            .textContent = document.querySelector('html')
-            .clientWidth;
-        document.getElementById('innerW')
-            .textContent = window.innerWidth;
-        document.getElementById('outerW')
-            .textContent = window.outerWidth;
-        document.getElementById('clientH')
-            .textContent = document.querySelector('html')
-            .clientHeight;
-        document.getElementById('innerH')
-            .textContent = window.innerHeight;
-        document.getElementById('outerH')
-            .textContent = window.outerHeight;
-        document.getElementById('screenW')
-            .textContent = screen.width;
-        document.getElementById('availW')
-            .textContent = screen.availWidth;
-        document.getElementById('screenH')
-            .textContent = screen.height;
-        document.getElementById('availH')
-            .textContent = screen.availHeight;
+        $output .= "</div> "; # -- tab-content -- ./../test/pdf_down.php
+        $output .= "</div> "; # -- ende.START --
+        endif;                # showForm
 
-        document.getElementById('matchMedia')
-            .textContent = window.matchMedia().media;
-    }
-});
-</script>
-
-        ";
-        $output .= "</div> "; // -- tab-content -- ./../test/pdf_down.php
-        $output .= "</div> "; // -- ende.START --
-        $output .= "</div> "; // -- container --
+        $output .= "</div> "; # -- container --
 
 
         ///////////////////////////////////////////////////

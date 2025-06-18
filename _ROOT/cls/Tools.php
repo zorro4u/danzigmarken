@@ -149,7 +149,7 @@ class Tools
         // Herkunftsseite speichern
         if (empty($return2)) $return2 = ["index", "index2", "details"];
         if (!isset($_SESSION['main'])) $_SESSION['main'] = $_SESSION['rootdir'].'/index.php';
-        
+
         if (isset($_SERVER['HTTP_REFERER']) &&
             (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
         {
@@ -194,6 +194,14 @@ class Tools
         return $data;
     }
 
+    /***********************
+     * (Error-) Array zu String wandeln
+     */
+    public static function arr2str($array): string
+    {
+        return implode("<br>", $array);
+    }
+
 
     /***********************
      * Statusmeldung auf html ausgeben
@@ -205,21 +213,21 @@ class Tools
 
         $ausgabe = '';
 
+        // id 'status' blendet sich per JS aus -> toolbox.js
         if(isset($success_msg) && $success_msg !== "") {
             $ausgabe =
-                '<div class="alert alert-success">'.
-                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.
-                $success_msg.'</div>';
-                #'&emsp;&emsp;<a href="'.htmlspecialchars(self::clean_input($_SERVER["PHP_SELF"])).'?tab='.$tab.'">< Reload ></a>'.
+                "<div id='status' class='alert alert-success'>".
+                "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>".
+                $success_msg."</div>";
 
         } elseif((isset($error_msg) && $error_msg !== "") || !empty($error_msg)) {
-            $exit_info = $exit ? '<br>-- <b>< <a href="logout">Logout</a> in 5sec ></b> --' : '';
+            $exit_info = $exit ? "<br>-- <b>< <a href='logout'>Logout</a> in 5sec ></b> --" : "";
 
             $ausgabe =
-                '<div class="alert alert-danger">'.
-                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.
-                $error_msg.$exit_info.'</div>';
+                "<div id='statusX' class='alert alert-danger' style='display:block;'>".
+                $error_msg.$exit_info."</div>";
         }
+
         return $ausgabe;
     }
 

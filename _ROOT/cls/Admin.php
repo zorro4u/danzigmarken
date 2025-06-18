@@ -5,14 +5,17 @@ namespace Dzg\Cls;
 #require_once __DIR__.'/Database.php';
 #require_once __DIR__.'/Auth.php';
 #require_once __DIR__.'/Tools.php';
+require_once __DIR__.'/Settings.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
 
 use PDO, PDOException;
 use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
 
+
 /****************************
  * Summary of Admin
+ * class A extends B implements C
  */
 class Admin
 {
@@ -25,7 +28,6 @@ class Admin
     public static $active;
     public static $usr_data;
     public static $user_list;
-    public static $user;
     public static $securitytoken_row;
     public static $identifier;
     public static $last_access;
@@ -41,6 +43,10 @@ class Admin
     public static $count24;
     public static $count25;
 
+    public static $userid;
+    protected static $showForm;
+
+
 
     /****************************
      * Summary of show
@@ -52,7 +58,9 @@ class Admin
             self::$pdo = Database::connect_mariadb();
         }
 
+        self::site_entry_check();
         self::data_preparation();
+        self::form_evaluation();
 
         Header::show();
         self::site_output();
@@ -62,6 +70,52 @@ class Admin
 
         // Datenbank schließen
         self::$pdo = Null;
+    }
+
+
+    /****************************
+     * Summary of site_entry_check
+     * CheckIn-Test
+     * Plausi-Test: userid, identifier, token_hash
+     * set identifier
+     * set last_site
+     * set showForm
+     */
+    public static function site_entry_check()
+    {
+        if (empty($_SESSION['main']))
+            $_SESSION['main'] = "/";
+
+        $return2 = ["index", "index2", "details"];
+        Tools::lastsite($return2);
+
+        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
+
+        // unberechtigter Seitenaufruf
+        $status = (empty($error_msg)) ? true : false;
+
+        // Nutzer nicht angemeldet? Dann weg hier ...
+        if (!Auth::is_checked_in()) {
+            header("location: /auth/login.php");
+            exit;
+        }
+
+        // Nutzer kein Admin? Dann auch weg hier ...
+        if ($_SESSION['su'] != 1) {
+            header("location: {$_SESSION['lastsite']}");
+            exit;
+        }
+
+        // globale Variablen setzen
+        if ($status) {
+            self::$identifier = $securitytoken_row['identifier'];
+            self::$userid = $usr_data['userid'];
+            self::$securitytoken_row = $securitytoken_row;
+            self::$usr_data = $usr_data;
+        }
+        self::$error_msg = $error_msg;
+        self::$showForm = $status;
+
     }
 
 
@@ -324,123 +378,72 @@ class Admin
      */
     public static function data_preparation()
     {
-        // Verbindung zur PW-Datenbank
-        $pdo = self::$pdo;
-
         Tools::lastsite();
 
-        $error_msg = "";
+        // Seiten-Check okay, Seite starten
+        if (self::$showForm):
 
-        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
-        if ($error_msg !== "") echo $error_msg;
+        $userid = self::$userid;
+        $identifier = self::$identifier;
 
-        // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in() || $error_msg !== "") {
-            #Auth::check_user();
-            #if (!Auth::is_checked_in()) {
-                header("location: /auth/login.php");
-                exit;
-            #}
-        }
-
-        // Nutzer kein Admin? Dann auch weg hier ...
-        if ((int)$_SESSION['su'] !== 1) {
-            header("location: {$_SESSION['lastsite']}");
-            exit;
-        }
-
-        $su = $_SESSION['su'] ? " _ ja _" : "";        // für Anzeige bei Tab: "Info"
-
-        $userid = $_SESSION['userid'];
-        $identifier = (!empty($securitytoken_row['identifier'])) ? htmlspecialchars($securitytoken_row['identifier'], ENT_QUOTES) : "";
-        $token_hash = (!empty($securitytoken_row['token_hash'])) ? htmlspecialchars($securitytoken_row['token_hash'], ENT_QUOTES) : "";
-
-        // Plausi-Check...
-        if (!preg_match('/^[0-9]{1,20}$/', $userid)) {
-            $error_msg = "- unzulässige Zeichen in User-ID -";
-        }
-        if (!preg_match("/^[a-zA-Z0-9]{0,1000}$/", $identifier)) {
-            $error_msg = "- unzulässige Zeichen im Identifier-Cookie -";
-        }
-        if (!preg_match("/^[a-zA-Z0-9]{0,1000}$/", $token_hash)) {
-            $error_msg = "- unzulässige Zeichen im Token-Cookie -";
-        }
-
-        if ($error_msg) {
-            Auth::delete_autocookies();
-            $usr_data = [];
-            echo $error_msg;
-        }
-
-        // Plausi-Check okay, Seite starten
-        if (!$error_msg):
-
-            // --- TAB: Registrierung ---
-            //
-            $reglinks = self::get_DBregistry_link();
+        // --- TAB: Registrierung ---
+        //
+        $reglinks = self::get_DBregistry_link();
 
 
-            // --- TAB: Nutzer ---
-            //
-            $user_list = self::get_DBuserlist($userid, $identifier);
+        // --- TAB: Nutzer ---
+        //
+        $user_list = self::get_DBuserlist($userid, $identifier);
 
 
-            // --- TAB: Autologin / Info ---
-            //
-            $last_access = self::get_DBlastaccess();
+        // --- TAB: Autologin / Info ---
+        //
+        $last_access = self::get_DBlastaccess();
 
-            $count10 = $count11 = $count12 = $count13 = $count21 = $count20 = $count22 = $count23 = $count24 = $count25 = 0;
-            foreach ($user_list as $user) {
+        $count10 = $count11 = $count12 = $count13 = $count21 = $count20 = $count22 = $count23 = $count24 = $count25 = 0;
+        foreach ($user_list as $user) {
 
-                // --- TAB: Info ---
-                if ($user['userid'] == $userid) {
-                    #$usr_data['username'] = $user['username'];
-                    #$usr_data['email'] = $user['email'];
-                    #$usr_data['created'] = $user['created'];
-                    #$usr_data['changed'] = $user['changed'];
-                    #$securitytoken_row['created'] = $user['created'];
-                    #$securitytoken_row['last_seen'] = $user['last_seen'];
-                    #$securitytoken_row['last_seen'] = $securitytoken_row['changed'];
-                    #$securitytoken_row['ip'] = $user['last_ip'];
-                    #$securitytoken_row['identifier'] = $identifier;
-                    #$securitytoken_row['token_hash'] = $securitytoken_row['token_hash'];
-                    #$securitytoken_row['token_endtime'] = $user['token_endtime'];
+            // --- TAB: Info ---
+            if ($user['userid'] == $userid) {
+                #$usr_data['username'] = $user['username'];
+                #$usr_data['email'] = $user['email'];
+                #$usr_data['created'] = $user['created'];
+                #$usr_data['changed'] = $user['changed'];
+                #$securitytoken_row['created'] = $user['created'];
+                #$securitytoken_row['last_seen'] = $user['last_seen'];
+                #$securitytoken_row['last_seen'] = $securitytoken_row['changed'];
+                #$securitytoken_row['ip'] = $user['last_ip'];
+                #$securitytoken_row['identifier'] = $identifier;
+                #$securitytoken_row['token_hash'] = $securitytoken_row['token_hash'];
+                #$securitytoken_row['token_endtime'] = $user['token_endtime'];
 
-                // --- TAB: Autologin ---
-                    // meine anderen aktiven
-                    if ($count11 < $user['count11']) $count11 = $user['count11'];
-                    // meine ausgeloggten
-                    if ($count10 < $user['count10']) $count10 = $user['count10'];
-                    // meine beendeten (tot)
-                    if ($count12 < $user['count12']) $count12 = $user['count12'];
-                    // meine abgelaufenen (tot)
-                    if ($count13 < $user['count13']) $count13 = $user['count13'];
+            // --- TAB: Autologin ---
+                // meine anderen aktiven
+                if ($count11 < $user['count11']) $count11 = $user['count11'];
+                // meine ausgeloggten
+                if ($count10 < $user['count10']) $count10 = $user['count10'];
+                // meine beendeten (tot)
+                if ($count12 < $user['count12']) $count12 = $user['count12'];
+                // meine abgelaufenen (tot)
+                if ($count13 < $user['count13']) $count13 = $user['count13'];
 
-                } else {
-                    // alle anderen aktiven
-                    if ($count21 < $user['count21']) $count21 = $user['count21'];
-                    // alle anderen ausgeloggten
-                    if ($count20 < $user['count20']) $count20 = $user['count20'];
-                    // alle anderen beendeten (tot)
-                    if ($count22 < $user['count22']) $count22 = $user['count22'];
-                    // alle anderen abgelaufenen (tot)
-                    if ($count23 < $user['count23']) $count23 = $user['count23'];
-                    // alle anderen Anmeldungen
-                    if ($count24 < $user['count24']) $count24 = $user['count24'];
-                    // alle anderen Nutzer
-                    if ($count25 < $user['count25']) $count25 = $user['count25'];
-                }
+            } else {
+                // alle anderen aktiven
+                if ($count21 < $user['count21']) $count21 = $user['count21'];
+                // alle anderen ausgeloggten
+                if ($count20 < $user['count20']) $count20 = $user['count20'];
+                // alle anderen beendeten (tot)
+                if ($count22 < $user['count22']) $count22 = $user['count22'];
+                // alle anderen abgelaufenen (tot)
+                if ($count23 < $user['count23']) $count23 = $user['count23'];
+                // alle anderen Anmeldungen
+                if ($count24 < $user['count24']) $count24 = $user['count24'];
+                // alle anderen Nutzer
+                if ($count25 < $user['count25']) $count25 = $user['count25'];
             }
+        }
 
-        endif;  // no error_msg
-
-
-        self::$error_msg = $error_msg;
-        self::$usr_data = $usr_data;
         self::$user_list = $user_list;
-        self::$user = $user;
-        self::$securitytoken_row = $securitytoken_row;
-        self::$identifier = $identifier;
         self::$last_access = $last_access;
         self::$reglinks = $reglinks;
         self::$count10 = $count10;
@@ -454,17 +457,15 @@ class Admin
         self::$count24 = $count24;
         self::$count25 = $count25;
 
-
-        // Formular-Eingabe verarbeiten
-        self::data_evaluation();
+        endif;      # Seiten-Check okay
     }
 
 
     /****************************
-     * Summary of data_evaluation
+     * Summary of form_evaluation
      * Änderungsformular empfangen, Eingaben verarbeiten
      */
-    public static function data_evaluation()
+    public static function form_evaluation()
     {
         $pdo = self::$pdo;
         $error_msg = self::$error_msg;
@@ -474,259 +475,263 @@ class Admin
         $userid = $_SESSION['userid'];
         $success_msg = "";
 
-        // Plausi-Check okay, Seite starten
-        if (!$error_msg):
+        // Seiten-Check okay, Seite starten
+        if (self::$showForm):
 
 
-        if (isset($_GET['save']) &&
-            strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
+        // Änderungsformular empfangen
+        if (isset($_GET['save']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
 
-            $save = htmlspecialchars(Tools::clean_input($_GET['save']));
-            switch ($save):
-
-                // --- Änderung TAB: Autologin ---
-                //
-                case "autologin":
-                    switch ((int)$_POST['logout']) {
-                        case 11:        // alle meine anderen aktiven Anmeldungen
-                            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                                WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
-                            #$stmt = "DELETE FROM site_login WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#11");}
-                            $success_msg = "Alle meine anderen aktiven Autologins beendet.";
-                            break;
-
-                        case 10:        // alle meine ausgeloggten Anmeldungen
-                            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                                WHERE userid = :userid AND (login IS NULL && autologin IS NOT NULL) AND identifier != :ident";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#10");}
-                            $success_msg = "Alle meine ausgeloggten Logins beendet.";
-                            break;
-
-                        case 12:     // alle meine beendeten Anmeldungen (tot)  #AND identifier IS NOT NULL
-                            $stmt = "DELETE FROM site_login
-                                WHERE userid = :userid AND (login IS NULL && autologin IS NULL)";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#12");}
-                            $success_msg = "Alle meine beendeten Logins gelöscht.";
-                            break;
-
-                        case 13:        // alle meine abgelaufenen Anmeldungen (tot)
-                            $stmt = "DELETE FROM site_login
-                                WHERE userid = :userid AND token_endtime < NOW()";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                #$qry->bindParam(':now', $now, PDO::PARAM_STR);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#13");}
-                            $success_msg = "Alle meine abgelaufenen Logins gelöscht.";
-                            break;
+        $save = htmlspecialchars(Tools::clean_input($_GET['save']));
+        switch ($save):
 
 
-                        case 21:        // alle anderen aktiven
-                            $stmt = "UPDATE site_login SET login = NULL
-                                WHERE userid != :userid AND (login IS NOT NULL && autologin IS NOT NULL)";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#21");}
-                            $success_msg = "Alle aktiven Autologins der anderen Nutzer beendet.";
-                            break;
+        // --- Änderung TAB: Autologin ---
+        //
+        case "autologin":
 
-                        case 20:        // alle anderen ausgeloggten Anmeldung
-                            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                                WHERE userid != :userid AND (login IS NULL && autologin IS NOT NULL)";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#20");}
-                            $success_msg = "Alle ausgeloggten Autologins der anderen Nutzer beendet.";
-                            break;
-
-                        case 22:        // alle anderen beendeten Anmeldung (tot)  #AND identifier IS NOT NULL
-                            $stmt = "DELETE FROM site_login
-                                WHERE userid != :userid AND (login IS NULL && autologin IS NULL)";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#22");}
-                            $success_msg = "Alle anderen toten Logins gelöscht.";
-                            break;
-
-                        case 23:        // alle anderen abgelaufenen (tot)
-                            $stmt = "DELETE FROM site_login
-                                WHERE userid != :userid AND token_endtime < NOW()";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                #$qry->bindParam(':now', $now, PDO::PARAM_STR);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#23");}
-                            $success_msg = "Alle anderen abgelaufenen Logins gelöscht.";
-                            break;
-
-                        case 24:        // alle Anmeldungen der anderen Nutzer ('break' weggelassen)
-                        case 25:        // alle anderen Nutzer
-                            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                                WHERE userid != :userid AND identifier IS NOT NULL";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#25");}
-                            $success_msg = "Alle Autologins der anderen Nutzer beendet.";
-                            break;
-
-                    }  // $_POST['logout']
-                    break;
-
-
-                // --- Änderung TAB: Registrierung ---
-                //
-                case "make_reglink":
-
-                    // Code für Zugang zur Registrierungsseite
-                    $reg_code = uniqid();
-                    $pwcode_endtime = time() + 3600*24*30;  // 4 Woche gültig
-
-                    #$reg_url = getSiteURL().'register.php?code='.$reg_code;
-                    $reg_url = "https://www.danzigmarken.de/auth/register.php?code=".$reg_code;
-                    $reg_link = "register.php?code=".$reg_code;     // intern
-                    $input_usr = $reg_code;
-                    $input_email = $reg_code."@dummy.de";
-                    $status = $reg_code;
-                    $notiz = $reg_url;
-
-                    $stmt = "INSERT
-                        INTO site_users (username, email, status, pwcode_endtime, notiz)
-                        VALUES (:username, :email, :status, :pwcode_endtime, :notiz)";
+            switch ((int)$_POST['logout']) {
+                case 11:        // alle meine anderen aktiven Anmeldungen
+                    $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
+                        WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
+                    #$stmt = "DELETE FROM site_login WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
                     try {
                         $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                        $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                        $qry->bindParam(':status', $status, PDO::PARAM_STR);
-                        $qry->bindParam(':pwcode_endtime', $pwcode_endtime, PDO::PARAM_STR);
-                        $qry->bindParam(':notiz', $notiz, PDO::PARAM_STR);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
                         $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_make_reglink");}
-                    $success_msg = "Registrierungs-Link erzeugt.";
-                    break;
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#11");}
+                    $success_msg = "Alle meine anderen aktiven Autologins beendet.";
+                break;
 
-                case "show_mail":
-                    if (isset($_POST['regchoise'])) {
-                        $i = (int)$_POST['regchoise'] - 1;
-                        $to       = str_replace("_dummy_", "", $reglinks[$i]['email']);
-                        $subject = "Registrierungs-Link für www.danzigmarken.de";
-                        $mailcontent  = "".
-                            "An: ".$to."<br>".
-                            "Betreff: ".$subject."<br>".
-                            "----------------------------------------<br>".
-                            "Hallo ".$reglinks[$i]['vorname'].",<br>".
-                            "du kannst dich jetzt auf www.danzigmarken.de registrieren. ".
-                            "Rufe dazu in den nächsten 4 Wochen (bis zum ".date('d.m.y', $reglinks[$i]['pwcode_endtime']).") ".
-                            "den folgenden Link auf: <br><a href='".$reglinks[$i]['notiz']."'>".$reglinks[$i]['notiz']."</a><br>".
-                            "Herzliche Grüße";
+                case 10:        // alle meine ausgeloggten Anmeldungen
+                    $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
+                        WHERE userid = :userid AND (login IS NULL && autologin IS NOT NULL) AND identifier != :ident";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#10");}
+                    $success_msg = "Alle meine ausgeloggten Logins beendet.";
+                break;
 
-                        $success_msg = $mailcontent;
-                    }
-                    break;
+                case 12:     // alle meine beendeten Anmeldungen (tot)  #AND identifier IS NOT NULL
+                    $stmt = "DELETE FROM site_login
+                        WHERE userid = :userid AND (login IS NULL && autologin IS NULL)";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#12");}
+                    $success_msg = "Alle meine beendeten Logins gelöscht.";
+                break;
 
-                case "delete_reg":
-                    if (isset($_POST['regchoise'])) {
-                        $i = (int)$_POST['regchoise'] - 1;
-                        $stmt = "DELETE FROM site_users WHERE userid = :userid";
-                        try {
-                            $qry = $pdo->prepare($stmt);
-                            $qry->bindParam(':userid', $reglinks[$i]['userid'], PDO::PARAM_INT);
-                            $qry->execute();
-                        } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_reg");}
-                        $success_msg = "Registrierungslink gelöscht.";
-                    }
-                    break;
-
-                case "delete_allregs":
-                    if (count($reglinks)) {
-                        // DB aufräumen, VACUUM;
-                        // DB Integritätsprüfung: PRAGMA integrity_check;
-                        // Zähler zurücksetzen: "DELETE FROM sqlite_sequence WHERE name = '{tab_name}'"  # autoincrement zurücksetzen
-                        $stmt = "DELETE FROM site_users WHERE email LIKE '%dummy%'";
-                        try {
-                            $pdo->exec($stmt);
-                            if (empty($_SESSION['mariaDB']))
-                                $pdo->exec("DELETE FROM sqlite_sequence WHERE name = 'site_users'");
-                        } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_allregs");}
-                        $success_msg = "alle Registrierungslinks gelöscht.";
-                    }
-                    break;
+                case 13:        // alle meine abgelaufenen Anmeldungen (tot)
+                    $stmt = "DELETE FROM site_login
+                        WHERE userid = :userid AND token_endtime < NOW()";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        #$qry->bindParam(':now', $now, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#13");}
+                    $success_msg = "Alle meine abgelaufenen Logins gelöscht.";
+                break;
 
 
-                // --- Änderung TAB: Nutzer (löschen) ---
-                //
-                case "delete_user":
-                    if (isset($_POST['usrchoise'])) {
-                        $i = (int)$_POST['usrchoise'] - 1;
-                        if ($user_list[$i]['userid'] !== $_SESSION['userid']) {
-                            $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
-                            #$stmt = "DELETE FROM site_users WHERE userid = :userid";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $user_list[$i]['userid'], PDO::PARAM_INT);
-                                $qry->execute();
+                case 21:        // alle anderen aktiven
+                    $stmt = "UPDATE site_login SET login = NULL
+                        WHERE userid != :userid AND (login IS NOT NULL && autologin IS NOT NULL)";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#21");}
+                    $success_msg = "Alle aktiven Autologins der anderen Nutzer beendet.";
+                break;
 
-                                // SQLite
-                                if (empty($_SESSION['mariaDB']))
-                                    $pdo->exec("DELETE FROM sqlite_sequence WHERE name = 'site_users'");
+                case 20:        // alle anderen ausgeloggten Anmeldung
+                    $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
+                        WHERE userid != :userid AND (login IS NULL && autologin IS NOT NULL)";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#20");}
+                    $success_msg = "Alle ausgeloggten Autologins der anderen Nutzer beendet.";
+                break;
 
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_user");}
-                            $success_msg = "Nutzer gelöscht.";
+                case 22:        // alle anderen beendeten Anmeldung (tot)  #AND identifier IS NOT NULL
+                    $stmt = "DELETE FROM site_login
+                        WHERE userid != :userid AND (login IS NULL && autologin IS NULL)";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#22");}
+                    $success_msg = "Alle anderen toten Logins gelöscht.";
+                break;
 
-                            // wenn Variante 'deaktiv setzen', dann auch alle Anmeldungen löschen,
-                            // (sonst bei DELETE automatisch per Verknüpfung gelöscht).
-                            $stmt = "DELETE FROM site_login WHERE userid = :userid";
-                            try {
-                                $qry = $pdo->prepare($stmt);
-                                $qry->bindParam(':userid', $user_list[$i]['userid'], PDO::PARAM_INT);
-                                $qry->execute();
-                            } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_user");}
-                        }
-                        else $error_msg = "Kann mich nicht selbst löschen.";
-                    }
-                    break;
+                case 23:        // alle anderen abgelaufenen (tot)
+                    $stmt = "DELETE FROM site_login
+                        WHERE userid != :userid AND token_endtime < NOW()";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        #$qry->bindParam(':now', $now, PDO::PARAM_STR);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#23");}
+                    $success_msg = "Alle anderen abgelaufenen Logins gelöscht.";
+                break;
+
+                case 24:        // alle Anmeldungen der anderen Nutzer ('break' weggelassen)
+                case 25:        // alle anderen Nutzer
+                    $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
+                        WHERE userid != :userid AND identifier IS NOT NULL";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#25");}
+                    $success_msg = "Alle Autologins der anderen Nutzer beendet.";
+                break;
+
+            }  // $_POST['logout']
+        break;
 
 
-                // --- Änderung TAB: Info ---
-                //
-                case "info":
-                    break;
+        // --- Änderung TAB: Registrierung ---
+        //
+        case "make_reglink":
 
-            endswitch;  // Tab-Reiter
+            // Code für Zugang zur Registrierungsseite
+            $reg_code = uniqid();
+            $pwcode_endtime = time() + 3600*24*30;  // 4 Woche gültig
 
-        endif;     // Änderungsformular empfangen
+            #$reg_url = getSiteURL().'register.php?code='.$reg_code;
+            $reg_url = "https://www.danzigmarken.de/auth/register.php?code=".$reg_code;
+            $reg_link = "register.php?code=".$reg_code;     // intern
+            $input_usr = $reg_code;
+            $input_email = $reg_code."@dummy.de";
+            $status = $reg_code;
+            $notiz = $reg_url;
 
-        endif;  // no error_msg
+            $stmt = "INSERT
+                INTO site_users (username, email, status, pwcode_endtime, notiz)
+                VALUES (:username, :email, :status, :pwcode_endtime, :notiz)";
+            try {
+                $qry = $pdo->prepare($stmt);
+                $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
+                $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
+                $qry->bindParam(':status', $status, PDO::PARAM_STR);
+                $qry->bindParam(':pwcode_endtime', $pwcode_endtime, PDO::PARAM_STR);
+                $qry->bindParam(':notiz', $notiz, PDO::PARAM_STR);
+                $qry->execute();
+            } catch(PDOException $e) {die($e->getMessage().": admin.inc_make_reglink");}
+            $success_msg = "Registrierungs-Link erzeugt.";
+        break;
+
+        case "show_mail":
+            if (isset($_POST['regchoise'])) {
+                $i = (int)$_POST['regchoise'] - 1;
+                $to       = str_replace("_dummy_", "", $reglinks[$i]['email']);
+                $subject = "Registrierungs-Link für www.danzigmarken.de";
+                $mailcontent  = "".
+                    "An: ".$to."<br>".
+                    "Betreff: ".$subject."<br>".
+                    "----------------------------------------<br>".
+                    "Hallo ".$reglinks[$i]['vorname'].",<br>".
+                    "du kannst dich jetzt auf www.danzigmarken.de registrieren. ".
+                    "Rufe dazu in den nächsten 4 Wochen (bis zum ".date('d.m.y', $reglinks[$i]['pwcode_endtime']).") ".
+                    "den folgenden Link auf: <br><a href='".$reglinks[$i]['notiz']."'>".$reglinks[$i]['notiz']."</a><br>".
+                    "Herzliche Grüße";
+
+                $success_msg = $mailcontent;
+            }
+        break;
+
+        case "delete_reg":
+            if (isset($_POST['regchoise'])) {
+                $i = (int)$_POST['regchoise'] - 1;
+                $stmt = "DELETE FROM site_users WHERE userid = :userid";
+                try {
+                    $qry = $pdo->prepare($stmt);
+                    $qry->bindParam(':userid', $reglinks[$i]['userid'], PDO::PARAM_INT);
+                    $qry->execute();
+                } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_reg");}
+                $success_msg = "Registrierungslink gelöscht.";
+            }
+        break;
+
+        case "delete_allregs":
+            if (count($reglinks)) {
+                // DB aufräumen, VACUUM;
+                // DB Integritätsprüfung: PRAGMA integrity_check;
+                // Zähler zurücksetzen: "DELETE FROM sqlite_sequence WHERE name = '{tab_name}'"  # autoincrement zurücksetzen
+                $stmt = "DELETE FROM site_users WHERE email LIKE '%dummy%'";
+                try {
+                    $pdo->exec($stmt);
+                    if (empty($_SESSION['mariaDB']))
+                        $pdo->exec("DELETE FROM sqlite_sequence WHERE name = 'site_users'");
+                } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_allregs");}
+                $success_msg = "alle Registrierungslinks gelöscht.";
+            }
+        break;
+
+
+        // --- Änderung TAB: Nutzer (löschen) ---
+        //
+        case "delete_user":
+            if (isset($_POST['usrchoise'])) {
+                $i = (int)$_POST['usrchoise'] - 1;
+                if ($user_list[$i]['userid'] !== $_SESSION['userid']) {
+                    $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
+                    #$stmt = "DELETE FROM site_users WHERE userid = :userid";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $user_list[$i]['userid'], PDO::PARAM_INT);
+                        $qry->execute();
+
+                        // SQLite
+                        if (empty($_SESSION['mariaDB']))
+                            $pdo->exec("DELETE FROM sqlite_sequence WHERE name = 'site_users'");
+
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_user");}
+                    $success_msg = "Nutzer gelöscht.";
+
+                    // wenn Variante 'deaktiv setzen', dann auch alle Anmeldungen löschen,
+                    // (sonst bei DELETE automatisch per Verknüpfung gelöscht).
+                    $stmt = "DELETE FROM site_login WHERE userid = :userid";
+                    try {
+                        $qry = $pdo->prepare($stmt);
+                        $qry->bindParam(':userid', $user_list[$i]['userid'], PDO::PARAM_INT);
+                        $qry->execute();
+                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_user");}
+                }
+                else $error_msg = "Kann mich nicht selbst löschen.";
+            }
+        break;
+
+
+        // --- Änderung TAB: Info ---
+        //
+        case "info":
+        break;
+
+        endswitch;  # Speichern-Taste gedrückt
+
+        // geänderte Daten für die Ausgabe neu laden
+        self::data_preparation();
+
+        endif;      # Formular empfangen
+        endif;      # Seiten-Check okay
 
 
         // Marker setzen, um wieder auf den letzten Tab-Reiter zu springen
         //
         // Liste der #Tab-ID's
-        $site_tabs = ["info", "user", "autologin", "regis"];
+        $site_tabs = ["info", "user", "autologin", "regis", "sonst"];
 
         $active = [];
         if (isset($_GET['tab']) && in_array($_GET['tab'], $site_tabs)) {
@@ -760,11 +765,17 @@ class Admin
      */
     public static function site_output()
     {
+        $showForm = self::$showForm;
         $status_message = self::$status_message;
+        $output = "<div class='container main-container'>";
+        if (!$showForm):
+            $output .= $status_message;
+        else:
+
+        // Seiten-Check okay, Seite starten
         $active = self::$active;
         $usr_data = self::$usr_data;
         $user_list = self::$user_list;
-        $user = self::$user;
         $securitytoken_row = self::$securitytoken_row;
         $last_access = self::$last_access;
         $reglinks = self::$reglinks;
@@ -779,10 +790,8 @@ class Admin
         $count24 = self::$count24;
         $count25 = self::$count25;
 
-        $output = "";
         $out_token = "";
         $last_seen = "";
-
 
 // TODO:
 // Link hinzufügen [mail-log löschen]:
@@ -791,10 +800,7 @@ class Admin
 
 /*******************************************/
 
-        $output = "
-            <div class='container'>
-            <div class='main-container'>
-            <h2>erweiterte Einstellungen</h2><br>";
+        $output .= "<h2>erweiterte Einstellungen</h2><br>";
         $output .= $status_message;
 
     // -- START --
@@ -806,6 +812,7 @@ class Admin
         <li role='presentation' class='".$active['user']."'><a href='#user' aria-controls='user' role='tab' data-toggle='tab'>Nutzer</a></l>
         <li role='presentation' class='".$active['autologin']."'><a href='#autologin' aria-controls='autologin' role='tab' data-toggle='tab'>Autologin</a></li>
         <li role='presentation' class='".$active['regis']."'><a href='#regis' aria-controls='regis' role='tab' data-toggle='tab'>Reg-Links</a></li>
+        <li role='presentation' class='".$active['sonst']."'><a href='#sonst' aria-controls='sonst' role='tab' data-toggle='tab'>Sonstiges</a></li>
     </ul>
 
     <div class='tab-content'>";
@@ -825,8 +832,8 @@ class Admin
         $act = "";
     }
 
-    $changed = (!empty($user['changed']))
-        ? date('d.m.y H:i', strtotime($user['changed']))
+    $changed = (!empty($usr_data['changed']))
+        ? date('d.m.y H:i', strtotime($usr_data['changed']))
         : "";
     $endtime = (!empty($securitytoken_row['token_endtime']))
         ? date('d.m.y H:i', strtotime($securitytoken_row['token_endtime']))
@@ -1188,8 +1195,88 @@ unset($ct_reg, $link, $reglinks_vorhanden, $endtime, $out_radio, $out_mail, $out
 // -- ende: Registrierung --
 
 
-$output .= "</div> "; // -- tab-content --
-$output .= "</div> "; // -- ende: START --
+// -- TAB: Sonstiges --
+$output .= "
+<div role='tabpanel' class='tab-pane ".$active['sonst']."' id='sonst'>
+    <p></p>";
+
+$output .= "
+        <h3>Viewportabmessungen</h3>
+        <h4>Breite</h4>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/ClientWidth\">Element.clientWidth</a>:
+            <span id=\"clientW\"></span>px</p>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/InnerWidth\">Window.innerWidth</a>:
+            <span id=\"innerW\"></span>px</p>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/OuterWidth\">Window.outerWidth</a>:
+            <span id=\"outerW\"></span>px</p>
+        <h4>Höhe</h4>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/ClientHeight\">Element.clientHeight</a>:
+            <span id=\"clientH\"></span>px</p>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/InnerHeight\">Window.innerHeight</a>:
+            <span id=\"innerH\"></span>px</p>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/OuterHeight\">Window.outerHeight</a>:
+            <span id=\"outerH\"></span>px</p>
+        <h3>Geräteabmessungen</h3>
+        <h4>Breite</h4>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Screen/width\">Screen.width</a>:
+            <span id=\"screenW\"></span>px</p>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/availWidth\">Screen.availWidth</a>:
+            <span id=\"availW\"></span>px</p>
+        <h4>Höhe</h4>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Screen/height\">Screen.height</a>:
+            <span id=\"screenH\"></span>px</p>
+        <p><a href=\"https://wiki.selfhtml.org/wiki/availHeight\">Screen.availHeight</a>:
+            <span id=\"availH\"></span>px</p>
+        <!--
+        <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Window/matchMedia\">matchMedia</a>:
+            <span id=\"matcMedia\"></span></p> -->
+";
+
+$output .= "</div>";  # -- Sonstiges.tab-pane --
+
+$output .= "
+<script>
+'use strict';
+document.addEventListener(\"DOMContentLoaded\", function () {
+    document.addEventListener('resize', messen);
+    messen();
+
+    function messen() {
+        document.getElementById('clientW')
+            .textContent = document.querySelector('html')
+            .clientWidth;
+        document.getElementById('innerW')
+            .textContent = window.innerWidth;
+        document.getElementById('outerW')
+            .textContent = window.outerWidth;
+        document.getElementById('clientH')
+            .textContent = document.querySelector('html')
+            .clientHeight;
+        document.getElementById('innerH')
+            .textContent = window.innerHeight;
+        document.getElementById('outerH')
+            .textContent = window.outerHeight;
+        document.getElementById('screenW')
+            .textContent = screen.width;
+        document.getElementById('availW')
+            .textContent = screen.availWidth;
+        document.getElementById('screenH')
+            .textContent = screen.height;
+        document.getElementById('availH')
+            .textContent = screen.availHeight;
+
+        document.getElementById('matchMedia')
+            .textContent = window.matchMedia().media;
+    }
+});
+</script>";
+
+unset($changed, $endtime, $out_created, $out_ip, $out_date, $act);
+// -- ende: Sonstiges --
+
+
+$output .= "</div> ";  # -- tab-content --
+$output .= "</div> ";  # -- ende: START --
 
 /*
 <div style='
@@ -1207,8 +1294,10 @@ O1nJ8Z5bY
 </div>
 */
 
-$output .= "</div>";  // -- main-container --
-$output .= "</div>";  // -- container --
+#$output .= "</div>";  # -- main-container --
+
+endif;                # showForm
+$output .= "</div>";  # -- container main-container --
 
 
         ///////////////////////////////////////////////////
@@ -1292,3 +1381,38 @@ for (var i = 0; i < anchors.length; i++) {
     }
 
 }
+
+#foreach ($_COOKIE AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
+#foreach ($_SESSION AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
+/*
+foreach ($_SESSION AS $k=>$v) {
+    $typ=["integer", "boolean"];
+    $typ1=["string"];
+    if (in_array(gettype($v), $typ)) {
+        echo gettype($v), "_", $k, ": ", $v, "<br>";}};echo"<br>";*/
+#var_dump($_SESSION);
+/*
+ident: xxxx
+autologin: -
+userid: zz
+loggedin: -
+su: z
+status: --v
+
+rootdir:
+main: /index.php
+lastsite: /index.php#674
+siteid: 3
+
+sort: the.id DESC, sta.kat10, sta.datum
+dir: ASC
+col: sta.kat10
+filter: the.id IS NOT NULL AND sta.deakt=0 AND dat.deakt=0 AND ort.deakt=0
+version: 250617
+proseite: 10
+start: 0
+groupid: 500
+fileid: 674
+prev: 674
+next: 673
+*/

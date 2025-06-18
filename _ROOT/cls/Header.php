@@ -351,6 +351,8 @@ class Header
      */
     private static function data_preparation()
     {
+        Auth::is_checked_in();
+
         self::$site_name = basename($_SERVER['PHP_SELF']);
         $siteid = self::get_siteid(self::$site_name);
 
@@ -360,7 +362,7 @@ class Header
         self::$rootdir = $rootdir = $_SESSION['rootdir'];
 
         // spezielle Menü-Formatierung debug-Mode und für Admin
-        if (isset($_SESSION['su']) && (int)$_SESSION['su'] === 1) {
+        if (isset($_SESSION['su']) && $_SESSION['su'] === 1) {
             $color = " <span style='color:red;'>*</span>";
         } elseif (isset($_SESSION['loggedin'])) {
             $color = " <span style='color:yellow;'>*</span>";
@@ -583,10 +585,11 @@ class Header
                 <ul class='nav navbar-nav navbar-right'>";
 
             // aktiv: Login     < login >
+            #<li><a class='active'><span class='login_self'><i class='fas fa-sign-in-alt'>
             if ($siteid === 7) {
                 $output .= "
-                <li><a class='active'><span class='login_self'><i class='fas fa-sign-in-alt'>
-                </i></span></a></li>";
+                </i></span></a></li>
+                <li><a class='active'><i class='fas fa-sign-in-alt'></i>Login</a></a></li>";
 
             } else {
                 switch ($siteid):
@@ -618,7 +621,7 @@ class Header
                 // aktiv: Kontakt     < kontakt_login >
                 case 13:
                     $output .= "
-                        <li><a class='active'>".$main['name']."</a></li>";
+                        <li><a class='active'><i class='fas fa-envelope'></i>".$main['name']."</a></li>";
                     break;
 
                 // aktiv: Impressum     < impressum_login >
@@ -640,7 +643,7 @@ class Header
 
                 endswitch;
 
-                // ... und Login-Menü als letztes ranhängen
+                // ... und Login-Symbol als Letztes ranhängen
                 $output .= "
                 <li><a href='{$rootdir}/auth/login' title='Anmelden'>
                 <i class='fas fa-sign-in-alt'></i><span class='login_link'></span></a></li>";
@@ -728,7 +731,7 @@ class Header
                 // aktiv: Kontakt     < kontakt_Konto >
                 case 13:
                     $output .= "
-                        <li><a class='active'>".$main['name']."</a></li>";
+                        <li><a class='active'><i class='fas fa-envelope'></i>".$main['name']."</a></li>";
                 break;
 
                 // aktiv: Impressum     < impressum_login >

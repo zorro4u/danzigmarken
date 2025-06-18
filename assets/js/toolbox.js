@@ -9,6 +9,17 @@ function prn_toogle(ID, PRN) {
     })
 }
 
+/**
+ * Fadeout der Statusmeldung, benötigt jquery
+ * Zeit in Sekunden
+ */
+function fadeOut(ID, totalTime, fadeTime) {
+    $(document).ready(function() {
+        $("#"+ID).delay(totalTime*1000).fadeOut(fadeTime*1000);
+    });
+}
+fadeOut("status", 4, 2);
+
 
 
 /**
