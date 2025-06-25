@@ -112,11 +112,11 @@ class Pw_forget
                 if(!$usr_data) {
                     $error_msg = "Keine solche E-Mail-Adresse im System hinterlegt.";
 
-                // okay... temporären Passwort-Code in DB schreiben
+                // okay... temporären Passwort-Code in DB schreiben, 2 Tage gültig
                 } else {
                     $pwcode = Auth::random_string();
                     $pwcode_hash = sha1($pwcode);
-                    $pwcode_endtime = time() + 3600*24*2;  // gültig für 2 Tage
+                    $pwcode_endtime = Auth::get_pwcode_timer(2);
                     $pwcode_endtime_str = date("d.m.y H:i", $pwcode_endtime);
                     $pwcode_url = Tools::getSiteURL().'pwreset.php?pwcode='.$pwcode;
 

@@ -83,13 +83,9 @@ class Register_pre
 
 
         // Nutzer nicht angemeldet? Dann weg hier ...
-        Auth::check_user();
         if (!Auth::is_checked_in()) {
-            Auth::check_user();
-            if (!Auth::is_checked_in()) {
-                header("location: login.php");
-                exit;
-            }
+            header("location: login.php");
+            exit;
         }
 
         // Nutzer kein Admin? Dann auch weg hier ...
@@ -106,9 +102,9 @@ class Register_pre
 
         if(isset($_REQUEST['reg'])):
 
-            // Code für Zugang zur Registrierungsseite
+            // Code für Zugang zur Registrierungsseite, 30 Tage gültig
             $reg_code = uniqid();
-            $pwcode_endtime = time() + 3600*24*30;  // 4 Woche gültig
+            $pwcode_endtime = Auth::get_pwcode_timer();
 
             $input_usr = $reg_code;
             $input_email = $reg_code."@dummy.de";

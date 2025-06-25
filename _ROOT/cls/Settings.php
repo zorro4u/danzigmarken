@@ -527,8 +527,11 @@ class Settings
             <form action='?save=email&tab=email' method='POST' class='form-horizontal'>
                 <div class='form-group'>
                     <label for='inputPW0' class='col-sm-2 control-label'>Passwort</label>
-                    <div class='col-sm-10'>
-                        <input class='form-control' id='inputPW0' name='passwort' type='password' autocomplete='off' required>
+                    <div class='col-sm-10 user-box'>
+                        <input id='inputPW0' type='password' name='passwort'
+                            class='form-control' autocomplete='current-password' spellcheck='false'
+                            required />
+                        <span class='password-toggle-icon' style='right:25px'><i id='pw0' class='fas fa-eye'></i></span>
                     </div>
                 </div>
                 <br>
@@ -575,15 +578,21 @@ class Settings
             <form action='?save=passwort&tab=passwort' method='POST' class='form-horizontal'>
                 <div class='form-group'>
                     <label for='inputPW1' class='col-sm-2 control-label'>Aktuelles Passwort</label>
-                    <div class='col-sm-10'>
-                        <input class='form-control' id='inputPW1' name='passwortAlt' type='password' autocomplete='off' required>
+                    <div class='col-sm-10 user-box'>
+                        <input id='inputPW1' type='password' name='passwortAlt'
+                            class='form-control' autocomplete='current-password' spellcheck='false'
+                            required />
+                        <span class='password-toggle-icon' style='right:25px'><i id='pw1' class='fas fa-eye'></i></span>
                     </div>
                 </div>
                 <br>
                 <div class='form-group'>
                     <label for='inputPW2' class='col-sm-2 control-label'>Neues Passwort</label>
-                    <div class='col-sm-10'>
-                        <input class='form-control' id='inputPW2' name='passwortNeu' type='password' autocomplete='off' required>
+                    <div class='col-sm-10 user-box'>
+                        <input id='inputPW2' type='password' name='passwortNeu'
+                            class='form-control' autocomplete='off' spellcheck='false'
+                            required />
+                        <span class='password-toggle-icon' style='right:25px'><i id='pw2' class='fas fa-eye'></i></span>
                     </div>
                 </div>
 
@@ -594,7 +603,10 @@ class Settings
                 <div class='form-group'>
                     <label for='inputPasswortNeu2' class='col-sm-2 control-label'>Neues Passwort (wiederholen)</label>
                     <div class='col-sm-10'>
-                        <input class='form-control' id='inputPasswortNeu2' name='passwortNeu2' type='password' placeholder='' autocomplete='off' required>
+                        <input id='inputPasswortNeu2' type='password' name='passwortNeu2'
+                            class='form-control' autocomplete='off' spellcheck='false'
+                            required />
+                        <span class='password-toggle-icon' style='right:25px'><i id='pw3' class='fas fa-eye'></i></span>
                     </div>
                 </div>
 
@@ -684,9 +696,12 @@ class Settings
             <p>Zum Löschen deines Kontos gib bitte zur Bestätigung dein aktuelles Passwort ein.</p><br>
             <form action='?save=delete&tab=delete' method='POST' class='form-horizontal'>
                 <div class='form-group'>
-                    <label for='inputPW3' class='col-sm-2 control-label'>Passwort</label>
-                    <div class='col-sm-10'>
-                        <input class='form-control' style='width:auto;' id='inputPW3' name='pw_delete' type='password' autocomplete='off' required>
+                    <div class='col-sm-10 user-box'>
+                        <input id='inputPW3' type='password' name='pw_delete' placeholder='Passwort'
+                            class='form-control'  style='width:auto;' autocomplete='current-password' spellcheck='false'
+                            required />
+                        <label for='inputPW3' class='col-sm-2 control-label sr-only'>Passwort</label>
+                        <span class='password-toggle-icon' style='left:190px;right:unset'><i id='pw4' class='fas fa-eye'></i></span>
                     </div>
                 </div>
                 <br><br>
@@ -740,6 +755,91 @@ class Settings
 
         $output .= "</div> "; # -- container --
 
+
+        // Passwort-Anzeige
+        $output .= "
+        <script>
+        // const togglePassword = document.querySelector('.password-toggle-icon i');
+
+        const togglePassword0 = document.getElementById('pw0');
+        const togglePassword1 = document.getElementById('pw1');
+        const togglePassword2 = document.getElementById('pw2');
+        const togglePassword3 = document.getElementById('pw3');
+        const togglePassword4 = document.getElementById('pw4');
+
+        const passwordField0 = document.getElementById('inputPW0');
+        const passwordField1 = document.getElementById('inputPW1');
+        const passwordField2 = document.getElementById('inputPW2');
+        const passwordField3 = document.getElementById('inputPasswortNeu2');
+        const passwordField4 = document.getElementById('inputPW3');
+
+        togglePassword0.addEventListener('click', function () {
+        if (passwordField0.type === 'password') {
+            passwordField0.type = 'text';
+            togglePassword0.classList.remove('fa-eye');
+            togglePassword0.classList.add('fa-eye-slash');
+
+        } else {
+            passwordField0.type = 'password';
+            togglePassword0.classList.remove('fa-eye-slash');
+            togglePassword0.classList.add('fa-eye');
+        }
+        });
+
+        togglePassword1.addEventListener('click', function () {
+        if (passwordField1.type === 'password') {
+            passwordField1.type = 'text';
+            togglePassword1.classList.remove('fa-eye');
+            togglePassword1.classList.add('fa-eye-slash');
+
+        } else {
+            passwordField1.type = 'password';
+            togglePassword1.classList.remove('fa-eye-slash');
+            togglePassword1.classList.add('fa-eye');
+        }
+        });
+
+        togglePassword2.addEventListener('click', function () {
+        if (passwordField2.type === 'password') {
+            passwordField2.type = 'text';
+            togglePassword2.classList.remove('fa-eye');
+            togglePassword2.classList.add('fa-eye-slash');
+
+        } else {
+            passwordField2.type = 'password';
+            togglePassword2.classList.remove('fa-eye-slash');
+            togglePassword2.classList.add('fa-eye');
+        }
+        });
+
+        togglePassword3.addEventListener('click', function () {
+        if (passwordField3.type === 'password') {
+            passwordField3.type = 'text';
+            togglePassword3.classList.remove('fa-eye');
+            togglePassword3.classList.add('fa-eye-slash');
+
+        } else {
+            passwordField3.type = 'password';
+            togglePassword3.classList.remove('fa-eye-slash');
+            togglePassword3.classList.add('fa-eye');
+        }
+        });
+
+        togglePassword4.addEventListener('click', function () {
+        if (passwordField4.type === 'password') {
+            passwordField4.type = 'text';
+            togglePassword4.classList.remove('fa-eye');
+            togglePassword4.classList.add('fa-eye-slash');
+
+        } else {
+            passwordField4.type = 'password';
+            togglePassword4.classList.remove('fa-eye-slash');
+            togglePassword4.classList.add('fa-eye');
+        }
+        });
+
+        </script>
+        ";
 
         ///////////////////////////////////////////////////
         // html Ausgabe

@@ -221,7 +221,7 @@ class Table
      */
     private static function data_preparation()
     {
-        // ggf Nutzerdaten holen
+        // TODO ggf Nutzerdaten holen ???
         if (!Auth::is_checked_in()) {
             Auth::check_user();
         }

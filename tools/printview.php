@@ -59,11 +59,8 @@ class PrintView
 
     protected static function site_entry_check()
     {
-        // Nutzer angemeldet?
-        if (!Auth::is_checked_in()) Auth::check_user();
-
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!isset($_SESSION['userid'])) {
+        if (!Auth::is_checked_in()) {
             header("location: /auth/login.php");
             exit;
         }

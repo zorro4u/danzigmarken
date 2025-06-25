@@ -3,7 +3,7 @@ namespace Dzg\Cls;
 
 require_once __DIR__.'/Database.php';
 use Dzg\Cls\Database;
-use PDO, PDOException, Exception;
+use PDOException, Exception;
 
 function vardump(mixed ...$params)
 {

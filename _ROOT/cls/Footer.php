@@ -1,9 +1,11 @@
 <?php
 namespace Dzg\Cls;
 
-include_once __DIR__.'/../inc/logged.inc.php';
+#include_once __DIR__.'/../inc/logged.inc.php';
+include_once __DIR__.'/Logger.php';
 require_once __DIR__.'/Database.php';
-use Dzg\Cls\Database;
+use Dzg\Cls\{Database, Logger};
+
 
 /***********************
  * Summary of Footer
@@ -37,6 +39,7 @@ class Footer
             default:
                 self::default();
         }
+        Logger::log();
     }
 
 
@@ -68,7 +71,7 @@ class Footer
     private const CC_COPY0 =
         "&copy; 2023 danzigmarken.de
     ";
-    private const CC_COPY1 = "
+    private const CC_COPY = "
         &copy; 2023 <a class='foot-link' href='https://www.danzigmarken.de/index.php'
         title='www.danzigmarken.de'>danzigmarken.de</a>
     ";
@@ -78,8 +81,8 @@ class Footer
     ";
     private const CC_COM = "
         <a class='foot-link' href='http://creativecommons.org/licenses/by-nc-sa/4.0/deed.de'
-        target='_blank' rel='license noopener noreferrer' style='display:inline-block;'
-        title='licenses creativecommons.org'>
+        target='_blank' rel='noopener noreferrer nofollow' style='display:inline-block;'
+        title='license CC-BY-NC-SA'>
         <img style='height:8px!important; margin-left:6px; vertical-align:text-top;'
         src='/assets/pic/cc.svg' alt='cc'>
         <img style='height:8px!important; margin-left:0px; vertical-align:text-top;'
@@ -93,11 +96,14 @@ class Footer
         <br>
         Bilder sind lizensiert via
         <a class='foot-link' href='https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de'
-        target='_blank' title='licenses creativecommons.org'>Creative&nbsp;Commons</a>
+        target='_blank' rel='noopener noreferrer nofollow'
+        title='licensed via creativecommons.org'>creativecommons.org</a>
     ";
     private const CC_ICO = "
         <br>
-        Icons von <a class='foot-link' href='https://fontawesome.com/' target='_blank' title='licenses fontawesome.com'>Font&nbsp;Awesome</a>
+        Icons von <a class='foot-link' href='https://fontawesome.com/'
+        target='_blank' rel='noopener noreferrer nofollow'
+        title='licensed via fontawesome.com'>fontawesome.com</a>
     ";
 
     // Bootstrap core JavaScript
@@ -187,7 +193,7 @@ class Footer
     protected static function default()
     {
         // Standard-Mitteltext
-        $mitte = self::CC_COPY0 . self::CC_COM . self::ABOUT . self::CC_PIC . self::CC_ICO;
+        $mitte = self::CC_COPY . self::CC_COM . self::ABOUT . self::CC_PIC . self::CC_ICO;
         $version = self::version();
         $lastchanged = self::lastchanged();
 
@@ -230,7 +236,7 @@ class Footer
     protected static function kontakt()
     {
         // Mitteltext
-        $mitte = self::CC_COPY0 . self::CC_COM . self::ABOUT . self::CC_ICO;
+        $mitte = self::CC_COPY . self::CC_COM . self::ABOUT . self::CC_ICO;
 
         // die neueste/letzte Änderungszeit einer Kontakt-Projektdatei
         $project_dirs = ['/assets/css'];
@@ -262,7 +268,7 @@ class Footer
     protected static function auth()
     {
         // Mitteltext
-        $mitte = self::CC_COPY0 . self::CC_COM . self::ABOUT . self::CC_ICO;
+        $mitte = self::CC_COPY . self::CC_COM . self::ABOUT . self::CC_ICO;
 
         // die neueste/letzte Änderungszeit einer Auth-Projektdatei
         $project_dirs = ['/assets/css', '/auth'];
@@ -293,7 +299,7 @@ class Footer
     protected static function account()
     {
         // Mitteltext
-        $mitte = self::CC_COPY0 . self::CC_COM . self::IMPRESSUM;
+        $mitte = self::CC_COPY . self::CC_COM . self::IMPRESSUM;
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
         $project_dirs = ['/assets/css', '/account'];
@@ -324,7 +330,7 @@ class Footer
     protected static function impressum()
     {
         // Mitteltext
-        $mitte = self::CC_COPY0 . self::CC_COM . self::CC_PIC . self::CC_ICO;
+        $mitte = self::CC_COPY . self::CC_COM . self::CC_PIC . self::CC_ICO;
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
         #$project_dirs = ['/about'];

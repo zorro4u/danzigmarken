@@ -164,9 +164,9 @@ class Register_info
             // Eingaben okay, Mail vorbereiten und versenden
             if (empty($error_msg)) {
 
-                // Code für Zugang zur Registrierungsseite
+                // Code für Zugang zur Registrierungsseite, 30 Tage gültig
                 $reg_code = uniqid();
-                $pwcode_endtime = time() + 3600*24*30;  // 4 Woche gültig
+                $pwcode_endtime = Auth::get_pwcode_timer();
 
                 // Links für Email-Versand erzeugen
                 $reg_url = Tools::getSiteURL().'register.php?code='.$reg_code;

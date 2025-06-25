@@ -209,7 +209,7 @@ class Register
                             ? $error_msg = "Die E-Mail-Adresse ist bereits registriert."
                             : $update_email = True;
                     }
-                }  // Eingabe usernamen/email okay
+                }  # Eingabe usernamen/email okay
 
                 // usernamen/email nutzbar --> Passwort Check
                 if ($error_msg === "") {
@@ -232,7 +232,7 @@ class Register
                 $error_msg = 'Name, Email und Passwort angeben.';
             }
 
-            $userliste = [];  // Bestandsliste wieder löschen;
+            $userliste = [];  # Bestandsliste wieder löschen;
 
             // Eingaben okay, jetzt in Datenbank schreiben
             if ($error_msg === "") {
@@ -248,8 +248,9 @@ class Register
                 } else {
                     $activate_needed = True;
 
-                    $act_code = uniqid();  // temporärer Aktivierungscode
-                    $pwcode_endtime = time() + 3600*24*30;  // 4 Woche Frist für Code
+                    // temporärer Aktivierungscode, 30 Tage gültig
+                    $act_code = uniqid();
+                    $pwcode_endtime = Auth::get_pwcode_timer();
 
                     // Links für Email-Versand erzeugen
                     $activate_url = Tools::getSiteURL().'activate.php?code='.$act_code;
@@ -278,7 +279,8 @@ class Register
                     $qry->execute();
                 } catch(PDOException $e) {die($e->getMessage().': register.inc_store-user');}
 
-                // wenn Konto-Email anders als Anfrage-Email, dann noch Verifizierung per Aktivierungs-Mail
+                // wenn Konto-Email anders als Anfrage-Email,
+                // dann noch Verifizierung per Aktivierungs-Mail
                 if ($activate_needed) {
 
                     // === EMAIL ===
@@ -365,10 +367,8 @@ class Register
                             $mailcontent2
                         );
                     }
+                }  # ende.Email-Verifizierungs-Abschnitt
 
-                    // === ENDE EMAIL-Abschnitt ===
-
-                }  // ende.Email-Verifizierung notwendig
 
                 if ($activate_needed) {
                     if ($email_send1) {
@@ -382,8 +382,8 @@ class Register
                     $showForm = False;
                 }
 
-            }  // Eingabewerte in Datenbank schreiben
-        }  // Formularwerte empfangen
+            }  # Eingabewerte in Datenbank schreiben
+        }      # Formularwerte empfangen
 
         } else {
             // Registrierungs-Link nicht okay, Seite nicht starten
@@ -474,7 +474,7 @@ class Register
 </ul>";
 
 // positive Statusausgabe ohne Formular
-elseif (!$activate_needed && $error_msg === ''):  // positive Statusausgabe ohne Formular
+elseif (!$activate_needed && $error_msg === ''):  # positive Statusausgabe ohne Formular
         $output .= "
 <br><br><hr><br>
 <div><form action='./login.php?usr=".$input_usr."' method='POST'>

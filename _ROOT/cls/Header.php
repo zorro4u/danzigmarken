@@ -734,13 +734,13 @@ class Header
                         <li><a class='active'><i class='fas fa-envelope'></i>".$main['name']."</a></li>";
                 break;
 
-                // aktiv: Impressum     < impressum_login >
+                // aktiv: Impressum     < impressum_Konto >
                 case 6:
                     $output .= "
                         <li><a class='active'>".$main['name']."</a></li>";
                     break;
 
-                // aktiv: About     < about_login >
+                // aktiv: About     < about_Konto >
                 case 16:
                     $output .= "
                         <li><a class='active'>".$main['name']."</a></li>";
@@ -749,28 +749,31 @@ class Header
                 endswitch;
 
                 // ... und Konto-Menü als letztes noch ranhängen    < (admin_) setting_logout >
-                $output .= "
+                /*$output .= "
                     <li>
                     <div class='collapsible-menu'>
                     <input type='checkbox' id='menu'>
                     <label for='menu' title='Konto'><i class='fas fa-user-circle'></i></label>
                     <div class='menu-content'>
-                    <ul>";
+                    <ul>";*/
 
-                // ggf Admin
-                if (isset($_SESSION['su']) && $_SESSION['su'] === True)
-                    $output .= "<li><a href='{$rootdir}/account/admin'>Admin</a></li>";
+                // ggf Admin    <li><a href='{$rootdir}/account/admin'>Admin</a></li>";
+                /*if (isset($_SESSION['su']) && $_SESSION['su'] === True)
+                    $output .= "
+                    <li><a href='{$rootdir}/account/admin' title='Admin'>
+                    <i class='fas fa-user-plus'></i></a></li>";*/
 
-                // Setting
+                // Setting  <li><a href='{$rootdir}/account/settings' title='Konto'><span class='konto'></span></a></li>";  ... class='fas fa-cog'
                 $output .= "
                     <li><a href='{$rootdir}/account/settings' title='Konto'>
-                    <span class='konto'></span></a></li>";
+                    <i class='fas fa-user-circle'></i></a></li>";
 
-                // Logout
-                $output .= "
-                    <li><a href='{$rootdir}/auth/logout' title='Abmelden'>Abmelden</a></li>";
+                // Logout   <li><a href='{$rootdir}/auth/logout' title='Abmelden'>Abmelden</a></li>";
+                /*$output .= "
+                    <li><a href='{$rootdir}/auth/logout' title='Abmelden'>
+                    <i class='fas fa-sign-out-alt'></i></a></li>";*/
 
-                $output .= "</ul></div></div></li>";
+                #$output .= "</ul></div></div></li>";
 
 
                 //TODO: das hier bitte als flyout-Menü
@@ -828,12 +831,12 @@ class Header
                             (in_array(basename($_SERVER['PHP_SELF']), $acc_pages)))
                         {
                             $output .= "
-                                <li><a href='{$rootdir}/account/admin'>
-                                <i class='fas fa-user-plus'></i>Admin</a></li>";
+                                <li><a href='{$rootdir}/account/admin' title='Admin'>
+                                <i class='fas fa-user-plus'></i></a></li>";
                         }
                         // Setting-Menü
                         $output .= "
-                        <li><a class='active'><i class='fas fa-cog'></i>Konto</a></li>";
+                        <li><a class='active'><i class='fas fa-user-circle'></i>Konto</a></li>";
 
                     // aktiv: Admin     < admin_setting_logout >
                     } elseif ($siteid === 101) {
@@ -841,13 +844,13 @@ class Header
                             <li><a class='active'><i class='fas fa-user-plus'>
                                 </i>Admin</a></a></li>
                             <li><a href='{$rootdir}/account/settings' title='Konto'>
-                                <i class='fas fa-cog'></i>Konto</a></li>";
+                                <i class='fas fa-user-circle'></i></a></li>";
                     }
 
                     // Logout-Menü
                     $output .= "
                         <li><a href='{$rootdir}/auth/logout' title='Abmelden'>
-                        <i class='fas fa-sign-out-alt'></i>Abmelden</a></li>";
+                        <i class='fas fa-sign-out-alt'></i></a></li>";
                 }
             }      # ende 'Konto-Bereich'
 

@@ -311,11 +311,8 @@ class Upload
         //-------------------------------------------------
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!Auth::is_checked_in() || (int)$_SESSION['su'] !== 1) {
-            Auth::check_user();
-            if (!Auth::is_checked_in() || $_SESSION['su'] != 1) {
-                header("location: /auth/login.php");
-                exit;
-            }
+            header("location: /auth/login.php");
+            exit;
         }
 
         //-------------------------------------------------

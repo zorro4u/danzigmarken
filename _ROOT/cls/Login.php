@@ -178,7 +178,7 @@ class Login
                             if(isset($_POST['angemeldet_bleiben'])) {
                                 $identifier = Auth::random_string();
                                 $token_hash = sha1(Auth::random_string());
-                                $token_timer = time() + 3600*24*365;  // gültig für 1 Jahr
+                                $token_timer = Auth::get_token_timer();  # gültig für 1 Jahr
                                 $token_endtime = date('Y-m-d H:i:s', $token_timer);
 
                                 // Autologin: Identifier/Token eintragen

@@ -28,7 +28,7 @@ class Admin
     public static $active;
     public static $usr_data;
     public static $user_list;
-    public static $securitytoken_row;
+    public static $login_data;
     public static $identifier;
     public static $last_access;
     public static $reglinks;
@@ -89,7 +89,7 @@ class Admin
         $return2 = ["index", "index2", "details"];
         Tools::lastsite($return2);
 
-        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
+        [$usr_data, $login_data, $error_msg] = Auth::check_user();
 
         // unberechtigter Seitenaufruf
         $status = (empty($error_msg)) ? true : false;
@@ -108,9 +108,9 @@ class Admin
 
         // globale Variablen setzen
         if ($status) {
-            self::$identifier = $securitytoken_row['identifier'];
+            self::$identifier = $login_data['identifier'];
             self::$userid = $usr_data['userid'];
-            self::$securitytoken_row = $securitytoken_row;
+            self::$login_data = $login_data;
             self::$usr_data = $usr_data;
         }
         self::$error_msg = $error_msg;
@@ -409,13 +409,13 @@ class Admin
                 #$usr_data['email'] = $user['email'];
                 #$usr_data['created'] = $user['created'];
                 #$usr_data['changed'] = $user['changed'];
-                #$securitytoken_row['created'] = $user['created'];
-                #$securitytoken_row['last_seen'] = $user['last_seen'];
-                #$securitytoken_row['last_seen'] = $securitytoken_row['changed'];
-                #$securitytoken_row['ip'] = $user['last_ip'];
-                #$securitytoken_row['identifier'] = $identifier;
-                #$securitytoken_row['token_hash'] = $securitytoken_row['token_hash'];
-                #$securitytoken_row['token_endtime'] = $user['token_endtime'];
+                #$login_data['created'] = $user['created'];
+                #$login_data['last_seen'] = $user['last_seen'];
+                #$login_data['last_seen'] = $login_data['changed'];
+                #$login_data['ip'] = $user['last_ip'];
+                #$login_data['identifier'] = $identifier;
+                #$login_data['token_hash'] = $login_data['token_hash'];
+                #$login_data['token_endtime'] = $user['token_endtime'];
 
             // --- TAB: Autologin ---
                 // meine anderen aktiven
@@ -605,9 +605,9 @@ class Admin
         //
         case "make_reglink":
 
-            // Code für Zugang zur Registrierungsseite
+            // Code für Zugang zur Registrierungsseite, 30 Tage gültig
             $reg_code = uniqid();
-            $pwcode_endtime = time() + 3600*24*30;  // 4 Woche gültig
+            $pwcode_endtime = Auth::get_pwcode_timer();
 
             #$reg_url = getSiteURL().'register.php?code='.$reg_code;
             $reg_url = "https://www.danzigmarken.de/auth/register.php?code=".$reg_code;
@@ -776,7 +776,7 @@ class Admin
         $active = self::$active;
         $usr_data = self::$usr_data;
         $user_list = self::$user_list;
-        $securitytoken_row = self::$securitytoken_row;
+        $login_data = self::$login_data;
         $last_access = self::$last_access;
         $reglinks = self::$reglinks;
         $count10 = self::$count10;
@@ -835,81 +835,53 @@ class Admin
     $changed = (!empty($usr_data['changed']))
         ? date('d.m.y H:i', strtotime($usr_data['changed']))
         : "";
-    $endtime = (!empty($securitytoken_row['token_endtime']))
-        ? date('d.m.y H:i', strtotime($securitytoken_row['token_endtime']))
+    $endtime = (!empty($login_data['token_endtime']))
+        ? date('d.m.y H:i', strtotime($login_data['token_endtime']))
         : "";
-    $out_created = (!empty($securitytoken_row['created']))
-        ? date('d.m.y H:i', strtotime($securitytoken_row['created']))
+    $out_created = (!empty($login_data['created']))
+        ? date('d.m.y H:i', strtotime($login_data['created']))
         : "";
-    $out_ip = (!empty($securitytoken_row['ip']))
-        ? htmlspecialchars($securitytoken_row['ip'], ENT_QUOTES)
+    $out_ip = (!empty($login_data['ip']))
+        ? htmlspecialchars($login_data['ip'], ENT_QUOTES)
         : "";
     $out_date = (!empty($last_access['date']))
         ? "&nbsp;".$last_access['ip']."<br>&nbsp;".date('d.m.y H:i', strtotime($last_access['date']))."<br>&nbsp;#".$last_access['ct']
         : "";
-    $out_ident = (!empty($securitytoken_row['identifier']))
-        ? htmlspecialchars($securitytoken_row['identifier'], ENT_QUOTES)
+    $out_ident = (!empty($login_data['identifier']))
+        ? htmlspecialchars($login_data['identifier'], ENT_QUOTES)
+        : "";
+    $autologin = (!empty($login_data['autologin']))
+        ? "<tr><td>a.login:</td><td>".$login_data['autologin']."</td></tr>"
+        : "";
+    $auto = (!empty($login_data['autologin']))
+        ? "*"
         : "";
     /*
-    $out_token = (!empty($securitytoken_row['token_hash'])) ? htmlspecialchars($securitytoken_row['token_hash'], ENT_QUOTES) : "";
-    $last_seen = (!empty($securitytoken_row['changed'])) ? date('d.m.y H:i', strtotime($securitytoken_row['changed'])) : "";
+    $out_token = (!empty($login_data['token_hash'])) ? htmlspecialchars($login_data['token_hash'], ENT_QUOTES) : "";
+    $last_seen = (!empty($login_data['changed'])) ? date('d.m.y H:i', strtotime($login_data['changed'])) : "";
     */
     $output .= "
 
     <table>
-        <tr>
-            <td>Nutzer:</td>
-            <td>".htmlspecialchars($usr_data['username'], ENT_QUOTES)."</td>
-        </tr>
-        <tr>
-            <td>Email:</td>
-            <td>".htmlspecialchars($usr_data['email'], ENT_QUOTES)."</td>
-        </tr>
-        <tr>
-            <td>erstellt:</td>
-            <td>".date('d.m.y H:i', strtotime($usr_data['created']))."</td>
-        </tr>
-        <tr>
-            <td>geändert:</td>
-            <td>".$changed."</td>
-        </tr>
-        <tr>
-            <td>Login:</td>
-            <td>".$out_created."</td>
-        </tr>
-        <tr>
-            <td>gültig bis:</td>
-            <td>".$endtime."</td>
-        </tr>
-        <tr>
-            <td>last.ip:</td>
-            <td>".$out_ip."</td>
-        </tr>
-        <!--<tr>
-            <td>AutoIdent:</td>
-            <td>".$out_ident."</td>
-        </tr>
-        <tr>
-            <td>Token:</td>
-            <td>".$out_token."</td>
-        </tr>-->
-        <!--<tr>
-            <td>last.seen:</td>
-            <td>".$last_seen."</td>
-        </tr>-->
+        <tr><td>Nutzer:</td><td>".htmlspecialchars($usr_data['username'], ENT_QUOTES)."</td></tr>
+        <tr><td>Email:</td><td>".htmlspecialchars($usr_data['email'], ENT_QUOTES)."</td></tr>
+        <tr><td>erstellt:</td><td>".date('d.m.y H:i', strtotime($usr_data['created']))."</td></tr>
+        <tr><td>geändert:</td><td>".$changed."</td></tr>
+        <tr><td>Login{$auto}:</td><td>".$out_created."</td></tr>
+        <tr><td>last.ip:</td><td>".$out_ip."</td></tr>";
 
-        <tr>
-            <td>&nbsp;</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>last.unknown:</td>
-            <td>".$out_date."</td>
-        </tr>
+    #$output .= $autologin;
+    $output .= "
+        <!--<tr><td>gültig bis:</td><td>".$endtime."</td></tr>-->
+        <!--<tr><td>AutoIdent:</td><td>".$out_ident."</td></tr>-->
+        <!--<tr><td>Token:</td><td>".$out_token."</td></tr>-->
+        <!--<tr><td>last.seen:</td><td>".$last_seen."</td></tr>-->
+        <tr><td>&nbsp;</td><td></td></tr>
+        <tr><td>last.unknown:</td><td>".$out_date."</td></tr>
     </table>
 
     <br><hr>
-    <form action='../tools/logged' method='POST'>
+    <form action='../tools/show_log' method='POST'>
         <button class='btn btn-primary' type=''>Log-Protokoll</button>&emsp;&emsp;
         <button formaction='../tools/maillog_show' class='btn btn-primary' type='' value='' name=''>Mail-Log</button>&emsp;&emsp;
         <button formaction='../tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
