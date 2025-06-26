@@ -578,23 +578,8 @@ class Auth
 
             $userid = $_SESSION['userid'];
 
-            // Plausi-Check...
+            // Plausi-Check userid ...
             //
-            // mariadb: (abs)BIGINT: 2^64-1, 18.446.744.073.709.551.615 > 18.44*10^18,
-            // mariadb: BIGINT: 2^64/2-1, +-9.223.372.036.854.775.807 > 9.22*10^18,
-            // mariadb: (abs)INT: 2^32-1, 4.294.967.295 > 4.29*10^9,
-            // mariadb: INT: 2^32/2-1, +-2.147.483.647 > 2.14*10^9,
-            // php, int max: 2^64, 9.223.372.036.854.775.807, 9.22*10^18, 9.22E+18,
-            // dann Umwandlung in float/double
-            // [0-9]:Zahl mit 1 bis 19 Ziffern, 10*10^18-1, zu große Zahl > php.int.max
-            // [0-9]:Zahl mit 1 bis 18 Ziffern,  1*10^18-1, zu kleine Zahl < php.int.max
-            //
-            // Umwandlung in int ergibt bei string mit Buchst od. zu grosser Zahl php.int.max
-            // -> Vgl mit Original dann negativ
-            // int grösser 9*10^18 (php.int.max) wird autom. in double/float gewandelt,
-            // die Wandlung in int ergibt neg. Integerzahl -> Wert-Vgl mit Original dann negativ
-            #var_dump(PHP_INT_MAX);
-
             // Zahl mit 1 bis 19 Ziffern, 10*10^18-1, in php aber nur 9*10^18 möglich
             if (!preg_match('/^[0-9]{1,19}$/', $userid)
                 || $userid != (int)$userid)

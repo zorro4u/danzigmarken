@@ -77,9 +77,14 @@ class Details
     }
 
 
+    /***********************
+     * Summary of site_entry_check
+     *
+     * Seitenaufruf nur mit file_id möglich.
+     * Test, ob ID eine korrekte Zahl ist.
+     */
     protected static function site_entry_check()
     {
-        // Plausi-Check der ID, bevor weiter gemacht wird !!
         $error_arr = [];
         $status = true;
         $akt_file_id = 0;
@@ -88,13 +93,33 @@ class Details
             $error_msg = 'Seite ohne ID-Angabe funktioniert nicht.';
 
         } else {
-            // Zahl mit 1 bis 19 Ziffern, 10*10^18-1, in php aber nur 9*10^18 möglich
             $get_id = $_GET['id'];
+
+            // Plausi-Check file_ID ...
+            //
+            // mariadb: (abs)BIGINT: 2^64-1, 18.446.744.073.709.551.615 > 18.44*10^18,
+            // mariadb: BIGINT: 2^64/2-1, +-9.223.372.036.854.775.807 > 9.22*10^18,
+            // mariadb: (abs)INT: 2^32-1, 4.294.967.295 > 4.29*10^9,
+            // mariadb: INT: 2^32/2-1, +-2.147.483.647 > 2.14*10^9,
+            //
+            // php, int max: 2^64, 9.223.372.036.854.775.807, 9.22*10^18, 9.22E+18,
+            // dann Umwandlung in float/double
+            // [0-9]:Zahl mit 1 bis 19 Ziffern, 10^19-1, zu große Zahl > php.int.max
+            // [0-9]:Zahl mit 1 bis 18 Ziffern,  10^18-1, zu kleine Zahl < php.int.max
+            //
+            // Umwandlung in (int) ergibt bei string mit Buchst -> Zahl ohne Buchstaben,
+            // Vgl mit Originalstring dann negativ.
+            // Zahl grösser 9*10^18 (php.int.max) wird autom. in double/float gewandelt,
+            // die Wandlung von (float) in (int) ergibt -> neg. Integerzahl,
+            // Wert-Vgl mit Original dann negativ.
+            #var_dump(PHP_INT_MAX);
+
+            // Zahl mit 1 bis 19 Ziffern, 10^19-1, in php aber nur 9*10^18 als Integer möglich
             $regex_digi    = "/^\d{1,19}$/";
             if (!preg_match($regex_digi, $get_id)
                 || $get_id != (int)$get_id)
             {
-                $error_arr []= 'a wrong ID transmitted ...';
+                $error_arr []= "uups, a wrong ID ... u'r out";
                 $status = false;
 
             } else {
@@ -111,6 +136,9 @@ class Details
     }
 
 
+    /***********************
+     * Summary of groupID_check
+     */
     protected static function groupID_check(int $gid=0)
     {
         // Nutzer nicht angemeldet?
@@ -332,7 +360,7 @@ class Details
 
 
     /***********************
-     *
+     * Summary of data_preparation
      */
     protected static function data_preparation()
     {
@@ -675,7 +703,9 @@ class Details
 
 
     /***********************
-     * HTML erzeugen
+     * Summary of site_output
+     *
+     * als HTML ausgeben
      */
     protected static function site_output()
     {
