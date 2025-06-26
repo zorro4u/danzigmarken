@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 use PDO, PDOException, Exception;
 
 date_default_timezone_set('Europe/Berlin');

@@ -1,11 +1,11 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 #require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once __DIR__.'/Details.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-use Dzg\Cls\{Database, Auth, Tools, Details, Header, Footer};
+use Dzg\{Database, Auth, Tools, Details, Header, Footer};
 use PDO, PDOException, Exception;
 
 /***********************

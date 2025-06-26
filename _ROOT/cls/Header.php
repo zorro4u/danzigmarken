@@ -1,8 +1,8 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 require_once __DIR__.'/Auth.php';
-use Dzg\Cls\Auth;
+use Dzg\Auth;
 
 /***********************
  * Summary of Header

@@ -1,6 +1,6 @@
 <?php
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->RegSeite-->email(AktLink)-->dieseSeite:ActivateSeite-->Login */
-namespace Dzg\Cls;
+namespace Dzg;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -13,7 +13,7 @@ require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
 
 use PDO, PDOException;
-use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
+use Dzg\{Database, Auth, Tools, Header, Footer};
 
 /***********************
  * Summary of Activate

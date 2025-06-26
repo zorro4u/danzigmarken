@@ -1,6 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Database.php";
-use Dzg\Cls\Database;
+use Dzg\Database;
 
 // je nachdem über welchen Weg die Daten kommen, json_Array vs POST
 $data = json_decode(file_get_contents('php://input'));

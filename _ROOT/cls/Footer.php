@@ -1,10 +1,10 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 #include_once __DIR__.'/../inc/logged.inc.php';
 include_once __DIR__.'/Logger.php';
 require_once __DIR__.'/Database.php';
-use Dzg\Cls\{Database, Logger};
+use Dzg\{Database, Logger};
 
 
 /***********************

@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 /****************************
  * Funktionscontainer für den Anmelde- und Verifizierungsprozess
@@ -19,7 +19,7 @@ include_once __DIR__.'/../inc/auth.password.func.php';
 include_once __DIR__.'/Tools.php';
 
 use PDO, PDOException;
-use Dzg\Cls\{Database, Tools};
+use Dzg\{Database, Tools};
 
 
 /****************************

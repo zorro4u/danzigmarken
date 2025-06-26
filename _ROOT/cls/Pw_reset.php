@@ -1,6 +1,6 @@
 <?php
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
-namespace Dzg\Cls;
+namespace Dzg;
 
 // TODO: alle Autologins beenden
 
@@ -14,7 +14,7 @@ error_reporting(E_ERROR | E_PARSE);
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 
-use Dzg\Cls\{Database, Tools, Header, Footer};
+use Dzg\{Database, Tools, Header, Footer};
 use PDO, PDOException;
 
 

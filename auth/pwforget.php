@@ -6,6 +6,6 @@ date_default_timezone_set('Europe/Berlin');
 #Starter::run("pw_forget");
 
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Pw_forget.php";
-use Dzg\Cls\Pw_forget;
+use Dzg\Pw_forget;
 
 Pw_forget::show();

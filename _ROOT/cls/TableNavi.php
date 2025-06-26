@@ -1,8 +1,8 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 require_once __DIR__.'/Table.php';
-use Dzg\Cls\Table;
+use Dzg\Table;
 use PDO, PDOException;
 
 

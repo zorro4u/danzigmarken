@@ -5,7 +5,7 @@ date_default_timezone_set('Europe/Berlin');
 // Datenbank- & Auth-Funktionen laden
 #require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Auth.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Header.php";
-use Dzg\Cls\{Database, Auth, Tools, Header};
+use Dzg\{Database, Auth, Tools, Header};
 
 // Seite anzeigen
 PrintView::show();

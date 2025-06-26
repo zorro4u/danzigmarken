@@ -1,6 +1,6 @@
 <?php
 /* Prozess: dieseSeite:RegInfo-->email(Admin)-->email(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
-namespace Dzg\Cls;
+namespace Dzg;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -16,7 +16,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Kontakt.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 
-use Dzg\Cls\{Database, Auth, Tools, Kontakt, Header, Footer};
+use Dzg\{Database, Auth, Tools, Kontakt, Header, Footer};
 use Dzg\Mail\{Mailcfg, Smtp};
 use PDO, PDOException;
 

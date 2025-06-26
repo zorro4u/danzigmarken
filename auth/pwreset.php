@@ -6,6 +6,6 @@ date_default_timezone_set('Europe/Berlin');
 #Starter::run("pw_reset");
 
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Pw_reset.php";
-use Dzg\Cls\Pw_reset;
+use Dzg\Pw_reset;
 
 Pw_reset::show();

@@ -6,6 +6,6 @@ date_default_timezone_set('Europe/Berlin');
 #Starter::run("register");
 
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Register.php";
-use Dzg\Cls\Register;
+use Dzg\Register;
 
 Register::show();

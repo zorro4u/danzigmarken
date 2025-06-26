@@ -1,7 +1,7 @@
 <?php
 /* Prozess: admin:-->dieseSeite:RegPre (statt:RegInfo) [-->(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login] */
 
-namespace Dzg\Cls;
+namespace Dzg;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -10,7 +10,7 @@ error_reporting(E_ERROR | E_PARSE);
 #require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
-use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
+use Dzg\{Database, Auth, Tools, Header, Footer};
 use PDO, PDOException, Exception;
 
 

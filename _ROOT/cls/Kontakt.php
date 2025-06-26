@@ -1,11 +1,11 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 // Datenbank- & Auth-Funktionen laden
 #require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-use Dzg\Cls\{Tools, Header, Footer};
+use Dzg\{Tools, Header, Footer};
 
 require __DIR__.'/../mail/Mailcfg.php';
 require __DIR__.'/../mail/Smtp.php';

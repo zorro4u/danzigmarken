@@ -4,7 +4,7 @@ session_start();
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
-use Dzg\Cls\{Auth, Header, Footer};
+use Dzg\{Auth, Header, Footer};
 
 Header::show();
 ?>

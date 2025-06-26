@@ -6,6 +6,6 @@ date_default_timezone_set('Europe/Berlin');
 #Starter::run("activate");
 
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Activate.php";
-use Dzg\Cls\Activate;
+use Dzg\Activate;
 
 Activate::show();

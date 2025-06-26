@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Cls;
+namespace Dzg;
 
 // Datenbank- & Auth-Funktionen laden
 #require_once __DIR__.'/Database.php';
@@ -10,7 +10,7 @@ require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
 
 use PDO, PDOException;
-use Dzg\Cls\{Database, Auth, Tools, Header, Footer};
+use Dzg\{Database, Auth, Tools, Header, Footer};
 
 
 /****************************
