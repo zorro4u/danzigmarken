@@ -4,7 +4,10 @@
 .venv
 _info/
 _py/
-data/
+data/*.*
+data/*/*/*.jpg
+data/*/*/*.webp
+data/*/*/*.png
 download/work/
 upload/*.php
 upload/files/*.php

@@ -7,7 +7,7 @@ require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
 
 use PDO, PDOException;
-#use Dzg\{Database, Auth Header, Footer};
+#use Dzg\{Database, Auth, Header, Footer};
 
 /*
 -- MVC Design --
@@ -1039,7 +1039,6 @@ class Details
         echo $output;
 
     }
-
 
 
 }

@@ -823,16 +823,20 @@ if ($cfg["Sicherheitsfrage"]) {
     }
     $output .= "
         ' >
-            <label class='control-label' for='answer'><i id='securityquestion-icon' class='fa fa fa-unlock-alt'></i></label>
-            <div aria-label='Sicherheitsfrage'>".$q[1]."<input type='hidden' name='q_id' value='".$q[0]."' />
-            </div>
+            <br />
+            <label class='control-label' for='answer'>
+            <div aria-label='Sicherheitsfrage'>
+            <i id='securityquestion-icon' class='fa fa fa-unlock-alt'></i>&nbsp;
+            Sicherheitsfrage <span style='color:red'>*</span>
+            <input type='hidden' name='q_id' value='".$q[0]."' />
+            </div></label>
             <input ";
             if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
                 $output .= " required ";
             } else {
                 $output .= " onchange='checkField(this)' ";
             }
-            $output .= " aria-label='Antwort' id='answer' placeholder='Antwort *' type='text' class='field";
+            $output .= " aria-label='Antwort' id='answer' placeholder='".$q[1]."' type='text' class='field";
             if (!empty($fehler["q_id12"])) {
                 $output .= " errordesignfields";
             }
