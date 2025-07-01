@@ -13,7 +13,11 @@ $questions = [
 */
 
 
-class AntiSpam {
+/***********************
+ * Summary of AntiSpam
+ */
+class AntiSpam
+{
 	private static array $questions_arr;
 
 	/**

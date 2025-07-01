@@ -5,6 +5,7 @@ date_default_timezone_set('Europe/Berlin');
 
 Mailcfg::load();
 
+
 /***********************
  * Summary of Mailcfg
  */
@@ -63,7 +64,6 @@ class Mailcfg
         self::$zeichenlaenge_telefon = $zeichenlaenge_telefon;
         self::$zeichenlaenge_betreff = $zeichenlaenge_betreff;
         self::$maillogFile = $maillogFile;
-
 
     }
 }

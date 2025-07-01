@@ -7,15 +7,13 @@ date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Kontakt.php';
-#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/mail/Mailcfg.php';
-#require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/mail/Smtp.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/mail/Mail.php';
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
 
-use Dzg\{Database, Auth, Tools, Kontakt, Header, Footer};
-use Dzg\Mail\{Mailcfg, Smtp};
+use Dzg\{Database, Auth, Tools, Header, Footer};
+use Dzg\Mail\{Mailcfg, Mail};
 use PDO, PDOException, Exception;
 
 
@@ -173,60 +171,22 @@ class Pw_forget
                     "Betreff: ".$subject1."\n".
                     "Nachricht:\n\n".$mailcontent1;
 
-                // via SMTP
-                if ($smtp['enabled'] !== 0) {
-
-                    // mail it to customer from rain.0
-                    $email_send1 = SMTP::send(
-                        $smtp['mail_host'],
-                        $smtp['login_usr'],
-                        $smtp['login_pwd'],
-                        $smtp['encryption'],
-                        $smtp['smtp_port'],
-                        $smtp['from_addr'],
-                        $smtp['from_name'],
-                        $mailto1,
-                        $subject1,
-                        $mailcontent1,
-                        [],
-                        'upload_directory',
-                        $smtp['debug']
-                    );
-
-                    // mail it to admin from rain.0
-                    $email_send2 = SMTP::send(
-                        $smtp['mail_host'],
-                        $smtp['login_usr'],
-                        $smtp['login_pwd'],
-                        $smtp['encryption'],
-                        $smtp['smtp_port'],
-                        $smtp['from_addr'],
-                        $smtp['from_name'],
-                        $mailto2,
-                        $subject2,
-                        $mailcontent2,
-                        [],
-                        'upload_directory',
-                        $smtp['debug']
-                    );
-
-                // via PHP_included_function
-                } else {
-                    $email_send1 = Kontakt::sendMyMail(
-                        $smtp['from_addr'],
-                        $smtp['from_name'],
-                        $mailto1,
-                        $subject1,
-                        $mailcontent1
-                    );
-                    $email_send2 = Kontakt::sendMyMail(
-                        $smtp['from_addr'],
-                        $smtp['from_name'],
-                        $mailto2,
-                        $subject2,
-                        $mailcontent2
-                    );
-                }
+                // mail it to customer
+                $email_send1 = Mail::sendMyMail(
+                    $smtp['from_addr'],
+                    $smtp['from_name'],
+                    $mailto1,
+                    $subject1,
+                    $mailcontent1
+                );
+                // mail it to admin
+                $email_send2 = Mail::sendMyMail(
+                    $smtp['from_addr'],
+                    $smtp['from_name'],
+                    $mailto2,
+                    $subject2,
+                    $mailcontent2
+                );
 
                 // === ENDE EMAIL-Abschnitt ===
 

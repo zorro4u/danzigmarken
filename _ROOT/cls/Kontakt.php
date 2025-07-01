@@ -2,18 +2,17 @@
 namespace Dzg;
 
 // Datenbank- & Auth-Funktionen laden
-#require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
 use Dzg\{Tools, Header, Footer};
 
-require __DIR__.'/../mail/Mailcfg.php';
-require __DIR__.'/../mail/Smtp.php';
-require __DIR__.'/../mail/AntiSpam.php';
-require __DIR__.'/../mail/RateLimiting.php';
-#include $_SERVER['DOCUMENT_ROOT'].'/kontakt/PHPMailer/Secureimage.php';   // ?? dawid.golunski@outlook.com
-use Dzg\Mail\{Mailcfg, SMTP, AntiSpam, RateLimiting};
+require_once __DIR__.'/../mail/Mail.php';
+require_once __DIR__.'/../mail/AntiSpam.php';
+require_once __DIR__.'/../mail/RateLimiting.php';
+require_once __DIR__.'/../mail/Captcha.php';
+use Dzg\Mail\{Mailcfg, Mail, AntiSpam, RateLimiting, Captcha};
 
+#require_once $_SERVER['DOCUMENT_ROOT']."/assets/inc/captcha_pic.php";
 
 /***********************
  * Webseite: Kontaktformular
@@ -29,6 +28,7 @@ class Kontakt
     public static function show()
     {
         self::data_preparation();
+        self::form_evaluation();
 
         Header::show();
         self::site_output();
@@ -47,86 +47,38 @@ class Kontakt
     private static $input_message_first;
     private static $cfg;
     private static $fehler;
-    private static $q;
+    private static $question;
     private static $datenschutzerklaerung;
-
-
-
-    /***********************
-     * Summary of encrypt
-     */
-    protected static function encrypt($string, $key): string
-    {
-        $result = '';
-        for($i=0; $i<strlen($string); $i++) {
-        $char = substr($string, $i, 1);
-        $keychar = substr($key, ($i % strlen($key))-1, 1);
-        $char = chr(ord($char)+ord($keychar));
-        $result.=$char;
-        }
-        return base64_encode($result);
-    }
-
-
-    /***********************
-     * Summary of sendMyMail
-     * prepare and send email via PHP included mail-function
-     */
-    public static function sendMyMail($fromMail, $fromName, $toMail, $subject, $content, $attachments=array()): bool
-    {
-        $boundary = md5(uniqid(time()));
-        $eol = PHP_EOL;
-
-        // header
-        $header = "From: =?UTF-8?B?".base64_encode(stripslashes($fromName))."?= <".$fromMail.">".$eol;
-        $header .= "Reply-To: <".$fromMail.">".$eol;
-        $header .= "MIME-Version: 1.0".$eol;
-        if (is_array($attachments) && 0<count($attachments)) {
-            $header .= "Content-Type: multipart/mixed; boundary=\"".$boundary."\"";
-        }
-        else {
-            $header .= "Content-type: text/plain; charset=utf-8";
-        }
-
-        // content with attachments
-        if (is_array($attachments) && 0<count($attachments)) {
-
-            // content
-            $message = "--".$boundary.$eol;
-            $message .= "Content-type: text/plain; charset=utf-8".$eol;
-            $message .= "Content-Transfer-Encoding: 8bit".$eol.$eol;
-            $message .= $content.$eol;
-
-            // attachments
-            foreach ($attachments as $filename=>$filecontent) {
-                $filecontent = chunk_split(base64_encode($filecontent));
-                $message .= "--".$boundary.$eol;
-                $message .= "Content-Type: application/octet-stream; name=\"".$filename."\"".$eol;
-                $message .= "Content-Transfer-Encoding: base64".$eol;
-                $message .= "Content-Disposition: attachment; filename=\"".$filename."\"".$eol.$eol;
-                $message .= $filecontent.$eol;
-            }
-            $message .= "--".$boundary."--";
-        }
-
-        // content without attachments
-        else {
-            $message = $content;
-        }
-
-        // subject
-        $subject = "=?UTF-8?B?".base64_encode($subject)."?=";
-
-        // send mail
-        return mail($toMail, $subject, $message, $header);
-    }
 
 
     /***********************
      * Summary of data_preparation
-     * [https://www.kontaktformular.com/]
      */
     private static function data_preparation()
+    {
+        $cfg = Mailcfg::$cfg;
+        $question = [];
+
+        if ($cfg['Sicherheitsfrage'])
+            $question = AntiSpam::getRandomQuestion();      # [id, question]
+
+        $script_root = substr(__FILE__, 0,
+                            strrpos(__FILE__,
+                                    DIRECTORY_SEPARATOR)
+                            ).DIRECTORY_SEPARATOR;
+
+        // Herkunftsseite speichern
+        Tools::lastsite(['index', 'index2', 'details', 'settings', 'admin']);
+
+        self::$question = $question;
+    }
+
+
+    /**
+     * Summary of form_evaluation
+     * [https://www.kontaktformular.com/]
+     */
+    private static function form_evaluation()
     {
         #require $_SERVER['DOCUMENT_ROOT'].'/kontakt/mail-setup.php';
         #global $cfg, $smtp;
@@ -149,19 +101,6 @@ class Kontakt
         $input_email = "";
         $input_message_first = "";
         $fehler = [];
-        $q = [];
-
-
-        if ($cfg['Sicherheitsfrage'])
-            $q = AntiSpam::getRandomQuestion();
-
-        $script_root = substr(__FILE__, 0,
-                            strrpos(__FILE__,
-                                    DIRECTORY_SEPARATOR)
-                            ).DIRECTORY_SEPARATOR;
-
-        // Herkunftsseite speichern
-        Tools::lastsite(['index', 'index2', 'details', 'settings', 'admin']);
 
         // Formularwerte empfangen
         # (isset($_GET['send']) && strtoupper($_SERVER["REQUEST_METHOD"] === "POST")
@@ -260,20 +199,15 @@ class Kontakt
             }
 
 
-            if ($cfg['Datenschutz_Erklaerung']) {
+            if ($cfg['Datenschutz_Erklaerung'])
                 $datenschutz = stripslashes($_POST["datenschutz"]);
-            }
-            if ($cfg['Sicherheitscode']) {
-                # encrypt() .. (email.func.php)
-                $sicherheits_eingabe = self::encrypt($_POST["sicherheitscode"], "8h384ls94");
-                $sicherheits_eingabe = str_replace("=", "", $sicherheits_eingabe);
-            }
 
+            if ($cfg['Sicherheitscode'])
+                $sicherheits_eingabe = Captcha::encrypt($_POST["sicherheitscode"]);
 
-            // Anzahl der Seiten-Aufrufe begrenzen --> kontakt/rate_limiting/login.php
-            if ($cfg['Aufrufe_limitieren']) {
-                RateLimiting::execute();
-            }
+            // Anzahl der Seiten-Aufrufe begrenzen
+            if ($cfg['Aufrufe_limitieren'])
+                RateLimiting::run();
 
 
             // -------------------- SPAMPROTECTION ERROR MESSAGES START ----------------------
@@ -285,8 +219,8 @@ class Kontakt
             }
 
             if ($cfg["Sicherheitsfrage"]) {
-                $answer = AntiSpam::getAnswerById(intval($_POST["q_id"]));
-                if (isset($_POST["q"]) && $_POST["q"] != $answer) {
+                $answer = AntiSpam::getAnswerById(intval($_POST["question_id"]));
+                if (!isset($_POST["answer"]) || $_POST["answer"] != $answer) {
                     $fehler['q_id12'] = "<span class='errormsg'>Bitte die <strong>Sicherheitsfrage</strong> richtig beantworten.</span>";
                 }
             }
@@ -403,36 +337,14 @@ class Kontakt
                     "Nachricht:\n\n".preg_replace("/\r\r|\r\n|\n\r|\n\n/","\n",$input_message)."\n\n\n".
                     "IP Adresse: ".$ip." - ".$host." - ".$UserAgent."\n";
 
-                // via SMTP
-                if ($smtp['enabled'] !== 0) {
-
-                    // mail it to admin from rain.0
-                    $email_send = SMTP::send(
-                        $smtp['mail_host'],
-                        $smtp['login_usr'],
-                        $smtp['login_pwd'],
-                        $smtp['encryption'],
-                        $smtp['smtp_port'],
-                        $smtp['from_addr'],
-                        $smtp['from_name'],
-                        $mailto,
-                        $subject,
-                        $mailcontent,
-                        [],
-                        'upload_directory',
-                        $smtp['debug']
-                    );
-
-                } else {
-                    // via PHP_included_mailfunction
-                    $email_send = self::sendMyMail(
-                        $smtp['from_addr'],
-                        $smtp['from_name'],
-                        $mailto,
-                        $subject,
-                        $mailcontent
-                    );
-                }
+                // mail it to admin
+                $email_send = Mail::sendMyMail(
+                    $smtp['from_addr'],
+                    $smtp['from_name'],
+                    $mailto,
+                    $subject,
+                    $mailcontent
+                );
 
                 // === ENDE EMAIL-Abschnitt ===
 
@@ -484,7 +396,6 @@ class Kontakt
         self::$input_message_first = $input_message_first;
         self::$cfg = $cfg;
         #self::$fehler = $fehler;
-        self::$q = $q;
         self::$datenschutzerklaerung = $datenschutzerklaerung;
 
     }
@@ -518,7 +429,7 @@ class Kontakt
         $input_message_first = self::$input_message_first;
         $cfg = self::$cfg;
         $fehler = self::$fehler;
-        $q = self::$q;
+        [$question_id, $question] = self::$question;
         $datenschutzerklaerung = self::$datenschutzerklaerung;
         $success_msg = self::$success_msg;
 
@@ -784,13 +695,14 @@ if ($cfg["Sicherheitscode"]) {
         }
         $output .= "
         '>
-        <label class='control-label' for='answer2'><i id='securitycode-icon' class='fa fa fa-unlock-alt'></i></label>
+        <br />
+        <label class='control-label' for='answer2'>
         <div>
-            <img aria-label='Captcha' src='kontakt/captcha/captcha.php' alt='Sicherheitscode' title='kontaktformular.com-sicherheitscode' id='captcha' />
-            <a href='javascript:void(0);' onclick='javascript:document.getElementById(\"captcha\").src='kontakt/captcha/captcha.php?'+Math.random();cursor:pointer;'>
-            <span class='captchareload'><i style='color:grey;' class='fas fa-sync-alt'></i></span>
-            </a>
-        </div>
+        <!-- <i id='securitycode-icon' class='fa fa fa-unlock-alt'></i>&nbsp; -->
+        <img aria-label='Captcha' src='/assets/inc/captcha.php' alt='Sicherheitscode' title='captcha code' id='captcha' />
+        <a href='javascript:void(0);' title='sicherheitscode' onclick=\"javascript:document.getElementById('captcha').src='/assets/inc/captcha.php?'+Math.random();cursor:pointer;\">
+        <span class='captchareload'><i style='color:grey;' class='fas fa-sync-alt'></i></span></a>
+        </div></label>
         <input";
         if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
             $output .= " required";
@@ -828,7 +740,7 @@ if ($cfg["Sicherheitsfrage"]) {
             <div aria-label='Sicherheitsfrage'>
             <i id='securityquestion-icon' class='fa fa fa-unlock-alt'></i>&nbsp;
             Sicherheitsfrage <span style='color:red'>*</span>
-            <input type='hidden' name='q_id' value='".$q[0]."' />
+            <input type='hidden' name='question_id' value='{$question_id}' />
             </div></label>
             <input ";
             if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
@@ -836,11 +748,11 @@ if ($cfg["Sicherheitsfrage"]) {
             } else {
                 $output .= " onchange='checkField(this)' ";
             }
-            $output .= " aria-label='Antwort' id='answer' placeholder='".$q[1]."' type='text' class='field";
+            $output .= " aria-label='Antwort' id='answer' placeholder='{$question}' type='text' class='field";
             if (!empty($fehler["q_id12"])) {
                 $output .= " errordesignfields";
             }
-            $output .= " form-control' name='q' onclick='setActive(this);' onfocus='setActive(this);' />";
+            $output .= " form-control' name='answer' onclick='setActive(this);' onfocus='setActive(this);' />";
             if (!empty($fehler["q_id12"])) {
                 $output .= $fehler["q_id12"];
             }
@@ -908,7 +820,7 @@ if ($cfg["Datenschutz_Erklaerung"]) { $output .= "
             $output .= " checked='checked' ";
         }
         $output .= "
-            onclick='setActive(this);' onfocus='setActive(this);' > <div style='padding-top:4px;padding-bottom:2px;line-height:27px;'> <a href='".$datenschutzerklaerung."' target='_blank'>Ich stimme der Datenschutz&shy;erklärung zu.</a> *</div>
+            onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;padding-bottom:2px;line-height:27px;'> <a href='".$datenschutzerklaerung."' target='_blank'>Ich stimme der Datenschutz&shy;erklärung zu.</a> *</div>
             </label>";
         if (!empty($fehler["datenschutz"])) {
             $output .= $fehler["datenschutz"];

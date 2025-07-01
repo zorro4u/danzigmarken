@@ -1,13 +1,17 @@
 <?php
 namespace Dzg\Mail;
 
-#@require __DIR__.'/Mailcfg.php';
+require_once __DIR__.'/Mailcfg.php';
+use Dzg\Mail\Mailcfg;
 
+
+/***********************
+ * Summary of RateLimiting
+ */
 class RateLimiting
 {
-    public static function execute() {
-
-        #global $cfg, $Maximale_Aufrufe;
+    public static function run()
+    {
         $cfg = Mailcfg::$cfg;
         $Maximale_Aufrufe = Mailcfg::$Maximale_Aufrufe;
 
