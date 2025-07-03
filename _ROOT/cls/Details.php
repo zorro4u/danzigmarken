@@ -39,7 +39,7 @@ class Details
     protected static int $prev;
     protected static int $next;
     protected static array $error_arr;
-    protected static bool $showForm;
+    protected static bool $show_form;
     protected static string $status_message;
 
 
@@ -50,14 +50,14 @@ class Details
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::site_entry_check();
-        self::data_preparation();
+        self::siteEntryCheck();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show();
 
         // Datenbank schließen
@@ -68,7 +68,7 @@ class Details
     function __construct() {
         if (!is_object(self::$pdo)) {
             // Datenbank öffnen
-            #$this->pdo = Database::connect_mariadb();
+            #$this->pdo = Database::connectMyDB();
         }
     }
     function __destruct() {
@@ -78,12 +78,12 @@ class Details
 
 
     /***********************
-     * Summary of site_entry_check
+     * Summary of siteEntryCheck
      *
      * Seitenaufruf nur mit file_id möglich.
      * Test, ob ID eine korrekte Zahl ist.
      */
-    protected static function site_entry_check()
+    protected static function siteEntryCheck()
     {
         $error_arr = [];
         $status = true;
@@ -132,17 +132,17 @@ class Details
         $_SESSION['fileid'] = $akt_file_id;
         self::$akt_file_id = $akt_file_id;
         self::$error_arr = $error_arr;
-        self::$showForm = $status;
+        self::$show_form = $status;
     }
 
 
     /***********************
-     * Summary of groupID_check
+     * Summary of checkGroupID
      */
-    protected static function groupID_check(int $gid=0)
+    protected static function checkGroupID(int $gid=0)
     {
         // Nutzer nicht angemeldet?
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
 
             // wenn nicht angemeldet und nicht von der Hauptseite kommend,
             // und aktuelles Bild nicht der letzten Gruppe angehört,
@@ -169,7 +169,7 @@ class Details
      * !!! in PDO\SQLite funktioniert nicht die sql-Funktion: ROW_NUMBER() OVER (ORDER BY ...)
      * bei direktem DB-Zugriff (ohne PDO) funktioniert es
      */
-    protected static function site_jump(int $gid): array
+    protected static function siteJump(int $gid): array
     {
         // $_SESSION['start'],$_SESSION['proseite'], $_SESSION['filter'], $_SESSION['sort'],
         // $_SESSION['idx2'], $_SESSION['fileid']
@@ -300,7 +300,7 @@ class Details
             #$qry->bindParam(":proseite", $proseite, PDO::PARAM_INT);
             $qry->execute();
             $results = $qry->fetchAll(PDO::FETCH_NUM);
-        } catch(PDOException $e) {echo'details_site_jump: ';die($e->getMessage());}
+        } catch(PDOException $e) {echo'details_siteJump: ';die($e->getMessage());}
 
         // Datenbank schließen
         unset($pdo_db);
@@ -360,9 +360,9 @@ class Details
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    protected static function data_preparation()
+    protected static function dataPreparation()
     {
         // Initialisierung
         self::$akt_file_idx = 0;
@@ -375,12 +375,12 @@ class Details
         self::$status_message = "";
 
         $pdo_db = self::$pdo;
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $error_arr = self::$error_arr;
         $success_msg = "";
 
         // Seiten-Check okay, Seite starten
-        if ($showForm):
+        if ($show_form):
 
         $akt_file_id = self::$akt_file_id;
         if (!isset($_SESSION['start'])) $_SESSION['start'] = 0;
@@ -535,7 +535,7 @@ class Details
             $gid = (int)$results[0]['gid'];
 
             // auf regulären Seitenzugriff prüfen, ggf Exit
-            self::groupID_check($gid);
+            self::checkGroupID($gid);
 
             // Gruppen-ID global setzen
             $_SESSION['groupid'] = self::$gid = $gid;
@@ -637,7 +637,7 @@ class Details
             //
 
             // Sprungmarken (prev, next) seitenübergreifend per SQL ermitteln
-            [$prev, $next] = self::site_jump($gid);
+            [$prev, $next] = self::siteJump($gid);
 
             $_SESSION['prev'] = ($prev > -1) ? $prev : $akt_file_id;  # wird für 'lastsite' benötigt
             #$_SESSION['next'] = ($next > -1) ? $next : $akt_file_id;
@@ -686,7 +686,7 @@ class Details
             }
 
             // wenn nicht angemeldet, dann Standard-Einstiegsseite
-            if (!Auth::is_checked_in()) {
+            if (!Auth::isCheckedIn()) {
                 if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
                 $_SESSION['lastsite'] = $_SESSION['main'];
             }
@@ -697,25 +697,25 @@ class Details
             ? implode("<br>", $error_arr)
             : "";
 
-        self::$showForm = ($error_msg === "") ? true : false;
-        self::$status_message = Tools::status_out($success_msg, $error_msg);
+        self::$show_form = ($error_msg === "") ? true : false;
+        self::$status_message = Tools::statusOut($success_msg, $error_msg);
     }
 
 
     /***********************
-     * Summary of site_output
+     * Summary of siteOutput
      *
      * als HTML ausgeben
      */
-    protected static function site_output()
+    protected static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $output = "<div class='container'>";
         #$output = "<div class='grid-container-detail'>";
         #$output .= '<div class="content detail">';
 
-        if (!$showForm):
+        if (!$show_form):
             $output .= $status_message;
         else:
 
@@ -754,7 +754,7 @@ class Details
                 $data = ($stamps[$akt_file_idx][$spalte_db])
                     ? date("d.m.Y", strtotime($stamps[$akt_file_idx][$spalte_db]))
                     : '';
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "</tbody><tfoot>
                         <tr><td class='detail-key' style='".$tfoot."padding-bottom: 0px;'>{$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-bottom: 0px;'>
@@ -766,7 +766,7 @@ class Details
                 $data = ($stamps[$akt_file_idx][$spalte_db])
                     ? date("d.m.Y", strtotime($stamps[$akt_file_idx][$spalte_db]))
                     : '';
-                $output .= ($data && Auth::is_checked_in())
+                $output .= ($data && Auth::isCheckedIn())
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 0px;'>
                         {$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-top: 0px;'>
@@ -776,7 +776,7 @@ class Details
             // Gruppen-ID
             } elseif ($spalte_db === 'gid') {
                 $data = $gid;
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 6px;'>
                         {$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-top: 0px;'>
@@ -786,7 +786,7 @@ class Details
             // Bild-ID
             } elseif ($spalte_db === 'fid') {
                 $data = $akt_file_id;
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 0px;'>
                         {$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-top: 6px;'>
@@ -800,7 +800,7 @@ class Details
                 $checked = ($data == 1) ? "checked" : "";
                 # onclick='return false;' .. disabled='disabled'
 
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 0px;'>
                         {$spalte_web}</td>
                         <td class='detail-val' style='".$tfoot."padding-top: 0px;'
@@ -851,7 +851,7 @@ class Details
             <table class=detail-pic><tbody><tr><td>
             <div class='detail-pic'>";
 
-            if (!Auth::is_checked_in()) {
+            if (!Auth::isCheckedIn()) {
                 $output .= "<a href='/".
                     htmlspecialchars($stamps[$akt_file_idx]['medium']).
                     "' title='größere Ansicht'><img src='/".
@@ -885,7 +885,7 @@ class Details
           <tfoot><tr><td style=''>
           <div class='pic-link'>";
 
-          if (!Auth::is_checked_in()) {
+          if (!Auth::isCheckedIn()) {
             #$output .= "<form style='margin:0;'><button class='button btn_pic' type='submit'
             formaction='{$stamps[$akt_file_idx]['small']}' title='(800x600)'>klein</button></form>";
             $output .= "<form style='margin:0; margin-top: 4px;'><a class='button btn_pic'
@@ -981,7 +981,7 @@ class Details
         // long-arrow-left angle-double-left chevron-circle-left arrow-circle-left caret-square-left
 
 
-        if (Auth::is_checked_in()) {
+        if (Auth::isCheckedIn()) {
             ($prev > -1)
                 ? $output .= "<div><a class='noprint' style='color:hsl(0, 0%, 45%);
                     background-color:transparent;' href={$_SERVER['PHP_SELF']}?id={$prev}

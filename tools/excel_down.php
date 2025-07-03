@@ -23,7 +23,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/static/vendor/autoload.php';
 use avadim\FastExcelWriter\Excel as wExcel;
 
 
-Download::excel_download();
+Download::excelDownload();
 
 
 // DB-Verbindung schließen
@@ -50,14 +50,14 @@ class Download
 
 
     // ______________
-    public static function db_spalten() :array
+    public static function dbSpalten() :array
     {
         if (empty(self::$db_spalten)) {
-            self::set_db_spalten();
+            self::setDBspalten();
         }
         return self::$db_spalten;
     }
-    protected static function set_db_spalten() :void
+    protected static function setDBspalten() :void
     {
         // Sp0/Sp1 (thema, datum) aufheben
         $tmp1 = array_slice(self::DB_SPALTEN, 0, 2);
@@ -78,14 +78,14 @@ class Download
 
 
     // Spaltennamen, kommt aus excel_read
-    public static function col_name() :array
+    public static function colName() :array
     {
         if (empty(self::$col_name)) {
-            self::set_col_name(self::db_spalten());
+            self::setColName(self::dbSpalten());
         }
         return self::$col_name;
     }
-    protected static function set_col_name(array $value) :void
+    protected static function setColName(array $value) :void
     {
         self::$col_name = $value;
     }
@@ -94,7 +94,7 @@ class Download
 
 
     // ______________
-    protected static function site_entry_check()
+    protected static function siteEntryCheck()
     {
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!isset($_SESSION['userid'])) {
@@ -120,7 +120,7 @@ class Download
         // Verbindung zur Datenbank herstellen
         $db_connect = (is_object($pdo))
             ? $pdo
-            : Database::connect_mariadb();
+            : Database::connectMyDB();
 
         $col = "the.sub2 thema, sta.datum,
             sta.kat10, sta.kat11, sta.kat12, sta.kat13, sta.kat14,
@@ -169,7 +169,7 @@ class Download
             ORDER BY {$sort}";
 # LIMIT :start, :proseite";
 
-        $dblist = Database::db_fetch($sql, "all", $db_connect);
+        $dblist = Database::fetchDB($sql, "all", $db_connect);
 
         // DB-Spaltennamen holen
         $sql2 = $sql." LIMIT 1";
@@ -181,7 +181,7 @@ class Download
 
         // Kat-Bezeichnung holen
         $sql3 = "SELECT spalte, bezeichnung FROM dzg_katbezeichnung ORDER BY spalte";
-        $kat_name = Database::db_fetch($sql3, "all", $db_connect);
+        $kat_name = Database::fetchDB($sql3, "all", $db_connect);
 
         // und tauschen
         foreach ($kat_name as $v) {
@@ -213,7 +213,7 @@ class Download
         // Rückgabe, 1.Zeile: Spaltennamen, Rest: Daten
         #return array_merge([$colname], $dblist);
 
-        self::set_col_name($colname);
+        self::setColName($colname);
         return $dblist;
     }
 
@@ -222,21 +222,21 @@ class Download
     /**
      * FastExcelWriter, Datei wird immer neu angelegt
      */
-    public static function write_excel(array $datalist, string $fullfilename) :bool
+    public static function writeExcel(array $datalist, string $fullfilename) :bool
     {
         $status = false;
 
         if (!empty($datalist)) {
-            $header = self::col_name();        # Spaltennamen aus excel-import
+            $header = self::colName();        # Spaltennamen aus excel-import
             $header_row = [];
             foreach ($header as $colname) {
                 $header_row[$colname] = "@";   # als 'Text' formatiert
             }
-            $rowOptions = ['font-style' => 'bold'];
+            $row_options = ['font-style' => 'bold'];
 
             $excel = wExcel::create(['dzg']);
             $sheet = $excel->getsheet('dzg');
-            $sheet->writeHeader($header_row, $rowOptions);
+            $sheet->writeHeader($header_row, $row_options);
             $sheet->writeArrayTo('A2', $datalist);
 
             $excel->save($fullfilename);
@@ -249,9 +249,9 @@ class Download
 
 
     // ______________
-    public static function excel_download()
+    public static function excelDownload()
     {
-        self::site_entry_check();
+        self::siteEntryCheck();
 
         $now = date('YmdHis');  # SQL datetime format "Y-m-d H:i:s"
         $today = date('Ymd');
@@ -265,7 +265,7 @@ class Download
         $file_save_as = "dzg-list_".$today.$file_ext;
 
         $data = self::bestandsabfrage();
-        self::write_excel($data, $ffn);
+        self::writeExcel($data, $ffn);
 
         if (file_exists($ffn)) {
             ob_clean();

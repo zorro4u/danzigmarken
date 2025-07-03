@@ -29,7 +29,7 @@ class Register_info
      * Klassenvariablen / Eigenschaften
      */
     private static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
     private static $success_msg;
     private static $input_message_first;
@@ -45,13 +45,13 @@ class Register_info
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -60,9 +60,9 @@ class Register_info
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
 
@@ -84,7 +84,7 @@ class Register_info
 
         $error_msg = [];
         $success_msg = "";
-        $showForm = True;
+        $show_form = True;
         $input_name = "";
         $input_email = "";
         $input_message_first = "";
@@ -117,7 +117,7 @@ class Register_info
                 $regex_name = "/^[a-zA-ZäüößÄÜÖ]+([a-zA-ZäüößÄÜÖ]|[ -](?=[a-zA-ZäüößÄÜÖ])){0,50}$/";
                 $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^a-zA-ZäüößÄÜÖ -]+|[- ]{2,}|[^a-zA-ZäüößÄÜÖ]+$/";
 
-                $input_name = isset($_POST['name']) ? htmlspecialchars(Tools::clean_input($_POST['name'])) : "";
+                $input_name = isset($_POST['name']) ? htmlspecialchars(Tools::cleanInput($_POST['name'])) : "";
                 if ($input_name !== "" && preg_match_all($regex_name_no, $input_name, $match))
                     $error_msg []= 'nur Buchstaben im Namen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
                 else {
@@ -133,7 +133,7 @@ class Register_info
                     }
                 }
                 // Email
-                $input_email = isset($_POST['email']) ? htmlspecialchars(Tools::clean_input($_POST['email'])) : "";
+                $input_email = isset($_POST['email']) ? htmlspecialchars(Tools::cleanInput($_POST['email'])) : "";
                 if ($input_email === "")
                     $error_msg []= 'Email angeben.';
                 elseif (!filter_var($input_email, FILTER_VALIDATE_EMAIL))
@@ -144,7 +144,7 @@ class Register_info
                 $regex_mess_no = "/[^\w\s\t\r\n ×÷=<>:;,!@#€%&§`´~£¥₩₽° •○●□■♤♡◇♧☆▪︎¤《》¡¿♠︎♥︎◆♣︎★±≈≠≡【〔「『】〕」』¡№٪‰–—‽· \\\\\^\$\.\|\?\*\+\-\(\)\[\]\{\}\/\"\']/mu";
 
                 $input_message_first = $_POST['message'];   // wird nicht weiter verwendet
-                $input_message = isset($_POST['message']) ? Tools::clean_input($_POST['message']) : "";
+                $input_message = isset($_POST['message']) ? Tools::cleanInput($_POST['message']) : "";
                 $input_message = preg_replace("/\r\r|\r\n|\n\r|\n\n|<br>/","\n", $input_message);
                 if ($input_email !== "" && preg_match_all($regex_mess_no, $input_message, $match))
                     $error_msg []= 'Die Nachricht verwendet unzulässige Zeichen: "'.htmlentities(implode(" ", $match[0])).'"';
@@ -164,7 +164,7 @@ class Register_info
 
                 // Code für Zugang zur Registrierungsseite, 30 Tage gültig
                 $reg_code = uniqid();
-                $pwcode_endtime = Auth::get_pwcode_timer();
+                $pwcode_endtime = Auth::getPWcodeTimer();
 
                 // Links für Email-Versand erzeugen
                 $reg_url = Tools::getSiteURL().'register.php?code='.$reg_code;
@@ -246,7 +246,7 @@ class Register_info
 
                 if ($email_send1) {
                     $success_msg = "Eine Email mit deiner Anfrage wurde versandt. Du erhälst in Kürze eine Antwort.";
-                    $showForm = False;
+                    $show_form = False;
                 } else {
                     $error_arr []= 'Oh, die Email konnte <b>NICHT</b> gesendet werden :-(';
                 }
@@ -273,21 +273,21 @@ class Register_info
         $pre_email = "";
         $pre_usr = "";
         if (isset($_GET['email']))
-            $pre_email = htmlspecialchars(Tools::clean_input($_GET['email']));
+            $pre_email = htmlspecialchars(Tools::cleanInput($_GET['email']));
         elseif ($input_email != "")
             $pre_email = $input_email;
         elseif(isset($_GET['usr']))
-            $pre_usr = htmlspecialchars(Tools::clean_input($_GET['usr']));
+            $pre_usr = htmlspecialchars(Tools::cleanInput($_GET['usr']));
         elseif ($input_name != "")
             $pre_usr = $input_name;
 
 
 
-        $showForm = ($error_msg === "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $show_form = ($error_msg === "") ? True : False;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
 
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
         self::$success_msg = $success_msg;
         self::$input_message_first = $input_message_first;
@@ -300,11 +300,11 @@ class Register_info
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $input_message_first = self::$input_message_first;
         $success_msg = self::$success_msg;
@@ -321,7 +321,7 @@ class Register_info
             <br>";
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
         $output .= "
 
 <p>Du interessierst dich für diese Seiten und willst erweiterten Zugriff auf den Inhalt haben? <br>

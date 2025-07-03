@@ -18,17 +18,17 @@ class Upload
 {
     public static function show()
     {
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
     }
 
 
 
     /********************************* */
-    private static function random_filename()
+    private static function randomFilename()
     {
         /***
         Es existieren zwei Möglichkeiten, um zu vermeiden das Dateien um Upload-Order überschrieben werden. Die erste Möglichkeit ist den Namen der Datei zu erweitern, z.B. indem man eine Zahl anhängt. Dies seht ihr im Script weiter unten, dass eine Zahl anhängt falls die Datei bereits existiert.
@@ -41,7 +41,7 @@ class Upload
 
         // Überprüfung der Datei-Endung, MIME-Header Check etc. ...
 
-        function random_string() {
+        function generateRandomString() {
             if(function_exists('random_bytes')) {
                 $bytes = random_bytes(16);
                 $str = bin2hex($bytes);
@@ -58,7 +58,7 @@ class Upload
             return $str;
         }
 
-        $name = random_string(); //random new name
+        $name = generateRandomString(); //random new name
         $new_name = $_SERVER['DOCUMENT_ROOT'].'/upload/files/'.$name.'.'.$extension;
         move_uploaded_file($temporary_name, $new_name);
         echo "Bild hochgeladen nach: $new_name";
@@ -135,7 +135,7 @@ class Upload
      * erzeugen. Dass sie für kryptografische Zwecke nicht mehr benutzt werden sollte, spielt hier
      * keine Rolle.
      */
-    private static function new_name()
+    private static function newName()
     {
         $upload_dir = '/pfad/zum/upload-verzeichnis/';
         do {
@@ -149,7 +149,7 @@ class Upload
     /*********************************
      * Datei mit einem PHP-Skript ausliefern
      */
-    private static function file_anzeigen()
+    private static function showFile()
     {
         if(!empty($_GET['file'])) {
             $file = realpath($upload_dir.$_GET['file']);
@@ -171,7 +171,7 @@ class Upload
     /*********************************
      * Generieren einer Fehlermeldung
      */
-    private static function error_message()
+    private static function errorMessage()
     {
         $messages = [];
 
@@ -224,7 +224,7 @@ class Upload
 
 
     /********************************* */
-    private static function dateiname_bereinigen($dateiname)
+    private static function dateinameBereinigen($dateiname)
     {
         // erwünschte Zeichen erhalten bzw. umschreiben
         // aus allen ä wird ae, ü -> ue, ß -> ss (je nach Sprache mehr Aufwand)
@@ -284,7 +284,7 @@ class Upload
             } else {
                 // Test ob Dateiname in Ordnung
                 $_FILES['uploaddatei']['name']
-                                    = self::dateiname_bereinigen($_FILES['uploaddatei']['name']);
+                                    = self::dateinameBereinigen($_FILES['uploaddatei']['name']);
 
                 if ($_FILES['uploaddatei']['name'] <> '') {
                     move_uploaded_file (
@@ -306,11 +306,11 @@ class Upload
 
 
     /********************************* */
-    protected static function data_preparation()
+    protected static function dataPreparation()
     {
         //-------------------------------------------------
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in() || (int)$_SESSION['su'] !== 1) {
+        if (!Auth::isCheckedIn() || (int)$_SESSION['su'] !== 1) {
             header("location: /auth/login.php");
             exit;
         }
@@ -406,7 +406,7 @@ class Upload
             }
 
             // Test ob Dateiname in Ordnung
-            # $_FILES['datei']['name'] = self::dateiname_bereinigen($_FILES['datei']['name']);
+            # $_FILES['datei']['name'] = self::dateinameBereinigen($_FILES['datei']['name']);
             if ($_FILES['datei']['name'] == '') {
                 $error_arr []= "Dateiname fehlerhaft konvertiert";
             }
@@ -504,9 +504,9 @@ class Upload
 
 
         // Nutzer nicht angemeldet?
-        if (!Auth::is_checked_in()) {
-            Auth::check_user();
-            if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
+            Auth::checkUser();
+            if (!Auth::isCheckedIn()) {
 
                 // wenn nicht angemeldet und nicht von der Hauptseite kommend,
                 // und aktuelle Bild nicht der letzten Gruppe angehört,
@@ -533,8 +533,8 @@ class Upload
         //
 
         // Sprungmarken (prev, next) seitenübergreifend per SQL ermitteln
-        // site_jump() -> details.func.php
-        [$prev, $next] = site_jump($gid);
+        // siteJump() -> details.func.php
+        [$prev, $next] = siteJump($gid);
 
         $_SESSION['prev'] = ($prev > -1) ? $prev : $akt_file_id;
 
@@ -562,19 +562,19 @@ class Upload
 
 
         ($error_msg === "")
-            ? $showForm = True
-            : $showForm = False;
+            ? $show_form = True
+            : $show_form = False;
 
     }
 
 
 
     /********************************* */
-    protected static function site_output()
+    protected static function siteOutput()
     {
 
-        $ausgabe = Tools::statusmeldung_ausgeben();
-        if ($showForm):
+        $ausgabe = Tools::statusmeldungAusgeben();
+        if ($show_form):
 
         $ausgabe .= '<div class="grid-container-detail">';
         $ausgabe .= '<div class="content detail">';

@@ -26,7 +26,7 @@ class Pw_forget
      * Klassenvariablen / Eigenschaften
      */
     private static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
     private static $success_msg;
     private static $pre_email;
@@ -39,13 +39,13 @@ class Pw_forget
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -54,9 +54,9 @@ class Pw_forget
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
 
@@ -80,14 +80,14 @@ class Pw_forget
 
         $error_msg = "";
         $success_msg = "";
-        $showForm = True;
+        $show_form = True;
 
         // Formularwerte empfangen
         if(isset($_GET['send']) && strtoupper($_SERVER["REQUEST_METHOD"] === "POST")):
 
             // Eingabeformular hat Daten mit $_POST gesendet
             if(isset($_POST['email'])) {
-                $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
+                $input_email = htmlspecialchars(Tools::cleanInput($_POST['email']));
 
                 // Email auf Plausibilität prüfen
                 if (!filter_var($input_email, FILTER_VALIDATE_EMAIL))
@@ -112,9 +112,9 @@ class Pw_forget
 
                 // okay... temporären Passwort-Code in DB schreiben, 2 Tage gültig
                 } else {
-                    $pwcode = Auth::random_string();
+                    $pwcode = Auth::generateRandomString();
                     $pwcode_hash = sha1($pwcode);
-                    $pwcode_endtime = Auth::get_pwcode_timer(2);
+                    $pwcode_endtime = Auth::getPWcodeTimer(2);
                     $pwcode_endtime_str = date("d.m.y H:i", $pwcode_endtime);
                     $pwcode_url = Tools::getSiteURL().'pwreset.php?pwcode='.$pwcode;
 
@@ -195,7 +195,7 @@ class Pw_forget
                     $success_msg =
                         "Dir wurde soeben eine Email an ".$usr_data['email']." zugesandt, mit der du innerhalb der nächsten 48 Stunden ".
                         "(bis zum <b>".$pwcode_endtime_str."</b>) dir eine neues Passwort vergeben kannst.";
-                    $showForm = False;
+                    $show_form = False;
                 } else {
                     $error_arr []= 'Oh, die Email konnte <b>NICHT</b> gesendet werden :-(';
                 }
@@ -207,15 +207,15 @@ class Pw_forget
         // Wert für das Vorausfüllen des Login-Formulars
         $pre_email = "";
         if (isset($_GET['email']))
-            $pre_email = htmlspecialchars(Tools::clean_input($_GET['email']));
+            $pre_email = htmlspecialchars(Tools::cleanInput($_GET['email']));
         elseif (!empty($input_email))
             $pre_email = $input_email;
 
-        $showForm = ($error_msg === "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $show_form = ($error_msg === "") ? True : False;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
 
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
         self::$success_msg = $success_msg;
         self::$pre_email = $pre_email;
@@ -223,11 +223,11 @@ class Pw_forget
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $success_msg = self::$success_msg;
         $pre_email = self::$pre_email;
@@ -241,7 +241,7 @@ class Pw_forget
             <br>";
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
         $output .= "
 
 <p>Gib deine registrierte E-Mail-Adresse an, um ein neues Passwort anzufordern.</p>

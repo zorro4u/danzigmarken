@@ -1,15 +1,21 @@
 <?php
 namespace Dzg\Mail;
 
-#header('Content-type: text/html; charset=utf-8');
+require_once __DIR__.'/QuestionBlocker.php';
+require_once __DIR__.'/RateLimiting.php';
+require_once __DIR__.'/Captcha.php';
+use Dzg\Mail\{QuestionBlocker, RateLimiting, Captcha};
+
 /*
-$questions = [
-	0 => ["5 + 5 =", 10],
-	1 => ["6 + 2 =", 8],
-	2 => ["2 + 2 =", 4],
-	3 => ["8 + 1 =", 9],
-	4 => ["3 + 4 =", 7]
-];
+Namenschreibweise:
+ClassName	- [PascalCase]
+methodName	- [camelCase]
+property_name - [snake_case]
+functionName (global functions)- [camelCase]
+$variable_name - [snake_case]
+CONST_NAME - [UPPER_SNAKE_CASE]
+url - [kebab-case]
+file - [snake_case]
 */
 
 
@@ -18,52 +24,58 @@ $questions = [
  */
 class AntiSpam
 {
-	private static array $questions_arr;
-
-	/**
-	 * Summary of questions
-	 * erzeugt ein Frage-Antwort-Array: [["FRAGE", ANTWORT], [..]]
-	 * [["0 + 1 =", 1], .. ["9 + 0 =", 9]]
-	 * 54 Additionsaufgaben mit einstelligem Ergebnis
-	 * letzlich sind immer nur 9 Antworten richtig, 1-9
-	 * --> Erraten mit Wahrscheinlichkeit 1:9
-	 *
-	 * @return array<int|string>[]
-	 */
-    protected static function questions() :array
-	{
-		if (empty(self::$questions_arr)) {
-			for ($a=0; $a<10; $a++) {
-				for ($b=0; $b<10; $b++) {
-					// beschränkt auf einstelliges Ergebnis
-					if ($a+$b > 0 && $a+$b < 10) {
-						$questions []= ["{$a} + {$b} =", $a+$b];
-					}
-				}
-			}
-			self::$questions_arr = $questions;
-		}
-        return self::$questions_arr;
-    }
-
-
-	/**
+	/***********************
 	 * Summary of getRandomQuestion
 	 * liefert eine zufällige Frage und deren Index
 	 */
-	public static function getRandomQuestion() :array
-	{
-		$rand = rand(0, count(self::questions())-1);
-		return [$rand, self::questions()[$rand][0]];
+	public static function getRandomQuestion(): array {
+        return QuestionBlocker::getRandomQuestion();
 	}
 
 
-	/**
+	/***********************
 	 * Summary of getAnswerById
 	 * liefert die Antwort zu der Frage (Index)
 	 */
-	public static function getAnswerById($id) :int
-	{
-		return self::questions()[$id][1];
+	public static function getAnswerById($id): int {
+        return QuestionBlocker::getAnswerById($id);
 	}
+
+
+	/***********************
+	 * Summary of rateLimiting
+	 * Aufrufe pro IP Adresse limitieren
+	 */
+    public static function rateLimiting() {
+        return RateLimiting::run();
+	}
+
+
+	/***********************
+	 * Summary of loadCaptchaPic
+	 *
+	 * erzeugt CAPTCHA Bild
+	 * <img src='/assets/inc/captcha.php' />
+	 * captcha.php  --> AntiSpam::loadCaptchaPic()
+	 * AntiSpam.php --> Captcha::getPic()
+	 */
+	public static function loadCaptchaPic() {
+        return Captcha::getPic();
+	}
+
+
+	/***********************
+	 * Summary of encryptCaptchaText
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+    public static function encrypt($string): string {
+        return Captcha::encrypt($string);
+	}
+
+    public static function decrypt(string $encrypted, int $len_original): string {
+        return Captcha::decrypt($encrypted, $len_original);
+	}
+
 }

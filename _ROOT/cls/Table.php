@@ -22,8 +22,8 @@ use Dzg\{Database, Auth, Tools, TableData, TableBody, TableNavi, Header, Footer}
  * __public__
  * show()
  * spaltennamen()
- * get_session()
- * set_session()
+ * getSession()
+ * setSession()
  * DBspalten
  * $maxID
  * $stamps_db
@@ -39,15 +39,15 @@ class Table
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = $pdo = Database::connect_mariadb();
+            self::$pdo = $pdo = Database::connectMyDB();
         } else {
             $pdo = self::$pdo;
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show();
 
         // Datenbank schließen
@@ -155,9 +155,9 @@ class Table
      }
 
 
-    public static function get_session()
+    public static function getSession()
     {
-        Header::set_siteid(basename($_SERVER['PHP_SELF']));
+        Header::setSiteID(basename($_SERVER['PHP_SELF']));
 
         $keys_str = ['version','sort','dir','col','search', 'suche','thema','filter','rootdir'];
         $keys_int = ['siteid','start','proseite','userid','su','loggedin','idx2'];
@@ -174,7 +174,7 @@ class Table
         }
     }
 
-    public static function set_session()
+    public static function setSession()
     {
         $key = ['idx2', 'sort', 'dir', 'col', 'search', 'suche',
                 'thema', 'filter', 'start', 'proseite'];
@@ -196,7 +196,7 @@ class Table
     function __construct() {
         if (!is_object(self::$pdo)) {
             // Datenbank öffnen
-            #$this->pdo = Database::connect_mariadb();
+            #$this->pdo = Database::connectMyDB();
         }
     }
     function __destruct() {
@@ -206,28 +206,28 @@ class Table
 
 
     /***********************
-     * Summary of site_entry_check
+     * Summary of siteEntryCheck
      * @return void
      */
-    private static function site_entry_check()
+    private static function siteEntryCheck()
     {
 
     }
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      * @return void
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         // TODO ggf Nutzerdaten holen ???
-        if (!Auth::is_checked_in()) {
-            Auth::check_user();
+        if (!Auth::isCheckedIn()) {
+            Auth::checkUser();
         }
 
         // globale $_SESSION Werte in Klassenvariblen importieren
-        self::get_session();
+        self::getSession();
 
         // Klassenvariblen laden
         $session = self::$_session;
@@ -246,7 +246,7 @@ class Table
 
             self::$_session['search'] = self::$_session['sort'] = "";
             #$_SESSION['search'] = $_SESSION['sort'] = "";
-            self::set_session();
+            self::setSession();
         }
 
 
@@ -344,9 +344,9 @@ class Table
             $regex_wrapper   = "/\r\r|\r\n|\n\r|\n\n|\n|\r|<br>/";      # Zeilenumbrüche
 
             // html-tags, Blackslash, Leerzeichen anfangs/ende entfernen
-            // auth.func.php: clean_input($data) = strip_tags(stripslashes(trim($data)));
+            // auth.func.php: cleanInput($data) = strip_tags(stripslashes(trim($data)));
 
-            $input_search = Tools::clean_input($_POST['search']);
+            $input_search = Tools::cleanInput($_POST['search']);
             // Zeilenumbrüche entfernen
             $input_search = preg_replace($regex_wrapper, "", $input_search);
 
@@ -410,7 +410,7 @@ class Table
 
 
         // Klassenwerte setzen
-        self::$maxID = TableData::get_maxID($filter);
+        self::$maxID = TableData::getMaxID($filter);
         self::$_session['sort'] = $sort;
         self::$_session['dir'] = $dir;
         self::$_session['col'] = $col;
@@ -420,16 +420,16 @@ class Table
         self::$_session['filter'] = $filter;
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-        self::set_session();
+        self::setSession();
     }
 
 
     /***********************
-     * Summary of site_output
+     * Summary of siteOutput
      *
      * @return void
      */
-    private static function site_output()
+    private static function siteOutput()
     {
         // Klassenvariblen laden
         $maxID = self::$maxID;
@@ -465,14 +465,14 @@ class Table
         // < Tabellen-NAVI >  Seiten-, Filter-Wahl
         //
         #if (1===1) {
-        if (Auth::is_checked_in()) {
+        if (Auth::isCheckedIn()) {
             // Nutzer angemeldet, Ausgabe Tabellen-Navi
 
             $navi_tab = "<div class='navi'>".
-                TableNavi::feld_anzeigewahl().   # Anzahl der Listeneinträge pro Seite
-                TableNavi::feld_themenwahl().    # Filter Thema
-                TableNavi::feld_seitenwahl().    # Seitenwahl / Pagination
-                TableNavi::feld_suchen().        # Suche
+                TableNavi::feldAnzeigewahl().   # Anzahl der Listeneinträge pro Seite
+                TableNavi::feldThemenwahl().    # Filter Thema
+                TableNavi::feldSeitenwahl().    # Seitenwahl / Pagination
+                TableNavi::feldSuchen().        # Suche
                 "</div>";
 
         } else {
@@ -488,7 +488,7 @@ class Table
                 self::$_session['proseite'] = $proseite;
 
                 // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-                self::set_session();
+                self::setSession();
             }
 
             $navi_tab = '';
@@ -500,7 +500,7 @@ class Table
         // -- zentrale Datenabfrage, die ausgegeben wird --
         //   (nach Filter- und Seitenwahl!)
         //
-        $stamps_db = TableData::get_data();
+        $stamps_db = TableData::getData();
 
 
         // < TABELLE >
@@ -509,8 +509,8 @@ class Table
         $output .= "<tr><td>$navi_tab</td></tr>";
 
         $output .= "<tr><td><table class='data'>";
-        $output .= TableBody::tabkopf_html();
-        $output .= TableBody::tabelle_html();
+        $output .= TableBody::htmlTabkopf();
+        $output .= TableBody::htmlTabelle();
         $output .= "</table></td></tr>";    # ende </data>
 
         $output .= "</table></div>";        # ende </main>
@@ -520,17 +520,17 @@ class Table
         //
         // - Download / Drucken -
         $btn_down_link = "";
-        if ((Auth::is_checked_in() && $userid===300) || !empty($su)) {
+        if ((Auth::isCheckedIn() && $userid===300) || !empty($su)) {
             // fa-download, fa-arrow-circle-down, fa-arrow-circle-o-down, fa-arrow-down
             $btn_down_link = "<a style='color:gray; background-color: transparent;' ".
                 "href='../tools/printview' title='Druckanzeige'>".
                 "<i class='fas fa-print'>&ensp;</i>Druckanzeige</a>";
         }
 
-        if(count($stamps_db) > 5 && Auth::is_checked_in()) {
+        if(count($stamps_db) > 5 && Auth::isCheckedIn()) {
             $output .= "
                 <div class='fuss'>
-                <div class='links noprint'>".TableNavi::feld_seitenwahl()."</div>
+                <div class='links noprint'>".TableNavi::feldSeitenwahl()."</div>
                 <div class='mitte noprint'>
                     <form action='#top' style='display:inline'>
                     <button class='btn Xbtn-primary' type='submit' title='zum Seitenanfang'>
@@ -539,7 +539,7 @@ class Table
                 <div class='rechts noprint'>{$btn_down_link}</div>
                 </div>";    # ende < /FUSS >
 
-        } elseif (!Auth::is_checked_in()) {
+        } elseif (!Auth::isCheckedIn()) {
             // nicht angemeldet --> ohne Navi-Möglichkeit
             $navi_tab = '';
             $txt = number_format($maxID, 0, ',', '.');

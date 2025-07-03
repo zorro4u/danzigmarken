@@ -122,7 +122,7 @@ class Tools
      * sonst Probleme zB. mit css Aufruf
      * nötig für Cookies, Header, Footer
      */
-    public static function rootdir(): string
+    public static function rootDir(): string
     {
         // mögliche root_Dir: "/" bei externem Aufruf, "stamps" bei internem Aufruf, "_prepare" debug-Mode
         $root_dir = ['stamps', '_prepare', 'localhost'];
@@ -144,7 +144,7 @@ class Tools
      * Summary of lastsite
      * @return void
      */
-    public static function lastsite($return2=[])
+    public static function lastSite($return2=[])
     {
         // Herkunftsseite speichern
         if (empty($return2)) $return2 = ["index", "index2", "details"];
@@ -186,7 +186,7 @@ class Tools
     /***********************
      * Input-Eingabe bereinigen
      */
-    public static function clean_input($data): string
+    public static function cleanInput($data): string
     {
         $data = trim($data);            // Leerzeichen anfang/ende entfernen
         $data = stripslashes($data);    // Blackslash entfernen
@@ -206,7 +206,7 @@ class Tools
     /***********************
      * Statusmeldung auf html ausgeben
      */
-    public static function statusmeldung_ausgeben(): string
+    public static function statusmeldungAusgeben(): string
     {
         global $success_msg, $error_msg, $exit;
         global $tab;
@@ -233,28 +233,28 @@ class Tools
 
 
     /***********************
-     * Summary of status_out
+     * Summary of statusOut
      */
-    public static function status_out($msg_success, $msg_error, $exit_true=false): string
+    public static function statusOut($msg_success, $msg_error, $exit_true=false): string
     {
         global $success_msg, $error_msg, $exit;
         $success_msg = $msg_success;
         $error_msg = $msg_error;
         if($exit_true) {$exit = $exit_true;}
-        return self::statusmeldung_ausgeben();
+        return self::statusmeldungAusgeben();
     }
 
 
     /***********************
      * Summary of dyndns_updater
      */
-    public static function dyndns_updater()
+    public static function dyndnsUpdater()
     {
         // Update der IP4 von danzig.goip.de auf den Rainbow-Server von danzigmarken.de
         # ip4: 45.10.26.7
         # ip6: 2a0a:51c0:0:18::3
 
-        $pdo = Database::get_pdo();
+        $pdo = Database::getPDO();
 
         $username = "ORXcbjSAlkVmoGV";
         $password = "xI154a2NCsTzFXr";

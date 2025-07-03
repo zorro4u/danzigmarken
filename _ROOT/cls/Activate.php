@@ -24,7 +24,7 @@ class Activate
      * Klassenvariablen / Eigenschaften
      */
     private static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
     private static $usr_data;
 
@@ -36,13 +36,13 @@ class Activate
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -51,9 +51,9 @@ class Activate
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
 
@@ -79,7 +79,7 @@ class Activate
 
         // Übergabewert auf Plausibilität prüfen
         if (isset($_GET['code'])) {
-            $input_code = htmlspecialchars(Tools::clean_input($_GET['code']));
+            $input_code = htmlspecialchars(Tools::cleanInput($_GET['code']));
             $error_msg = "";
 
             // Code prüfen (nur alphanumerisch)
@@ -134,22 +134,22 @@ class Activate
             }
         }
 
-        $showForm = ($success_msg !== "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $show_form = ($success_msg !== "") ? True : False;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
 
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
         self::$usr_data = $usr_data;
     }
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $usr_data = self::$usr_data;
 
@@ -162,7 +162,7 @@ class Activate
             <br>";
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
         $output .= "
         <form action='./login.php?usr=".$usr_data['username']."' method='POST' style='margin-top: 30px;'>
             <button class='btn btn-lg btn-primary btn-block' type='submit'>Anmelden</button>

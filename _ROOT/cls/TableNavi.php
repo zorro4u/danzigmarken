@@ -11,10 +11,10 @@ use PDO, PDOException;
  * Container für Navigations-Funktionen
  *
  * __public__
- * feld_seitenwahl()
- * feld_anzeigewahl()
- * feld_themenwahl()
- * feld_suchen()
+ * feldSeitenwahl()
+ * feldAnzeigewahl()
+ * feldThemenwahl()
+ * feldSuchen()
  */
 class TableNavi
 {
@@ -71,14 +71,14 @@ class TableNavi
         Table::$_session['proseite'] = $proseite;
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-        Table::set_session();
+        Table::setSession();
 
         return $proseite;
     }
 
 
     /***********************
-     * Summary of feld_seitenwahl
+     * Summary of feldSeitenwahl
      * -- Pagination --
      * Übergabeparameter für seitenweise Ausgabe in Abhängigkeit anpassen
      * $_REQUEST globales Array mit Übergabeparameter von POST, GET, ...
@@ -90,7 +90,7 @@ class TableNavi
      * und endet x-Elemente später (DB-Abfrage: LIMIT start, proseite)
      * @return string
      */
-    public static function feld_seitenwahl(): string
+    public static function feldSeitenwahl(): string
     {
         $maxID = Table::$maxID;
         $start = Table::$_session['start'];
@@ -118,7 +118,7 @@ class TableNavi
 
         //-------------------------------------------------
         // max. Seitenzahl
-        $anzahlSeiten = (!($maxID % $proseite))
+        $seitenanzahl = (!($maxID % $proseite))
             // wenn alle Seiten gleichmäßig aufgeteilt sind (Div.Rest=0)
             ? intdiv($maxID, $proseite)
 
@@ -152,19 +152,19 @@ class TableNavi
 
         //-------------------------------------------------
         // aktuellen Seitenindex bestimmen
-        $aktSeite = $startNr / $proseite;
+        $akt_seite = $startNr / $proseite;
 
 
         //-------------------------------------------------
         // 'zurück'
         $newStart_back = ($startNr - $proseite < 0) ? 0 : ($startNr-$proseite);
-        $rewind = ($aktSeite - 2*$cut + $jump) * $proseite;
+        $rewind = ($akt_seite - 2*$cut + $jump) * $proseite;
 
         //-------------------------------------------------
         // 'vor'
         $newStart_fwd = $startNr + $proseite;
-        $fastforward  = ($aktSeite + 2*$cut - $jump) * $proseite;
-        $lastSite = $proseite * ($anzahlSeiten - 1);        # '-1' da Zählg. mit '0' beginnt
+        $fastforward  = ($akt_seite + 2*$cut - $jump) * $proseite;
+        $last_site = $proseite * ($seitenanzahl - 1);        # '-1' da Zählg. mit '0' beginnt
 
 
         ///////////////////////////////////////////////////
@@ -205,7 +205,7 @@ class TableNavi
         //-------------------------------------------------
         //  Anzeige "Seitennummern"
         //
-        for ($i = 1; $i < $anzahlSeiten-1; $i++) {
+        for ($i = 1; $i < $seitenanzahl-1; $i++) {
 
             $str_active = "
             <td class='active' title='aktuelle Seite ".($i+1)."'>
@@ -238,13 +238,13 @@ class TableNavi
 
 
             // unterhalb Cut: nix anzeigen
-            if ($i < ($aktSeite - $cut)) {
+            if ($i < ($akt_seite - $cut)) {
                 if ($rewind <= 0) {
                     $output .= $str_step;
                 }
 
             // unterer Cut: "..." anzeigen
-            } elseif ($i === ($aktSeite - $cut)) {
+            } elseif ($i === ($akt_seite - $cut)) {
                 if ($rewind > 0) {
                     $output .= $str_jump_backward;
                 } else {
@@ -252,8 +252,8 @@ class TableNavi
                 }
 
             // innerhalb Cut-Bereich: Seitennummer anzeigen
-            } elseif ($i > ($aktSeite - $cut) && $i < ($aktSeite + $cut)) {
-                if ($i !== $aktSeite) {
+            } elseif ($i > ($akt_seite - $cut) && $i < ($akt_seite + $cut)) {
+                if ($i !== $akt_seite) {
                     // wenn nicht aktuelle Seite, dann einen Link erstellen
                     $output .= $str_step;
                 } else {
@@ -262,16 +262,16 @@ class TableNavi
                 }
 
             // oberer Cut: "..." anzeigen
-            } elseif ($i === ($aktSeite + $cut)) {
-                if ($fastforward < $lastSite) {
+            } elseif ($i === ($akt_seite + $cut)) {
+                if ($fastforward < $last_site) {
                     $output .= $str_jump_forward;
                 } else {
                     $output .= $str_step;
                 }
 
             // oberhalb Cut: nix anzeigen
-            } elseif ($i > ($aktSeite + $cut)) {
-                if ($fastforward >= $lastSite) {
+            } elseif ($i > ($akt_seite + $cut)) {
+                if ($fastforward >= $last_site) {
                     $output .= $str_step;
                 }
             }
@@ -283,15 +283,15 @@ class TableNavi
         // >: &gt; >>: &gg; >>>: &ggg;
         // &GreaterGreater; &raquo; &RightTriangle; &rangle; &rang; &Rang; &blacktriangleright;
         //
-        if ($startNr !== $lastSite) {
+        if ($startNr !== $last_site) {
             // akt.Seite nicht letzte Seite -> letzte Seitenzahl mit Link + Symbol
-            if ($anzahlSeiten > 1) {
+            if ($seitenanzahl > 1) {
                 $output .= "
-                    <td class='site' title='letzte Seite {$anzahlSeiten}'>
+                    <td class='site' title='letzte Seite {$seitenanzahl}'>
                     <a class='site'>
                     <form method='POST' action='' class='site'>
-                    <input type='hidden' name='start' value='{$lastSite}' />
-                    <button class='lnk' style='color:initial'>{$anzahlSeiten}</button>
+                    <input type='hidden' name='start' value='{$last_site}' />
+                    <button class='lnk' style='color:initial'>{$seitenanzahl}</button>
                     </form>
                     </a></td>";
             }
@@ -310,10 +310,10 @@ class TableNavi
                 <a class='site' href={$_SERVER['PHP_SELF']}?start={$newStart_fwd}
                 title='eine Seite vorwärts'>&gt;</a></td>";
 */
-        } elseif ($anzahlSeiten > 1) {
+        } elseif ($seitenanzahl > 1) {
             // akt.Seite = letzte Seite -> ohne Link/Symbol
             $output .= "<td class='active'><a class='active'
-                        title='aktuelle Seite {$anzahlSeiten}'>{$anzahlSeiten}</a></td>";
+                        title='aktuelle Seite {$seitenanzahl}'>{$seitenanzahl}</a></td>";
         }
 
         $output .= "</tr></table></div>";   # ende < /SEITENAUSWAHL >
@@ -323,21 +323,21 @@ class TableNavi
         Table::$_session['start'] = $start;
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-        Table::set_session();
+        Table::setSession();
 
         return $output;
     }
 
 
     /***********************
-     * Summary of feld_anzeigewahl
+     * Summary of feldAnzeigewahl
      * "Dropdown-proSeite"
      *
      * IN:  $_SESSION['proseite'], $maxID
      * OUT: $_SESSION['new_range']
      * @return string
      */
-    public static function feld_anzeigewahl(): string
+    public static function feldAnzeigewahl(): string
     {
         $maxID = Table::$maxID;
 
@@ -382,13 +382,13 @@ class TableNavi
 
 
     /***********************
-     * Summary of feld_themenwahl
+     * Summary of feldThemenwahl
      * "Dropdown Thema"
      *
      * IN: $pdo
      * @return string
      */
-    public static function feld_themenwahl()
+    public static function feldThemenwahl()
     {
         $pdo = Table::$pdo;
         $thema = Table::$_session['thema'];
@@ -398,7 +398,7 @@ class TableNavi
         try {
             $qry = $pdo->query($stmt);
             $theme_qry = $qry->fetchAll(PDO::FETCH_NUM);
-        } catch(PDOException $e) {die($e->getMessage().': TableNavi.feld_themenwahl()');}
+        } catch(PDOException $e) {die($e->getMessage().': TableNavi.feldThemenwahl()');}
 
         foreach ($theme_qry AS $entry) {
             foreach ($entry AS $theme) {
@@ -448,11 +448,11 @@ class TableNavi
 
 
     /***********************
-     * Summary of feld_suchen
+     * Summary of feldSuchen
      * "Suche"
      * @return string
      */
-    public static function feld_suchen()
+    public static function feldSuchen()
     {
         $search = Table::$_session['search'];
 

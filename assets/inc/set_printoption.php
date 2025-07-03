@@ -15,7 +15,7 @@ if (isset($_POST['id']) && isset($_POST['prn'])) :
 
     $sql = "UPDATE dzg_file SET print=?, chg_ip=?, chg_by=? WHERE id=?";
 
-    Database::db_fetch($sql, [$prn, $ip, $userid, $id]);
+    Database::fetchDB($sql, [$prn, $ip, $userid, $id]);
 
 endif;
 
@@ -136,7 +136,7 @@ $id = (int)$_GET['id'];
 $prn = (int)$_GET['prn'];
 $ip = $_SERVER['REMOTE_ADDR'];
 $sql = "UPDATE dzg_file SET print=?, chg_ip=? WHERE id=?";
-Database::db_fetch($sql, [$prn,$ip,$id]);
+Database::fetchDB($sql, [$prn,$ip,$id]);
 
 <script>
 function prn_toogle(id, prn) {

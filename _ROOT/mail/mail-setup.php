@@ -59,8 +59,8 @@ $datenschutzerklaerung = "datenschutz.php";     // Pfad zur Datenschutzerklärun
 
 
 // Spamschutz - Einstellungen   // (Eine durchdachte IP Blockierung ist ebenso möglich. Siehe: https://www.kontaktformular.com/kontaktformular-spamschutz-captcha-badword-filter-zeitsperre-honeypot.html)
-$cfg['Sicherheitscode'] = 0;    // 0 = Ohne Sicherheitscode   1 = Mit Sicherheitscode
-$cfg['Sicherheitsfrage'] = 1;   // 0 = Ohne Sicherheitsfrage   1 = Mit Sicherheitsfrage
+$cfg['Sicherheitscode'] = 1;    // 0 = Ohne Sicherheitscode   1 = Mit Sicherheitscode
+$cfg['Sicherheitsfrage'] = 0;   // 0 = Ohne Sicherheitsfrage   1 = Mit Sicherheitsfrage
 $cfg['Honeypot'] = 1;           // 0 = Ohne Honeypot   1 = Mit Honeypot
 $cfg['Zeitsperre'] = 5;         // Mindest-Anzahl der Sekunden zwischen Anzeigen und Senden des Formulars  	0 = Ohne Zeitsperre
 $cfg['Klick-Check'] = 1;        // 0 = Ohne Klick-Check   1 = Mit Klick-Check

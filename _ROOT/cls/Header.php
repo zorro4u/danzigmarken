@@ -261,7 +261,7 @@ class Header
     private static $main;
     private static $stepout;
     private static string $site_name;
-    private static int $siteid;
+    private static int $site_id;
 
 
     /***********************
@@ -271,9 +271,9 @@ class Header
     {
         #self::$site_name = $site_name;
 
-        self::data_preparation();
-        self::html_meta_load();
-        self::navigation_show();
+        self::dataPreparation();
+        self::loadHtmlMeta();
+        self::showNavigation();
     }
 
 
@@ -281,7 +281,7 @@ class Header
      * auf der Webseite die oberste, nicht sichtbare
      * Html <head> Section mit den meta-Anweisungen ausgeben
      */
-    public static function html_meta_load()
+    public static function loadHtmlMeta()
     {
         # https://www.danzig.org/
         # https://arge.danzig.org/
@@ -305,12 +305,12 @@ class Header
     }
 
 
-    public static function get_siteid(string $site_name): int
+    public static function getSiteID(string $site_name): int
     {
-        if (empty(self::$siteid)) self::set_siteid($site_name);
-        return self::$siteid;
+        if (empty(self::$site_id)) self::setSiteID($site_name);
+        return self::$site_id;
     }
-    public static function set_siteid(string $site_name)
+    public static function setSiteID(string $site_name)
     {
         # TODO
         #$site_name = basename($_SERVER['PHP_SELF']);
@@ -320,7 +320,7 @@ class Header
             ? $page[$site_name]['id']
             : $page['dummy']['id'];
 
-        $_SESSION['siteid'] = self::$siteid = $id;
+        $_SESSION['siteid'] = self::$site_id = $id;
 
         if (empty($_SESSION['idx2']) && $id === 2) {
             $_SESSION['idx2'] = True;
@@ -347,14 +347,14 @@ class Header
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
-        Auth::is_checked_in();
+        Auth::isCheckedIn();
 
         self::$site_name = basename($_SERVER['PHP_SELF']);
-        $siteid = self::get_siteid(self::$site_name);
+        $site_id = self::getSiteID(self::$site_name);
 
         // Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
         // sonst Probleme zB. mit css Aufruf
@@ -376,8 +376,8 @@ class Header
 
         // Startseite festlegen, $_SESSION['main'], siehe auch: list-func
         $main_pages = self::MAIN_PAGES;
-        if (in_array($siteid, array_keys($main_pages))) {
-            $main_page = $rootdir.'/'.$main_pages[$siteid];
+        if (in_array($site_id, array_keys($main_pages))) {
+            $main_page = $rootdir.'/'.$main_pages[$site_id];
         } elseif (isset($_SESSION['main'])) {
             $main_page = $_SESSION['main'];
         } else {
@@ -394,7 +394,7 @@ class Header
         if (empty($_SESSION['prev']))   $_SESSION['prev']   = -1;
 
 
-        switch ($siteid):
+        switch ($site_id):
 
             // index.php
             case 1:
@@ -437,14 +437,14 @@ class Header
 
             // impressum.php
             case 6:
-                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
                 $main = ['site' => $rootdir.'/impressum', 'name' => 'Impressum'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // login.php
             case 7:
-                Tools::lastsite();
+                Tools::lastSite();
                 $main = ['site' => $rootdir.'/auth/login', 'name' => 'Anmelden'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -481,14 +481,14 @@ class Header
 
             // kontakt.php
             case 13:
-                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
                 $main = ['site' => $rootdir.'/kontakt/kontakt', 'name' => 'Kontakt'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // logout.php
             case 14:
-                Tools::lastsite();
+                Tools::lastSite();
                 $main = ['site' => $rootdir.'/auth/logout', 'name' => 'Abmelden'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -501,27 +501,27 @@ class Header
 
             // about.php
             case 16:
-                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
                 $main = ['site' => $rootdir.'/about.php', 'name' => 'About'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // setting.php
             case 100:
-                Tools::lastsite(["index", "index2", "details"]);
+                Tools::lastSite(["index", "index2", "details"]);
                 #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // admin.php
             case 101:
-                Tools::lastsite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
                 #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             default:
-                Tools::lastsite();
+                Tools::lastSite();
                 $stepout['site'] = $_SESSION['lastsite'];
 
         endswitch;
@@ -536,7 +536,7 @@ class Header
     /***********************
      * Webseiten-Navigation ausgeben
      */
-    private static function navigation_show()
+    private static function showNavigation()
     {
         $rootdir = self::$rootdir;
         $debug = self::$debug;
@@ -544,7 +544,7 @@ class Header
         $main_pages = self::MAIN_PAGES;
         $stepout = self::$stepout;
         $acc_pages = self::ACC_PAGES;
-        $siteid = self::$siteid;
+        $site_id = self::$site_id;
 
         $output = "
             <nav class='navbar navbar-inverse navbar-static-top'>
@@ -578,7 +578,7 @@ class Header
 
 
         // -- Menü: nicht angemeldet --
-        if (!Auth::is_checked_in())
+        if (!Auth::isCheckedIn())
         {
             $output .= "
                 <div id='navbar' class='navbar-collapse collapse'>
@@ -586,13 +586,13 @@ class Header
 
             // aktiv: Login     < login >
             #<li><a class='active'><span class='login_self'><i class='fas fa-sign-in-alt'>
-            if ($siteid === 7) {
+            if ($site_id === 7) {
                 $output .= "
                 </i></span></a></li>
                 <li><a class='active'><i class='fas fa-sign-in-alt'></i>Login</a></a></li>";
 
             } else {
-                switch ($siteid):
+                switch ($site_id):
 
                 // aktiv: Einzelansicht     < einzel_gruppe_login >
                 case 1:
@@ -661,7 +661,7 @@ class Header
 
             // -- nicht im Konto-Bereich --
             if (!in_array(basename($_SERVER['PHP_SELF']), $acc_pages)) {
-                switch ($siteid):
+                switch ($site_id):
 
                 // aktiv: Einzelansicht     < einzel_gruppe_Konto >
                 case 1:
@@ -671,7 +671,7 @@ class Header
                         break;
 
                     /*
-                    if (Auth::is_checked_in() && isset($_SESSION['su'])):    # || $_SESSION['userid']==3)
+                    if (Auth::isCheckedIn() && isset($_SESSION['su'])):    # || $_SESSION['userid']==3)
                         $output .= "
                         <li><a class='change' href='{$rootdir}/download.php' title='Download'>
                         <i class='fas fa-download'></i></a></li>";
@@ -692,7 +692,7 @@ class Header
 
                     // Bearbeiten
                     // für Admin und Heinz (id.3) anzeigen, (gelb markiert, class=change)
-                    if (Auth::is_checked_in() && !empty($_SESSION['fileid'])) {
+                    if (Auth::isCheckedIn() && !empty($_SESSION['fileid'])) {
                         if ($_SESSION['userid']==3 || isset($_SESSION['su'])) {
                             /*$output .= "
                             <li><a class='change'>
@@ -818,14 +818,14 @@ class Header
             } else {
 
                 // aktiv: Logout   < logout >
-                if ($siteid === 14) {
+                if ($site_id === 14) {
                     $output .= "
                     <li><a class='active'><i class='fas fa-sign-out-alt'></i>Logout</a></a></li>";
 
                 } else {
 
                     // aktiv: Einstellungen   < (admin_) setting_logout >
-                    if ($siteid === 100) {
+                    if ($site_id === 100) {
                         // wenn als Admin angemeldet, dann Admin-Menü zeigen
                         if (!empty($_SESSION['su']) &&
                             (in_array(basename($_SERVER['PHP_SELF']), $acc_pages)))
@@ -839,7 +839,7 @@ class Header
                         <li><a class='active'><i class='fas fa-user-circle'></i>Konto</a></li>";
 
                     // aktiv: Admin     < admin_setting_logout >
-                    } elseif ($siteid === 101) {
+                    } elseif ($site_id === 101) {
                         $output .= "
                             <li><a class='active'><i class='fas fa-user-plus'>
                                 </i>Admin</a></a></li>

@@ -18,13 +18,13 @@ class Logout
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -36,12 +36,12 @@ class Logout
      * Klassenvariablen / Eigenschaften
      */
     public static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static $root_site;
     private static string $status_message;
 
 
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
         $success_msg = "";
@@ -64,16 +64,16 @@ class Logout
         unset($return2, $referer, $fn_referer);
 
 
-        # [$usrdata_X, $logindata_X, $error_msg] = Auth::check_user();
+        # [$usrdata_X, $logindata_X, $error_msg] = Auth::checkUser();
 
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
             header("location: {$_SESSION['lastsite']}");
             exit;
         }
 
 
-        $showForm = True;
+        $show_form = True;
         $root_site = $_SESSION['rootdir'].'/'.basename($_SESSION['main']);
         $userid = $_SESSION['userid'];
         $identifier = (!empty($_COOKIE['auto_identifier']))
@@ -123,7 +123,7 @@ class Logout
             Auth::logout($_SESSION['lastsite']);
 
             $success_msg = "Du bist abgemeldet";
-            $showForm = False;
+            $show_form = False;
 
             #header("location: {$_SESSION['lastsite']}");
             #exit;
@@ -135,16 +135,16 @@ class Logout
         #$error_msg = (!empty($error_arr))
         #    ? implode("<br>", $error_arr)
         #    : "";
-        #self::$showForm = ($error_msg === "") ? True : False;
-        self::$showForm = $showForm;
-        self::$status_message = Tools::status_out($success_msg, $error_msg);
+        #self::$show_form = ($error_msg === "") ? True : False;
+        self::$show_form = $show_form;
+        self::$status_message = Tools::statusOut($success_msg, $error_msg);
     }
 
 
 
-    private static function site_output()
+    private static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $root_site = self::$root_site;
         $status_message = self::$status_message;
 
@@ -152,11 +152,11 @@ class Logout
             <div class='container small-container-330 form-signin'>
             <h2 class='form-signin-heading'>Abmelden</h2>";
 
-        #$output .= statusmeldung_ausgeben();
+        #$output .= statusmeldungAusgeben();
         $output .= $status_message;
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
             $output .= "
                 <form action='?logout' method='POST'>
                 <br>";

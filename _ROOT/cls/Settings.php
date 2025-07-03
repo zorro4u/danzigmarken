@@ -24,7 +24,7 @@ class Settings
     protected static $userliste;
     protected static $identifier;
     protected static $error_msg;
-    protected static $showForm;
+    protected static $show_form;
     protected static $status_message;
 
 
@@ -35,15 +35,15 @@ class Settings
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::site_entry_check();
-        self::data_preparation();
-        self::form_evaluation();
+        self::siteEntryCheck();
+        self::dataPreparation();
+        self::formEvaluation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("account");
 
         // Datenbank schließen
@@ -52,28 +52,28 @@ class Settings
 
 
     /****************************
-     * Summary of site_entry_check
+     * Summary of siteEntryCheck
      * CheckIn-Test
      * Plausi-Test: userid, identifier, token_hash
      * set identifier
      * set last_site
      * set showForm
      */
-    public static function site_entry_check()
+    public static function siteEntryCheck()
     {
         if (empty($_SESSION['main']))
             $_SESSION['main'] = "/";
 
         $return2 = ["index", "index2", "details"];
-        Tools::lastsite($return2);
+        Tools::lastSite($return2);
 
-        [$usr_data, $securitytoken_row, $error_msg] = Auth::check_user();
+        [$usr_data, $securitytoken_row, $error_msg] = Auth::checkUser();
 
         // unberechtigter Seitenaufruf
         $status = (empty($error_msg)) ? true : false;
 
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
             header("location: /auth/login.php");
             exit;
         }
@@ -84,15 +84,15 @@ class Settings
             self::$userid = $usr_data['userid'];
         }
         self::$error_msg = $error_msg;
-        self::$showForm = $status;
+        self::$show_form = $status;
     }
 
 
     /****************************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      * set $usr_data, $userliste
      */
-    public static function data_preparation()
+    public static function dataPreparation()
     {
         // TODO:
         // Konto löschen per PW legitimieren
@@ -102,13 +102,13 @@ class Settings
         // globale Variablen holen
         $userid = self::$userid;
         $identifier = self::$identifier;
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $pdo = self::$pdo;
         $usr_data = [];
         $userliste = [];
 
         // Seiten-Check okay, Seite starten
-        if ($showForm):
+        if ($show_form):
 
         // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
         // alle aktiven Anmeldungen
@@ -152,22 +152,22 @@ class Settings
 
 
     /****************************
-     * Summary of form_evaluation
+     * Summary of formEvaluation
      * Formular-Eingabe verarbeiten
      */
-    public static function form_evaluation()
+    public static function formEvaluation()
     {
         $pdo = self::$pdo;
         $identifier = self::$identifier;
         $usr_data = self::$usr_data;
         $userliste = self::$userliste;
         $userid = self::$userid;
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $error_msg = self::$error_msg;
         $success_msg = "";
 
         // Seiten-Check okay, Seite starten
-        if ($showForm):
+        if ($show_form):
 
         // Änderungsformular empfangen
         if (isset($_GET['save']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
@@ -179,7 +179,7 @@ class Settings
         $regex_name = "/^[a-zA-ZäüößÄÜÖ]+([a-zA-ZäüößÄÜÖ]|[ -](?=[a-zA-ZäüößÄÜÖ])){0,50}$/";
         $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^a-zA-ZäüößÄÜÖ -]+|[- ]{2,}|[^a-zA-ZäüößÄÜÖ]+$/";
 
-        $save = htmlspecialchars(Tools::clean_input($_GET['save']));
+        $save = htmlspecialchars(Tools::cleanInput($_GET['save']));
         switch ($save):
 
         // Änderung Anmeldedaten
@@ -187,9 +187,9 @@ class Settings
             $update_username = False;
             $update_email = False;
 
-            $input_usr = htmlspecialchars(Tools::clean_input($_POST['username']));    # strtolower()
-            $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
-            $input_email2 = htmlspecialchars(Tools::clean_input($_POST['email2']));
+            $input_usr = htmlspecialchars(Tools::cleanInput($_POST['username']));    # strtolower()
+            $input_email = htmlspecialchars(Tools::cleanInput($_POST['email']));
+            $input_email2 = htmlspecialchars(Tools::cleanInput($_POST['email2']));
             $input_pw = $_POST['passwort'];
 
 
@@ -342,8 +342,8 @@ class Settings
         // Änderung Persönl. Daten
         case 'data':
             $error_msg = [];
-            $input_vor = isset($_POST['vorname']) ? htmlspecialchars(Tools::clean_input($_POST['vorname'])) : "";
-            $input_nach = isset($_POST['nachname']) ? htmlspecialchars(Tools::clean_input($_POST['nachname'])) : "";
+            $input_vor = isset($_POST['vorname']) ? htmlspecialchars(Tools::cleanInput($_POST['vorname'])) : "";
+            $input_nach = isset($_POST['nachname']) ? htmlspecialchars(Tools::cleanInput($_POST['nachname'])) : "";
 
             // Plausi-Check
             if ($input_vor !== "" && preg_match_all($regex_name_no, $input_vor, $match))
@@ -462,7 +462,7 @@ class Settings
             $active[$site_tabs[0]] = "active";
         }
 
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
         // globale Variablen setzen
         self::$usr_data = $usr_data;
@@ -475,14 +475,14 @@ class Settings
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $output = "<div class='container main-container'>";
-        if (!$showForm):
+        if (!$show_form):
             $output .= $status_message;
         else:
 
@@ -718,7 +718,7 @@ class Settings
 
     // -- Downloads --
 
-    function human_filesize($bytes, $decimals = 2) {
+    function humanFileSize($bytes, $decimals = 2) {
         $factor = floor((strlen($bytes) - 1) / 3);
         #$sz = "BKMGTP";
         #return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$sz[$factor];
@@ -731,7 +731,7 @@ class Settings
     $size = (file_exists($ffn))     # is_file()
         ? filesize($ffn)
         : 0;
-    $filesize = human_filesize($size, 0);
+    $filesize = humanFileSize($size, 0);
     $output .= "
 
         <div role='tabpanel' class='tab-pane ".$active['download']."' id='download'>

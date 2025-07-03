@@ -38,7 +38,7 @@ class RateLimiting
 
         // Wenn die IP-Adresse mehr als 100 Mal aufgerufen wurde, zeige eine Warnung
         if ($ipCount >= $Maximale_Aufrufe) {
-            echo '
+            $output = '
             <style>
                 .centered-container {
                     display: flex;
@@ -78,11 +78,14 @@ class RateLimiting
                 </div>
             </div>';
 
+            echo $output;
             exit;
         }
 
-        // Füge die IP-Adresse in die Logdatei ein
-        file_put_contents($logFile, $visitorIP . "\n", FILE_APPEND | LOCK_EX);
+        else {
+            // Füge die IP-Adresse in die Logdatei ein
+            file_put_contents($logFile, $visitorIP . "\n", FILE_APPEND | LOCK_EX);
+        }
 
         endif;
     }

@@ -30,15 +30,15 @@ class Change extends Details
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::site_entry_check();
-        self::data_preparation();
-        self::form_evaluation();
+        self::siteEntryCheck();
+        self::dataPreparation();
+        self::formEvaluation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show();
 
         // Datenbank schließen
@@ -46,27 +46,27 @@ class Change extends Details
     }
 
 
-    protected static function site_entry_check()
+    protected static function siteEntryCheck()
     {
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
             self::$pdo = Null;
             header("location: /auth/login.php");
             exit;
         }
 
         // PlausiCheck Seiten-ID
-        parent::site_entry_check();
+        parent::siteEntryCheck();
     }
 
 
-    public static function data_preparation()
+    public static function dataPreparation()
     {
         // Details Hauptroutine ausführen
-        parent::data_preparation();
+        parent::dataPreparation();
 
         // Seiten-Check bisher okay
-        if (self::$showForm):
+        if (self::$show_form):
 
         # self:: kommt hier von Details
         $pdo_db = self::$pdo;
@@ -103,7 +103,7 @@ class Change extends Details
             SELECT kat20 FROM dzg_kat20 ORDER BY kat20 DESC) AS s3, (
             SELECT kat21 FROM dzg_kat21 ORDER BY kat21) AS s4";
 
-        $results = Database::db_fetch($stmt, 'all', $pdo_db);
+        $results = Database::fetchDB($stmt, 'all', $pdo_db);
 
         $qry_arr = [];
         // abfrage_array nach Spalten (select Statement) aufsplitten
@@ -135,7 +135,7 @@ class Change extends Details
      * Formular-Eingabe verarbeiten
      * und an DB schicken
      */
-    public static function form_evaluation()
+    public static function formEvaluation()
     {
         // kat10-kat17, datum -> dzg_group
         // kat21-24           -> dzg_file
@@ -146,7 +146,7 @@ class Change extends Details
 
         $userid = $_SESSION['userid'];
         $stamps = self::$stamps;
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $error_arr = self::$error_arr;
         $success_msg = "";
@@ -154,7 +154,7 @@ class Change extends Details
 
 
         // Seiten-Check bisher okay, Formularauswertung starten
-        if ($showForm):
+        if ($show_form):
 
         $pdo_db = self::$pdo;
         $max_file = self::$max_file;
@@ -394,9 +394,9 @@ class Change extends Details
                     $regex_wrapper = "/\r\r|\r\n|\n\r|\n\n|\n|\r|<br>/";  # Zeilenumbrüche
 
                     // html-tags, Blackslash, Leerzeichen anfangs/ende entfernen
-                    // auth.func.php: clean_input($data) = strip_tags(stripslashes(trim($data)));
+                    // auth.func.php: cleanInput($data) = strip_tags(stripslashes(trim($data)));
 
-                    $input_wert = Tools::clean_input($input_wert);
+                    $input_wert = Tools::cleanInput($input_wert);
                     $input_wert = preg_replace($regex_wrapper, "", $input_wert);
 
                     $regex = ($spalte === "gid") ? $regex_digi_no : $regex_wert_no;
@@ -624,12 +624,12 @@ class Change extends Details
             $error_msg = "Diese Seite wird überarbeitet und funktioniert im Augenblick nicht.";
         } ---*/
 
-        $showForm = ($error_msg === "" OR $error2) ? true : false;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $show_form = ($error_msg === "" OR $error2) ? true : false;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
         // globale Variablen setzen
         self::$stamps = $stamps;
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
     }
 
@@ -637,12 +637,12 @@ class Change extends Details
     /***********************
      * HTML erzeugen
      */
-    protected static function site_output()
+    protected static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $output = "<div class='container'>";
-        if (!$showForm):
+        if (!$show_form):
             $output .= $status_message;
         else:
 

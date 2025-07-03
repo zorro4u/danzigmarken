@@ -11,11 +11,11 @@ use PDO, PDOException;
  * Funktionen für Datenbank-Abfragen
  *
  * __public__
- * get_maxID($filter)
- * get_data()
- * hole_thumb_ffn($gid)
- * hole_thumb($gid)
- * kategoriebezeichnungen()
+ * getMaxID($filter)
+ * getData()
+ * getThumbPath($gid)
+ * getThumbBlob($gid)
+ * kategorieBezeichnungen()
  */
 class TableData
 {
@@ -25,7 +25,7 @@ class TableData
 
 
     /***********************
-     * Summary of get_maxID
+     * Summary of getMaxID
      * Anzahl der Einträge der Datenbank ermitteln,
      * 'maxID' wird für die Seiten-Navigation benötigt.
      *
@@ -36,7 +36,7 @@ class TableData
      * @param mixed $filter
      * @return int
      */
-    public static function get_maxID(string $filter): int
+    public static function getMaxID(string $filter): int
     {
         $pdo = Table::$pdo;
         $idx2 = Table::$_session['idx2'];
@@ -63,7 +63,7 @@ class TableData
         try {
             $qry = $pdo->query($stmt);
             $maxID = $qry->fetch()[0];
-        } catch(PDOException $e) {'TableData.get_maxID(): '.die($e->getMessage());}
+        } catch(PDOException $e) {'TableData.getMaxID(): '.die($e->getMessage());}
         unset($pdo);
 
         return (int)$maxID;
@@ -71,7 +71,7 @@ class TableData
 
 
     /***********************
-     * Summary of get_data
+     * Summary of getData
      * Zentral-Werte aus Datenbank auslesen
      *
      * IN:  $_SESSION['start'], $_SESSION['proseite'], $_SESSION['sort'],
@@ -80,7 +80,7 @@ class TableData
      *
      * @return array
      */
-    public static function get_data(): array
+    public static function getData(): array
     {
         $pdo = Table::$pdo;
         $start = Table::$_session['start'];
@@ -143,7 +143,7 @@ class TableData
             $qry->bindParam(":proseite", $proseite, PDO::PARAM_INT);
             $qry->execute();
             $stamps_db = $qry->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {'TableData.get_data(): '.die($e->getMessage());}
+        } catch(PDOException $e) {'TableData.getData(): '.die($e->getMessage());}
         unset($pdo);
 
         // fetch()/fetchAll() Modus einmal nach execute() festlegen
@@ -193,7 +193,7 @@ class TableData
 
 
     /***********************
-     * Summary of hole_thumb_ffn
+     * Summary of getThumbPath
      * alle Verzeichnispfade der Thumb-Bilder einer Gruppe holen
      * und zum Fullfilename zusammensetzen
      *
@@ -201,7 +201,7 @@ class TableData
      * @param mixed $gid
      * @return array[]
      */
-    public static function hole_thumb_ffn(int $gid): array
+    public static function getThumbPath(int $gid): array
     {
         $pdo = Table::$pdo;
 
@@ -229,7 +229,7 @@ class TableData
             $qry->bindParam(":id", $gid, PDO::PARAM_INT);
             $qry->execute();
             $stamps = $qry->fetchAll(PDO::FETCH_ASSOC); // {key}: Spaltenname
-        } catch(PDOException $e) {'TableData.hole_thumb_ffn()'.die($e->getMessage());}
+        } catch(PDOException $e) {'TableData.getThumbPath()'.die($e->getMessage());}
         unset($pdo);
 
         #foreach (){}
@@ -250,7 +250,7 @@ class TableData
 
 
     /***********************
-     * Summary of hole_thumb
+     * Summary of getThumbBlob
      * alle Thumb-BLOB-Bilder einer Gruppe holen,
      * Thumbs der Einzeldateien der Gruppe abrufen,
      * die ganzen JOINs wegen dem Filter
@@ -259,7 +259,7 @@ class TableData
      * @param mixed $gid
      * @return array
      */
-    public static function hole_thumb(int $gid): array
+    public static function getThumbBlob(int $gid): array
     {
         $pdo = Table::$pdo;
         $filter = Table::$_session['filter'];
@@ -281,7 +281,7 @@ class TableData
             $qry->bindParam(':gid', $gid, PDO::PARAM_INT);
             $qry->execute();
             $thumb_liste = $qry->fetchAll(PDO::FETCH_ASSOC);   # {key}: Spaltenname
-        } catch(PDOException $e) {'TableData.hole_thumb(): '.die($e->getMessage());}
+        } catch(PDOException $e) {'TableData.getThumbBlob(): '.die($e->getMessage());}
         unset($pdo);
 
         return $thumb_liste;
@@ -289,12 +289,12 @@ class TableData
 
 
     /***********************
-     * Summary of kategoriebezeichnungen
+     * Summary of kategorieBezeichnungen
      *
      * IN: $pdo;
      * @return array
      */
-    public static function kategoriebezeichnungen()
+    public static function kategorieBezeichnungen()
     {
         $pdo = Table::$pdo;
 
@@ -302,7 +302,7 @@ class TableData
         try {
             $qry = $pdo->query($stmt);
             $result = $qry->fetchAll();        # (PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {'TableData.kategoriebezeichnungen(): '.die($e->getMessage());}
+        } catch(PDOException $e) {'TableData.kategorieBezeichnungen(): '.die($e->getMessage());}
         unset($pdo);
 
         return $result;

@@ -24,7 +24,7 @@ class Pw_reset
      * Klassenvariablen / Eigenschaften
      */
     private static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
     private static $success_msg;
     private static $name;
@@ -39,13 +39,13 @@ class Pw_reset
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -54,9 +54,9 @@ class Pw_reset
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
 
@@ -85,14 +85,14 @@ class Pw_reset
         $success_msg = "";
         $name = "";
         $input_code = "";
-        $showForm = True;
+        $show_form = True;
 
         if (!isset($_GET['pwcode'])) {
             $error_msg = "Ohne Legitimations-Code kann das Passwort nicht zurückgesetzt werden.";
 
         // Passcode prüfen
         } else {
-            $input_code = htmlspecialchars(Tools::clean_input($_GET['pwcode']));
+            $input_code = htmlspecialchars(Tools::cleanInput($_GET['pwcode']));
 
             // Werte auf Plausibilität prüfen
             if ($input_code === "")
@@ -185,7 +185,7 @@ class Pw_reset
                     } catch(PDOException $e) {die($e->getMessage().': pwreset_storePW');}
 
                     $success_msg = "Dein Passwort wurde geändert";
-                    $showForm = False;
+                    $show_form = False;
 
                 }  // Eingabewerte in Datenbank schreiben
             }  // Formularwerte empfangen
@@ -193,11 +193,11 @@ class Pw_reset
         endif;  // Passcode okay, Seite starten
 
 
-        $showForm = ($error_msg === "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $show_form = ($error_msg === "") ? True : False;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
 
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
         self::$success_msg = $success_msg;
         self::$name = $name;
@@ -207,11 +207,11 @@ class Pw_reset
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $success_msg = self::$success_msg;
         $name = self::$name;
@@ -227,7 +227,7 @@ class Pw_reset
             <br>";
 
         // Seite anzeigen  ... 4-50 Zeichen: alphanumerisch, !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>
-        if ($showForm):
+        if ($show_form):
         $output .= "
 
 <br><p>Hallo <b>{$name}</b>, du kannst dir hier ein neues Passwort vergeben.</p>

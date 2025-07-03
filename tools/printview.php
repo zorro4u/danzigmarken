@@ -35,7 +35,7 @@ class PrintView
     private static array $stamps;
     private static int $max_file;
     private static int $gid;
-    private static bool $showForm;
+    private static bool $show_form;
     private static string $status_message;
 
 
@@ -43,13 +43,13 @@ class PrintView
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         } else {
         }
 
-        self::site_entry_check();
+        self::siteEntryCheck();
 
-        Header::html_meta_load();
+        Header::loadHtmlMeta();
         self::seitenausgabe();
 
         // Datenbank schließen
@@ -57,10 +57,10 @@ class PrintView
     }
 
 
-    protected static function site_entry_check()
+    protected static function siteEntryCheck()
     {
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
             header("location: /auth/login.php");
             exit;
         }
@@ -73,23 +73,23 @@ class PrintView
     }
 
 
-    protected static function sub2_list(): array
+    protected static function sub2List(): array
     {
         if (empty(self::$sub2_list)) {
-            self::set_sub2_list();
+            self::setSub2List();
         }
         return self::$sub2_list;
     }
-    protected static function set_sub2_list()
+    protected static function setSub2List()
     {
-        self::$sub2_list = self::sub2_liste_holen();
+        self::$sub2_list = self::sub2ListeHolen();
     }
-    protected static function sub2_liste_holen(): array
+    protected static function sub2ListeHolen(): array
     {
         $pdo_db = self::$pdo;
         $sql = "SELECT sub2 FROM dzg_dirsub2";
 
-        $sub2_array = Database::db_fetch($sql, "all", $pdo_db);
+        $sub2_array = Database::fetchDB($sql, "all", $pdo_db);
 
         // [[x],[y],...] -> [x,y,...]
         foreach ($sub2_array as $entry_array) {
@@ -105,7 +105,7 @@ class PrintView
     }
 
 
-    protected static function idliste_holen(string $sub2=''): array
+    protected static function idListeHolen(string $sub2=''): array
     {
         $pdo_db = self::$pdo;
         $col = "ort.id oid, dat.id did, sta.id sid";
@@ -145,7 +145,7 @@ class PrintView
             WHERE {$filter} AND pre.prefix='t_' AND dat.print=1
             ORDER BY {$sort}";
 
-        $result = Database::db_fetch($sql, "all", $pdo_db);
+        $result = Database::fetchDB($sql, "all", $pdo_db);
 
         // [[x],[y],...] -> [x,y,...]
         foreach ($result as $entry_array) {
@@ -159,7 +159,7 @@ class PrintView
     }
 
 
-    protected static function data_preparation(int $file_id)
+    protected static function dataPreparation(int $file_id)
     {
         $pdo_db = self::$pdo;
         $error_arr = [];
@@ -334,17 +334,17 @@ class PrintView
             ? implode("<br>", $error_arr)
             : "";
 
-        self::$showForm = ($error_msg === "") ? True : False;
-        self::$status_message = Tools::status_out($success_msg, $error_msg);
+        self::$show_form = ($error_msg === "") ? True : False;
+        self::$status_message = Tools::statusOut($success_msg, $error_msg);
     }
 
 
-    protected static function einzelseite_erzeugen(int $file_id): string
+    protected static function erzeugeEinzelseite(int $file_id): string
     {
-        self::data_preparation($file_id);
+        self::dataPreparation($file_id);
 
         $output = self::$status_message;
-        if (self::$showForm):
+        if (self::$show_form):
 
         $output .= '<div class="grid-container-detail">';
         $output .= '<div class="content detail">';
@@ -375,7 +375,7 @@ class PrintView
                 $data = ($stamps[$akt_file_idx][$spalte_db])
                     ? date("d.m.Y", strtotime($stamps[$akt_file_idx][$spalte_db]))
                     : '';
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "</tbody><tfoot><tr><td class='detail-key' style='".$tfoot.
                         "padding-bottom: 0px;'>{$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-bottom: 0px;'>
@@ -386,7 +386,7 @@ class PrintView
                 $data = ($stamps[$akt_file_idx][$spalte_db])
                     ? date("d.m.Y", strtotime($stamps[$akt_file_idx][$spalte_db]))
                     : '';
-                $output .= ($data && Auth::is_checked_in())
+                $output .= ($data && Auth::isCheckedIn())
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 0px;'>
                         {$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-top: 0px;'>
@@ -395,7 +395,7 @@ class PrintView
 
             } elseif ($spalte_db === 'gid') {
                 $data = self::$gid;
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 6px;'>
                         {$spalte_web}</td>
                        <td class='detail-val' style='".$tfoot."padding-top: 6px;'>
@@ -404,7 +404,7 @@ class PrintView
 
             } elseif ($spalte_db === 'fid') {   #style='".$tfoot."padding-top: 8px;'
                 $data = self::$akt_file_id;
-                $output .= (Auth::is_checked_in())
+                $output .= (Auth::isCheckedIn())
                     ? "<tr><td class='detail-key fid' >{$spalte_web}</td>
                        <td class='detail-val fid' >{$data}</td></tr></tfoot>"
                     : "";
@@ -499,12 +499,12 @@ class PrintView
         }
 
         $sub2_liste = (empty($_SESSION['thema']) || $_SESSION['thema'] === "- alle -")
-            ? self::sub2_list()
+            ? self::sub2List()
             : $sub2_liste = [$_SESSION['thema']];
 
         // kontinuierliche Einzelseitenausgabe
         foreach ($sub2_liste as $thema) {
-            $id_liste = self::idliste_holen($thema);
+            $id_liste = self::idListeHolen($thema);
             if (!$id_liste) continue;
 
             echo "<br><hr><center>{$thema}</center><hr><br>";
@@ -512,7 +512,7 @@ class PrintView
             $i = 0;
             foreach ($id_liste as $id) {
                 // html-Ausgabe
-                echo self::einzelseite_erzeugen($id);
+                echo self::erzeugeEinzelseite($id);
 
                 // Ausgabe begrenzen
                 // (komplett: 2.000 Einträge, 1.000 Seiten, 500 Blätter) max: Kork=900

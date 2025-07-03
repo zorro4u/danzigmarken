@@ -26,7 +26,7 @@ class Register
      * Klassenvariablen / Eigenschaften
      */
     private static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
     private static $usr_data;
     private static $input_code;
@@ -42,13 +42,13 @@ class Register
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -57,9 +57,9 @@ class Register
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
 
@@ -93,7 +93,7 @@ class Register
         $error_msg = "";
         $success_msg = "";
         $exist = False;
-        $showForm = True;
+        $show_form = True;
         $activate_needed = False;
 
 
@@ -101,7 +101,7 @@ class Register
         if (!isset($_GET['code'])) {
             $error_msg = "Es fehlt ein gültiger Registrierungs-Link. <br>Wende dich dafür an den Seitenbetreiber.";
         } else {
-            $input_code = htmlspecialchars(Tools::clean_input($_GET['code']));
+            $input_code = htmlspecialchars(Tools::cleanInput($_GET['code']));
 
             // Plausi-Check
             if ($input_code === "")
@@ -152,8 +152,8 @@ class Register
                 $regex_email = "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
                 $regex_pw = "/^[\w<>()?!,.:_=$%&#+*~^ @€µäüößÄÜÖ]{1,100}$/";
 
-                $input_usr = strtolower(htmlspecialchars(Tools::clean_input($_POST['username'])));
-                $input_email = htmlspecialchars(Tools::clean_input($_POST['email']));
+                $input_usr = strtolower(htmlspecialchars(Tools::cleanInput($_POST['username'])));
+                $input_email = htmlspecialchars(Tools::cleanInput($_POST['email']));
                 $input_pw1 = $_POST['passwort'];
                 $input_pw2 = $_POST['passwort2'];
 
@@ -251,7 +251,7 @@ class Register
 
                     // temporärer Aktivierungscode, 30 Tage gültig
                     $act_code = uniqid();
-                    $pwcode_endtime = Auth::get_pwcode_timer();
+                    $pwcode_endtime = Auth::getPWcodeTimer();
 
                     // Links für Email-Versand erzeugen
                     $activate_url = Tools::getSiteURL().'activate.php?code='.$act_code;
@@ -336,13 +336,13 @@ class Register
                 if ($activate_needed) {
                     if ($email_send1) {
                         $success_msg = "Eine Email wurde dir soeben zur Bestätigung zugesandt, in der die Registrierung abschließend noch aktiviert werden muss. Danach kannst du dich anmelden.";
-                        $showForm = False;
+                        $show_form = False;
                     } else {
                         $error_arr []= 'Oh, die Email konnte <b>NICHT</b> gesendet werden :-(';
                     }
                 } else {
                     $success_msg = 'Du wurdest erfolgreich registriert und kannst dich jetzt <a href="login.php?usr='.$input_usr.'">anmelden</a>.';
-                    $showForm = False;
+                    $show_form = False;
                 }
 
             }  # Eingabewerte in Datenbank schreiben
@@ -350,15 +350,15 @@ class Register
 
         } else {
             // Registrierungs-Link nicht okay, Seite nicht starten
-            $showForm = False;
+            $show_form = False;
         }
 
 
-        #$showForm = ($error_msg === "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        #$show_form = ($error_msg === "") ? True : False;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
 
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
         self::$usr_data = $usr_data;
         self::$input_code = $input_code;
@@ -369,11 +369,11 @@ class Register
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $usr_data = self::$usr_data;
         $input_code = self::$input_code;
@@ -390,7 +390,7 @@ class Register
             <p><br></p>";
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
 
         $pre_user = (!empty($usr_data['username']))
             ? str_replace("_dummy_", "", $usr_data['username'])

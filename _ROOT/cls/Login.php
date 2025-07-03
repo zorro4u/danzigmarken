@@ -18,15 +18,15 @@ class Login
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::site_entry_check();
-        self::data_preparation();
-        self::form_evaluation();
+        self::siteEntryCheck();
+        self::dataPreparation();
+        self::formEvaluation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -38,7 +38,7 @@ class Login
      * Klassenvariablen / Eigenschaften
      */
     public static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static $cookie;
     private static string $status_message;
     private static string $user_value;
@@ -47,10 +47,10 @@ class Login
     private static string $success_msg;
 
 
-    protected static function site_entry_check()
+    protected static function siteEntryCheck()
     {
         // Nutzer schon angemeldet? Dann weg hier ...
-        self::$success_msg = (Auth::is_checked_in())
+        self::$success_msg = (Auth::isCheckedIn())
             ? "Du bist schon angemeldet. Was machst du dann hier? ..."
             : "";
 
@@ -82,7 +82,7 @@ class Login
     }
 
 
-    private static function data_preparation()
+    private static function dataPreparation()
     { }
 
 
@@ -90,7 +90,7 @@ class Login
      * Formular-Eingabe verarbeiten
      * und an DB schicken
      */
-    public static function form_evaluation()
+    public static function formEvaluation()
     {
         $pdo = self::$pdo;
 
@@ -107,7 +107,7 @@ class Login
             if(isset($_POST['email'], $_POST['passwort'])) {
 
                 // Eingabeformular hat Daten mit $_POST gesendet
-                $input_email1 = htmlspecialchars(Tools::clean_input($_POST['email']));
+                $input_email1 = htmlspecialchars(Tools::cleanInput($_POST['email']));
                 $input_pwNEU1 = $_POST['passwort'];
                 $input_usr = "";
 
@@ -155,7 +155,7 @@ class Login
                         // Passwort Vergleich okay
                         if(password_verify($input_pwNEU1, $usr_data['pw_hash'])) {
                             $userid = $usr_data['userid'];
-                            $ip = Auth::remote_addr();
+                            $ip = Auth::remoteAddr();
 
                             // Passwort neu hashen, wenn Algo nicht übereinstimmen
                             // und in der DB den alten Hash durch den neuen ersetzen
@@ -176,9 +176,9 @@ class Login
 
                             // Nutzer möchte angemeldet bleiben (1 Jahr)
                             if(isset($_POST['angemeldet_bleiben'])) {
-                                $identifier = Auth::random_string();
-                                $token_hash = sha1(Auth::random_string());
-                                $token_timer = Auth::get_token_timer();  # gültig für 1 Jahr
+                                $identifier = Auth::generateRandomString();
+                                $token_hash = sha1(Auth::generateRandomString());
+                                $token_timer = Auth::getTokenTimer();  # gültig für 1 Jahr
                                 $token_endtime = date('Y-m-d H:i:s', $token_timer);
 
                                 // Autologin: Identifier/Token eintragen
@@ -210,12 +210,12 @@ class Login
                                 $_COOKIE['auto_token'] = $token_hash;
 
                                 // Session-Autologin-Werte setzen
-                                Auth::set_autologin_session($login_id, $identifier);
+                                Auth::setAutologinSession($login_id, $identifier);
 
 
                                 // Cookie Variante, LocalStorage
                                 // speichert hier aber nix :-(
-                                // erst in Auth::check_user()->refresh_token()
+                                // erst in Auth::checkUser()->refresh_token()
                                 /*self::$cookie =
                                     "<script>
                                         localStorage.setItem('auto_identifier', $identifier);
@@ -256,7 +256,7 @@ class Login
                             $success_msg = "Du bist angemeldet";
 
                             // Session-Login-Werte setzen
-                            Auth::set_login_session($usr_data);
+                            Auth::setLoginSession($usr_data);
 
                             // Rücksprung zur Herkunftsseite
                             header("location: {$_SESSION['lastsite']}");
@@ -284,7 +284,7 @@ class Login
         $user_value = "";
         if(isset($_GET['usr']) || $input_usr !== "") {
             isset($_GET['usr'])
-                ? $user_value = htmlspecialchars(Tools::clean_input($_GET['usr']))
+                ? $user_value = htmlspecialchars(Tools::cleanInput($_GET['usr']))
                 : $user_value = $input_usr;
         } else {
             if($input_email1 !== "")
@@ -294,8 +294,8 @@ class Login
         // Fehlermeldung
         $error_msg = (!empty($error_arr)) ? Tools::arr2str($error_arr) : "";
 
-        self::$showForm = ($success_msg === "") ? true : false;
-        self::$status_message = Tools::status_out($success_msg, $error_msg);
+        self::$show_form = ($success_msg === "") ? true : false;
+        self::$status_message = Tools::statusOut($success_msg, $error_msg);
         self::$user_value = $user_value;
         self::$input_email1 = $input_email1;
         self::$input_usr = $input_usr;
@@ -303,7 +303,7 @@ class Login
 
 
 
-    private static function site_output()
+    private static function siteOutput()
     {
         /**
          * Passwort-Eingabe sichtbar machen,
@@ -350,7 +350,7 @@ class Login
         */
 
 
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $cookie = self::$cookie;
         $status_message = self::$status_message;
         $user_value = self::$user_value;
@@ -366,7 +366,7 @@ class Login
         if (!empty($cookie)) $output .= $cookie;
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
 
             if ($user_value != "") {
                 $af1 = "";

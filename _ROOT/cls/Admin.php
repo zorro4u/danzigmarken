@@ -44,7 +44,7 @@ class Admin
     public static $count25;
 
     public static $userid;
-    protected static $showForm;
+    protected static $show_form;
 
 
 
@@ -55,18 +55,18 @@ class Admin
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::site_entry_check();
-        self::data_preparation();
-        self::form_evaluation();
+        self::siteEntryCheck();
+        self::dataPreparation();
+        self::formEvaluation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("account");
 
-        self::last_script_ausgeben();
+        self::lastScriptAusgeben();
 
         // Datenbank schließen
         self::$pdo = Null;
@@ -74,28 +74,28 @@ class Admin
 
 
     /****************************
-     * Summary of site_entry_check
+     * Summary of siteEntryCheck
      * CheckIn-Test
      * Plausi-Test: userid, identifier, token_hash
      * set identifier
      * set last_site
      * set showForm
      */
-    public static function site_entry_check()
+    public static function siteEntryCheck()
     {
         if (empty($_SESSION['main']))
             $_SESSION['main'] = "/";
 
         $return2 = ["index", "index2", "details"];
-        Tools::lastsite($return2);
+        Tools::lastSite($return2);
 
-        [$usr_data, $login_data, $error_msg] = Auth::check_user();
+        [$usr_data, $login_data, $error_msg] = Auth::checkUser();
 
         // unberechtigter Seitenaufruf
         $status = (empty($error_msg)) ? true : false;
 
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
             header("location: /auth/login.php");
             exit;
         }
@@ -114,15 +114,15 @@ class Admin
             self::$usr_data = $usr_data;
         }
         self::$error_msg = $error_msg;
-        self::$showForm = $status;
+        self::$show_form = $status;
 
     }
 
 
     /****************************
-     * Summary of get_DBregistry_link
+     * Summary of getDBregistryLink
      */
-    protected static function get_DBregistry_link(): array
+    protected static function getDBregistryLink(): array
     {
         $pdo = self::$pdo;  # Verbindung zur Datenbank
         $reglinks = [];
@@ -132,16 +132,16 @@ class Admin
         try {
             $qry = $pdo->query($stmt);
             $reglinks = $qry->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": admin.inc.get_DBregistry_link()");}
+        } catch(PDOException $e) {die($e->getMessage().": admin.inc.getDBregistryLink()");}
 
         return $reglinks;
     }
 
 
     /****************************
-     * Summary of get_DBlastaccess
+     * Summary of getDBlastAccess
      */
-    protected static function get_DBlastaccess(): array
+    protected static function getDBlastAccess(): array
     {
         $pdo = self::$pdo;  # Verbindung zur Datenbank
         $last_access = [];
@@ -170,9 +170,9 @@ class Admin
 
 
     /****************************
-     * Summary of get_DBuserlist
+     * Summary of getDBuserList
      */
-    protected static function get_DBuserlist($userid, $identifier): array
+    protected static function getDBuserList($userid, $identifier): array
     {
         $pdo = self::$pdo;  # Verbindung zur Datenbank
         $user_list = [];
@@ -367,38 +367,38 @@ class Admin
             $qry->execute();
 
             $user_list = $qry->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": admin.inc.get_DBuserlist()");}
+        } catch(PDOException $e) {die($e->getMessage().": admin.inc.getDBuserList()");}
 
         return $user_list;
     }
 
 
     /****************************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    public static function data_preparation()
+    public static function dataPreparation()
     {
-        Tools::lastsite();
+        Tools::lastSite();
 
         // Seiten-Check okay, Seite starten
-        if (self::$showForm):
+        if (self::$show_form):
 
         $userid = self::$userid;
         $identifier = self::$identifier;
 
         // --- TAB: Registrierung ---
         //
-        $reglinks = self::get_DBregistry_link();
+        $reglinks = self::getDBregistryLink();
 
 
         // --- TAB: Nutzer ---
         //
-        $user_list = self::get_DBuserlist($userid, $identifier);
+        $user_list = self::getDBuserList($userid, $identifier);
 
 
         // --- TAB: Autologin / Info ---
         //
-        $last_access = self::get_DBlastaccess();
+        $last_access = self::getDBlastAccess();
 
         $count10 = $count11 = $count12 = $count13 = $count21 = $count20 = $count22 = $count23 = $count24 = $count25 = 0;
         foreach ($user_list as $user) {
@@ -462,10 +462,10 @@ class Admin
 
 
     /****************************
-     * Summary of form_evaluation
+     * Summary of formEvaluation
      * Änderungsformular empfangen, Eingaben verarbeiten
      */
-    public static function form_evaluation()
+    public static function formEvaluation()
     {
         $pdo = self::$pdo;
         $error_msg = self::$error_msg;
@@ -476,13 +476,13 @@ class Admin
         $success_msg = "";
 
         // Seiten-Check okay, Seite starten
-        if (self::$showForm):
+        if (self::$show_form):
 
 
         // Änderungsformular empfangen
         if (isset($_GET['save']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
 
-        $save = htmlspecialchars(Tools::clean_input($_GET['save']));
+        $save = htmlspecialchars(Tools::cleanInput($_GET['save']));
         switch ($save):
 
 
@@ -607,7 +607,7 @@ class Admin
 
             // Code für Zugang zur Registrierungsseite, 30 Tage gültig
             $reg_code = uniqid();
-            $pwcode_endtime = Auth::get_pwcode_timer();
+            $pwcode_endtime = Auth::getPWcodeTimer();
 
             #$reg_url = getSiteURL().'register.php?code='.$reg_code;
             $reg_url = "https://www.danzigmarken.de/auth/register.php?code=".$reg_code;
@@ -722,7 +722,7 @@ class Admin
         endswitch;  # Speichern-Taste gedrückt
 
         // geänderte Daten für die Ausgabe neu laden
-        self::data_preparation();
+        self::dataPreparation();
 
         endif;      # Formular empfangen
         endif;      # Seiten-Check okay
@@ -752,7 +752,7 @@ class Admin
         }
 
 
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
         self::$status_message = $status_message;
         self::$active = $active;
@@ -761,14 +761,14 @@ class Admin
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $output = "<div class='container main-container'>";
-        if (!$showForm):
+        if (!$show_form):
             $output .= $status_message;
         else:
 
@@ -1283,7 +1283,7 @@ $output .= "</div>";  # -- container main-container --
      * Java Script zur Steuerung der Tab-Navigation
      * --> ans Ende der Webseite hängen
      */
-    public static function last_script_ausgeben()
+    public static function lastScriptAusgeben()
     {
         $output = "
 

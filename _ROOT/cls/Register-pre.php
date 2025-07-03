@@ -26,7 +26,7 @@ class Register_pre
      * Klassenvariablen / Eigenschaften
      */
     private static $pdo;
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
 
 
@@ -37,13 +37,13 @@ class Register_pre
     {
         // Datenbank öffnen
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
 
-        self::data_preparation();
+        self::dataPreparation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("auth");
 
         // Datenbank schließen
@@ -52,9 +52,9 @@ class Register_pre
 
 
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $pdo = self::$pdo;
 
@@ -83,7 +83,7 @@ class Register_pre
 
 
         // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::is_checked_in()) {
+        if (!Auth::isCheckedIn()) {
             header("location: login.php");
             exit;
         }
@@ -96,7 +96,7 @@ class Register_pre
 
 
         // Soll dasRegistrierungsformular angezeigt werden?
-        $showForm = True;
+        $show_form = True;
         $error_msg = "";
         $success_msg = "";
 
@@ -104,7 +104,7 @@ class Register_pre
 
             // Code für Zugang zur Registrierungsseite, 30 Tage gültig
             $reg_code = uniqid();
-            $pwcode_endtime = Auth::get_pwcode_timer();
+            $pwcode_endtime = Auth::getPWcodeTimer();
 
             $input_usr = $reg_code;
             $input_email = $reg_code."@dummy.de";
@@ -135,27 +135,27 @@ class Register_pre
                 '<a href="'.$reg_url.'" target="_blank">'.$reg_url.'</a><br><br>'.
                 'Herzliche Grüße';
 
-            $showForm = False;
+            $show_form = False;
 
         endif;  // request
 
-        $showForm = ($showForm === True && $_SESSION['su'] === True) ? True : False;
-        #$showForm = ($error_msg === "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        $show_form = ($show_form === True && $_SESSION['su'] === True) ? True : False;
+        #$show_form = ($error_msg === "") ? True : False;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
 
-        self::$showForm = $showForm;
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
 
     }
 
 
     /****************************
-     * Summary of site_output
+     * Summary of siteOutput
      */
-    public static function site_output()
+    public static function siteOutput()
     {
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
 
         $output = "<div class='container'>";
@@ -167,7 +167,7 @@ class Register_pre
             <p>Link zur Registrierung für einen neuen Benutzer erzeugen.<br><br></p>";
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
             $output .= "
             <form action='?reg' method='post' style='margin-top: 30px;'>
             <button type='submit' class='btn btn-lg btn-primary btn-block'>Link erzeugen</button>

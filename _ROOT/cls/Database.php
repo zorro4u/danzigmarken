@@ -15,7 +15,7 @@ if (strpos(__DIR__, $debug) !== False) {
 /***********************
  * global: Datenbankverbindung aufbauen
  */
-#$pdo = Database::connect_mariadb();
+#$pdo = Database::connectMyDB();
 
 
 function X_version() {return Database::version();}
@@ -28,18 +28,18 @@ function X_version() {return Database::version();}
 class Database
 {
     /***********************
-     *  Datenbank-Verbindung
+     *  Datenbank-Verbindung, Maria-DB
      * -- alte Bezeichnung, wird noch verwendet --
      */
-    public static function connect_mariadb() :PDO {
-        return self::get_pdo();
+    public static function connectMyDB() :PDO {
+        return self::getPDO();
     }
 
     public static $pdo;
-    public static function get_pdo()
+    public static function getPDO()
     {
         if (!is_object(self::$pdo)) {
-            self::set_pdo();
+            self::setPDO();
         }
         return self::$pdo;
     }
@@ -47,7 +47,7 @@ class Database
     /***********************
      * Verbindung zur Datenbank herstellen
      */
-    protected static function set_pdo()
+    protected static function setPDO()
     {
         // Anmeldedaten laden
         #require $_SERVER['DOCUMENT_ROOT']."/db/account_data.php";
@@ -75,10 +75,10 @@ class Database
         ];
         # vs. PDO::FETCH_BOTH, PDO::FETCH_ASSOC / PDO::FETCH_COLUMN
 
-        $mariaHost  = "mysql:host=$host;dbname=$database;charset=$charset";
+        $maria_host  = "mysql:host=$host;dbname=$database;charset=$charset";
 
         try {
-            $pdo = new PDO($mariaHost, $user, $password, $options);
+            $pdo = new PDO($maria_host, $user, $password, $options);
         } catch(PDOException $e) {die($e->getMessage().': #1.mariaDB.stamps');}
 
         // PHP-Fehlermeldungen anzeigen
@@ -94,11 +94,11 @@ class Database
     /***********************
      * sql_Befehl an DB senden (exec)
      */
-    public static function db_exec(string $sql, $pdo=Null) :void
+    public static function execDB(string $sql, $pdo=Null) :void
     {
         $pdo_db = (is_object($pdo))
             ? $pdo
-            : self::connect_mariadb();
+            : self::connectMyDB();
 
         try {
             $pdo_db->exec($sql);
@@ -110,12 +110,12 @@ class Database
 
 
     /***********************
-     * Summary of db_execute
+     * Summary of executeDB
      */
-    public static function db_execute(string $sql, mixed ...$params)
+    public static function executeDB(string $sql, mixed ...$params)
     {
         // TODO klappt so nicht
-        return self::db_fetch($sql, $params);
+        return self::fetchDB($sql, $params);
     }
 
 
@@ -126,7 +126,7 @@ class Database
      * "many" -> executemany()
      * PDO::FETCH_NUM,     # vs. PDO::FETCH_ASSOC / PDO::FETCH_COLUMN
      */
-    public static function db_fetch(string $sql, mixed ...$params)
+    public static function fetchDB(string $sql, mixed ...$params)
     {
         $pdo = Null;
         $all = Null;
@@ -144,12 +144,12 @@ class Database
         }
 
         if ($all === "many") {
-            return self::db_executemany($sql, $data, $pdo);
+            return self::executemanyDB($sql, $data, $pdo);
         }
 
         $pdo_db = (is_object($pdo))
             ? $pdo
-            : self::connect_mariadb();;
+            : self::connectMyDB();;
         $qry = $pdo_db->prepare($sql);
 
         if (!empty($data)) {
@@ -178,7 +178,7 @@ class Database
      * sql_Befehl mehrfach an DB senden (prepare, bindParam, execute)
      * $data  im array-format: [[a], [b], ...]
      */
-    public static function db_executemany(string $sql, array $data, $pdo=Null) :bool
+    public static function executemanyDB(string $sql, array $data, $pdo=Null) :bool
     {
         /*
         https://phpdelusions.net/pdo_examples/insert
@@ -194,7 +194,7 @@ class Database
 
         $pdo_db = (is_object($pdo))
             ? $pdo
-            : self::connect_mariadb();
+            : self::connectMyDB();
         $qry = $pdo_db->prepare($sql);
 
         try {
@@ -230,8 +230,8 @@ class Database
     public static function version() {
         // Verbindung zur Datenbank
         $pdo_db = (is_object(self::$pdo))
-            ? self::get_pdo()
-            : self::connect_mariadb();
+            ? self::getPDO()
+            : self::connectMyDB();
 
         # neuestes Datum aus created/changed: dzg_fileplace, dzg_file, dzg_group
         # MAX-Werte der einzelnen Spalten holen,

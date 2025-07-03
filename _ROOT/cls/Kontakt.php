@@ -8,38 +8,36 @@ use Dzg\{Tools, Header, Footer};
 
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/AntiSpam.php';
-require_once __DIR__.'/../mail/RateLimiting.php';
-require_once __DIR__.'/../mail/Captcha.php';
-use Dzg\Mail\{Mailcfg, Mail, AntiSpam, RateLimiting, Captcha};
+#require_once __DIR__.'/../mail/RateLimiting.php';
+#require_once __DIR__.'/../mail/Captcha.php';
+use Dzg\Mail\{Mailcfg, Mail, AntiSpam};
 
-#require_once $_SERVER['DOCUMENT_ROOT']."/assets/inc/captcha_pic.php";
 
 /***********************
  * Webseite: Kontaktformular
- *
- * __public__
- * show()
  */
 class Kontakt
 {
-    /**
+    /***********************
      * Anzeige der Webseite
      */
     public static function show()
     {
-        self::data_preparation();
-        self::form_evaluation();
+        self::dataPreparation();
+        self::formEvaluation();
 
         Header::show();
-        self::site_output();
+        self::siteOutput();
         Footer::show("kontakt");
+
+        self::siteClose();
     }
 
 
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $showForm;
+    private static $show_form;
     private static string $status_message;
     private static $success_msg;
     private static $input_name;
@@ -51,34 +49,56 @@ class Kontakt
     private static $datenschutzerklaerung;
 
 
+    private static function siteClose()
+    {
+        if (!empty($_POST)) {
+        unset($_POST, $_GET, $_REQUEST, $_SESSION['captcha'], $_SESSION['captcha_code'], $_SESSION['captcha_frage']);
+        }
+    }
+
+
     /***********************
-     * Summary of data_preparation
+     * Summary of dataPreparation
      */
-    private static function data_preparation()
+    private static function dataPreparation()
     {
         $cfg = Mailcfg::$cfg;
         $question = [];
 
-        if ($cfg['Sicherheitsfrage'])
+        if ($cfg['Sicherheitsfrage']) {
             $question = AntiSpam::getRandomQuestion();      # [id, question]
 
-        $script_root = substr(__FILE__, 0,
-                            strrpos(__FILE__,
-                                    DIRECTORY_SEPARATOR)
-                            ).DIRECTORY_SEPARATOR;
+            // Bei Erstaufruf 'frage_id' setzen (statt per Formular zu senden)
+            // Abfrage, ob existiert oder nicht leer.
+            // Da richtige Antwort nie '0', ist alles okay.
+            if (empty($_POST['answer']))
+                $_SESSION['Sicherheitsfrage'] = $question[0];
+        }
+
+        if ($cfg['Sicherheitscode']) {
+            $question = AntiSpam::getRandomQuestion();      # [id, question]
+
+            if (empty($_POST['sicherheitscode']))
+                $_SESSION['captcha_frage'] = $question;
+        }
+
+        // ggf. übrig gebliebene Werte löschen
+        if ($cfg['Sicherheitscode'] && empty($_POST['sicherheitscode'])) {
+            unset($_SESSION['captcha_code'], $_SESSION['captcha']);
+        }
 
         // Herkunftsseite speichern
-        Tools::lastsite(['index', 'index2', 'details', 'settings', 'admin']);
+        Tools::lastSite(['index', 'index2', 'details', 'settings', 'admin']);
 
         self::$question = $question;
     }
 
 
-    /**
-     * Summary of form_evaluation
+    /***********************
+     * Summary of formEvaluation
      * [https://www.kontaktformular.com/]
      */
-    private static function form_evaluation()
+    private static function formEvaluation()
     {
         #require $_SERVER['DOCUMENT_ROOT'].'/kontakt/mail-setup.php';
         #global $cfg, $smtp;
@@ -96,14 +116,19 @@ class Kontakt
         $error_arr = [];
         $error_msg = "";
         $success_msg = "";
-        $showForm = True;
+        $show_form = True;
         $input_name = "";
         $input_email = "";
         $input_message_first = "";
         $fehler = [];
 
+#var_dump($_SESSION['captcha']);#echo'<br>';
+#var_dump($_SESSION['captcha_code']);echo'<br>';
+#var_dump($_POST['sicherheitscode']);#echo'<br>';
+#var_dump(AntiSpam::encrypt($_POST['sicherheitscode']));
+
         // Formularwerte empfangen
-        # (isset($_GET['send']) && strtoupper($_SERVER["REQUEST_METHOD"] === "POST")
+        # (isset($_GET['send']) && strtoupper($_SERVER['REQUEST_METHOD'] === "POST")
         if (!empty($_POST)) {
 
             // clean post
@@ -137,14 +162,11 @@ class Kontakt
                 $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^0-9a-zA-ZäüößÄÜÖ -._]+|[_.- ]{2,}|[^0-9a-zA-ZäüößÄÜÖ]+$/";
 
                 $input_name = isset($_POST['name'])
-                    ? htmlspecialchars(Tools::clean_input($_POST['name']))
+                    ? htmlspecialchars(Tools::cleanInput($_POST['name']))
                     : "";
 
                 $regex = !preg_match($regex_name, $input_name, $match);
-                #var_dump($regex0, $regex_name, $input_name, $match);echo' #1<br>';
-
                 #$regex1 = preg_match_all($regex_name_no, $input_name, $match);
-                #var_dump($regex1, $regex_name_no, $input_name, $match);echo' #2<br>';
 
                 if ($input_name !== "" && $regex) {
                     $error_arr []= 'nur Buchstaben im Namen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen)';
@@ -165,7 +187,7 @@ class Kontakt
 
                 // Email
                 $input_email = isset($_POST['email'])
-                    ? htmlspecialchars(Tools::clean_input($_POST['email']))
+                    ? htmlspecialchars(Tools::cleanInput($_POST['email']))
                     : "";
                 if ($input_email !== "" &&
                     !filter_var($input_email, FILTER_VALIDATE_EMAIL))
@@ -179,7 +201,7 @@ class Kontakt
 
                 $input_message_first = $_POST['message'];   // wird nicht weiter verwendet
                 $input_message = isset($_POST['message'])
-                    ? Tools::clean_input($_POST['message'])
+                    ? Tools::cleanInput($_POST['message'])
                     : "";
                 $input_message = preg_replace("/\r\r|\r\n|\n\r|\n\n|<br>/","\n", $input_message);
                 if ($input_email !== "" &&
@@ -199,47 +221,52 @@ class Kontakt
             }
 
 
-            if ($cfg['Datenschutz_Erklaerung'])
-                $datenschutz = stripslashes($_POST["datenschutz"]);
-
-            if ($cfg['Sicherheitscode'])
-                $sicherheits_eingabe = Captcha::encrypt($_POST["sicherheitscode"]);
-
-            // Anzahl der Seiten-Aufrufe begrenzen
-            if ($cfg['Aufrufe_limitieren'])
-                RateLimiting::run();
-
-
             // -------------------- SPAMPROTECTION ERROR MESSAGES START ----------------------
-            if ($cfg['Sicherheitscode'] &&
-                $sicherheits_eingabe != $_SESSION['captcha_spam'])
-            {
-                unset($_SESSION['captcha_spam']);
-                $fehler['captcha'] = "<span class='errormsg'>Der <strong>Sicherheitscode</strong> wurde falsch eingegeben.</span>";
+
+            if ($cfg['Aufrufe_limitieren'])
+                AntiSpam::rateLimiting();
+
+#var_dump($_SESSION['captcha']);echo'<br>';
+#var_dump($_SESSION['captcha_code']);echo'<br>';
+#var_dump($_POST['sicherheitscode']);echo'<br>';
+#var_dump(AntiSpam::encrypt($_POST['sicherheitscode']));
+            if ($cfg['Sicherheitscode'] && !empty($_SESSION['captcha_frage'])) {
+                #$answer = $_SESSION['captcha_code'];   # wurde in AntiSpam::loadCaptchaPic() gesetzt
+                $answer = AntiSpam::getAnswerById($_SESSION['captcha_frage'][0]);
+                #unset($_SESSION['captcha_frage']);
+
+                if (empty($_POST['sicherheitscode']) ||
+                    $answer != $_POST['sicherheitscode'])
+                {
+                    unset($_SESSION['captcha_code']);
+                    $fehler['captcha'] = "<span class='errormsg'>Der <strong>Sicherheitscode</strong> wurde falsch eingegeben.</span>";
+                }
             }
 
-            if ($cfg["Sicherheitsfrage"]) {
-                $answer = AntiSpam::getAnswerById(intval($_POST["question_id"]));
-                if (!isset($_POST["answer"]) || $_POST["answer"] != $answer) {
+            if ($cfg['Sicherheitsfrage'] && isset($_SESSION['Sicherheitsfrage'])) {
+                $answer = AntiSpam::getAnswerById($_SESSION['Sicherheitsfrage']);
+                unset($_SESSION['Sicherheitsfrage']);
+
+                if (!isset($_POST['answer']) || $answer != $_POST['answer']) {
                     $fehler['q_id12'] = "<span class='errormsg'>Bitte die <strong>Sicherheitsfrage</strong> richtig beantworten.</span>";
                 }
             }
 
             if ($cfg['Honeypot'] &&
-                (!isset($_POST["mail"]) || ''!=$_POST["mail"]))
+                (!isset($_POST['mail']) || ''!=$_POST['mail']))
             {
                 $fehler['Honeypot'] = "<span class='errormsg-spamprotection' style='display: block;'>Es besteht Spamverdacht. Bitte überprüfen Sie Ihre Angaben.</span>";
             }
 
             if ($cfg['Zeitsperre'] &&
-                (!isset($_POST["chkspmtm"]) || ''==$_POST["chkspmtm"] || '0'==$_POST["chkspmtm"] ||
-                (time() - (int) $_POST["chkspmtm"]) < (int) $cfg['Zeitsperre']))
+                (!isset($_POST['chkspmtm']) || ''==$_POST['chkspmtm'] || '0'==$_POST['chkspmtm'] ||
+                (time() - (int) $_POST['chkspmtm']) < (int) $cfg['Zeitsperre']))
             {
                 $fehler['Zeitsperre'] = "<span class='errormsg-spamprotection' style='display: block;'>Bitte warten Sie einige Sekunden, bevor Sie das Formular erneut absenden.</span>";
             }
 
             if ($cfg['Klick-Check'] &&
-                (!isset($_POST["chkspmkc"]) || 'chkspmhm'!=$_POST["chkspmkc"]))
+                (!isset($_POST['chkspmkc']) || 'chkspmhm'!=$_POST['chkspmkc']))
             {
                 $fehler['Klick-Check'] = "<span class='errormsg-spamprotection' style='display: block;'>Sie müssen den Senden-Button mit der Maus anklicken, um das Formular senden zu können.</span>";
             }
@@ -296,8 +323,15 @@ class Kontakt
             // -------------------- SPAMPROTECTION ERROR MESSAGES ENDE ----------------------
 
 
-            if ($cfg['Datenschutz_Erklaerung'] && isset($datenschutz) && $datenschutz == "") {
-                $fehler['datenschutz'] = "<span class='errormsg'>Sie müssen die <strong>Datenschutz&shy;erklärung</strong> akzeptieren.</span>";
+            if ($cfg['Datenschutz_Erklaerung']) {
+                $datenschutz = stripslashes($_POST['datenschutz']);
+
+                if (isset($datenschutz) && $datenschutz == "") {
+                    $fehler['datenschutz'] = "
+                        <span class='errormsg'>
+                        Sie müssen die <strong>Datenschutz&shy;erklärung</strong> akzeptieren.
+                        </span>";
+                }
             }
 
             $buttonClass = 'failed';
@@ -320,10 +354,11 @@ class Kontakt
 
                 // === EMAIL ===
                 //
+                $email_send = true;
                 $remote_ip = getenv("REMOTE_ADDR");
                 $ip = $_SERVER['REMOTE_ADDR'];
                 $host = getHostByAddr($ip);
-                $UserAgent = $_SERVER["HTTP_USER_AGENT"];
+                $UserAgent = $_SERVER['HTTP_USER_AGENT'];
                 $date = date("d.m.Y | H:i");
 
                 // ---- create mail for admin (from admin to admin with user message)
@@ -336,7 +371,7 @@ class Kontakt
 
                     "Nachricht:\n\n".preg_replace("/\r\r|\r\n|\n\r|\n\n/","\n",$input_message)."\n\n\n".
                     "IP Adresse: ".$ip." - ".$host." - ".$UserAgent."\n";
-
+/*
                 // mail it to admin
                 $email_send = Mail::sendMyMail(
                     $smtp['from_addr'],
@@ -345,12 +380,12 @@ class Kontakt
                     $subject,
                     $mailcontent
                 );
-
+*/
                 // === ENDE EMAIL-Abschnitt ===
 
                 if ($email_send) {
                     $success_msg = 'Deine Nachricht wurde versandt. Du erhälst in Kürze eine Antwort.';
-                    $showForm = False;
+                    #$show_form = False;
                 } else {
                     $error_arr []= 'Oh, die Nachricht konnte <b>NICHT</b> gesendet werden :-(';
                 }
@@ -366,17 +401,17 @@ class Kontakt
                 }
                 */
 
+                // Formular nach Verarbeitung wieder löschen
+                #$input_name = "";
+                #$input_email = "";
+                $input_message_first = "";
+
             // Eingabewerte nicht okay, kein Mailversand
             } else {}
 
-            // Formular nach Verarbeitung wieder löschen
-            unset($_POST);
-            $input_name = "";
-            $input_email = "";
-            $input_message_first = "";
+
 
         }  # Formularwerte empfangen
-
 
         if (!empty($error_arr)) {
             $error_arr = [implode("<br>", $error_arr)];
@@ -384,11 +419,11 @@ class Kontakt
         $error_msg = implode("", $error_arr);
 
 
-        $showForm = ($error_msg === "") ? True : False;
-        $status_message = Tools::status_out($success_msg, $error_msg);
+        #$show_form = ($error_msg === "") ? true : false;
+        $status_message = Tools::statusOut($success_msg, $error_msg);
 
-
-        self::$showForm = $showForm;
+        unset($_POST, $_GET, $_REQUEST, $_SESSION['captcha'], $_SESSION['captcha_code']);
+        self::$show_form = $show_form;
         self::$status_message = $status_message;
         self::$success_msg = $success_msg;
         self::$input_name = $input_name;
@@ -402,10 +437,10 @@ class Kontakt
 
 
     /***********************
-     * Summary of site_output
+     * Summary of siteOutput
      * [https://www.kontaktformular.com/]
      */
-    private static function site_output()
+    private static function siteOutput()
     {
         /*
         $act_pth = explode('/', __DIR__);
@@ -422,7 +457,7 @@ class Kontakt
         #$root_site = $rootdir.'/'.basename($_SESSION['main']);
 
 
-        $showForm = self::$showForm;
+        $show_form = self::$show_form;
         $status_message = self::$status_message;
         $input_name = self::$input_name;
         $input_email = self::$input_email;
@@ -436,7 +471,7 @@ class Kontakt
         $output = "<div class='container'>";
         #$output = "<div class='container main-container registration-form'>";
         $output .= $status_message;
-        #echo statusmeldung_ausgeben();
+        #echo statusmeldungAusgeben();
 
         $output .= "<div class='registration-form'>";
         $output .= "
@@ -444,7 +479,7 @@ class Kontakt
                 <br>";
 
         // Seite anzeigen
-        if ($showForm):
+        if ($show_form):
         $output .= "
 
 <form action='' method='POST' enctype='multipart/form-data' style='margin-top: 30px;'>
@@ -459,17 +494,21 @@ if (navigator.userAgent.search('Safari') >= 0 && navigator.userAgent.search('Chr
 
 <div class='form-group'>
     <label for='inputName'>Dein Name:</label>
-    <input type='text' id='inputName' size='40' maxlength='50' name='name' value='".$input_name."' class='form-control' autocomplete='name' autofocus>
+    <input type='text' id='inputName' size='40' maxlength='50' name='name'
+    value='".$input_name."' class='form-control' autocomplete='name' autofocus>
 </div>
 
 <div class='form-group'>
     <label for='inputEmail'>Deine E-Mail-Adresse: <span style='color:red'>*</span></label>
-    <input type='email' id='inputEmail' size='40' maxlength='100' name='email' value='".$input_email."' class='form-control' autocomplete='email' required>
+    <input type='email' id='inputEmail' size='40' maxlength='100' name='email'
+    value='".$input_email."' class='form-control' autocomplete='email' required>
 </div>
 
 <div class='form-group'>
     <label for='inputMessage'>Deine Nachricht: <span style='color:red'>*</span></label>
-    <textarea id='inputMessage' name='message' rows='9' style='width:100%;' maxlength='250' spellcheck='true' class='form-control' autocomplete='off' required>".$input_message_first."</textarea>
+    <textarea id='inputMessage' name='message' rows='9' style='width:100%;' maxlength='500'
+    spellcheck='true' class='form-control' autocomplete='off' required>".$input_message_first."
+    </textarea>
 </div>
 <!-- ..................... -->";
 
@@ -479,41 +518,41 @@ $output .= "
 <!--
 <p id=\"submitMessage\" class=\"".$buttonClass."\">".$formMessage;
     if (
-        (isset($fehler["Honeypot"]) && $fehler["Honeypot"] != '') ||
-        (isset($fehler["Zeitsperre"]) && $fehler["Zeitsperre"] != '') ||
-        (isset($fehler["Klick-Check"]) && $fehler["Klick-Check"] != '') ||
-        (isset($fehler["Links"]) && $fehler["Links"] != '') ||
-        (isset($fehler["Badwordfilter"]) && $fehler["Badwordfilter"] != '') ||
-        (isset($fehler["Sendmail"]) && $fehler["Sendmail"] != '') ||
-        (isset($fehler["upload"]) && $fehler["upload"] != '')):
+        (isset($fehler['Honeypot']) && $fehler['Honeypot'] != '') ||
+        (isset($fehler['Zeitsperre']) && $fehler['Zeitsperre'] != '') ||
+        (isset($fehler['Klick-Check']) && $fehler['Klick-Check'] != '') ||
+        (isset($fehler['Links']) && $fehler['Links'] != '') ||
+        (isset($fehler['Badwordfilter']) && $fehler['Badwordfilter'] != '') ||
+        (isset($fehler['Sendmail']) && $fehler['Sendmail'] != '') ||
+        (isset($fehler['upload']) && $fehler['upload'] != '')):
         $output .= "
 
         <div class=\"row\">
         <div class=\"col-sm-8\">
 
         ";
-        if (isset($fehler["Honeypot"]) && $fehler["Honeypot"] != '') {
-            $output .= $fehler["Honeypot"];
+        if (isset($fehler['Honeypot']) && $fehler['Honeypot'] != '') {
+            $output .= $fehler['Honeypot'];
         }
 
-        if (isset($fehler["Zeitsperre"]) && $fehler["Zeitsperre"] != '') {
-            $output .= $fehler["Zeitsperre"];
+        if (isset($fehler['Zeitsperre']) && $fehler['Zeitsperre'] != '') {
+            $output .= $fehler['Zeitsperre'];
         }
 
-        if (isset($fehler["Klick-Check"]) && $fehler["Klick-Check"] != '') {
-            $output .= $fehler["Klick-Check"];
+        if (isset($fehler['Klick-Check']) && $fehler['Klick-Check'] != '') {
+            $output .= $fehler['Klick-Check'];
         }
-        if (isset($fehler["Links"]) && $fehler["Links"] != '') {
-            $output .= $fehler["Links"];
+        if (isset($fehler['Links']) && $fehler['Links'] != '') {
+            $output .= $fehler['Links'];
         }
-        if (isset($fehler["Badwordfilter"]) && $fehler["Badwordfilter"] != '') {
-            $output .= $fehler["Badwordfilter"];
+        if (isset($fehler['Badwordfilter']) && $fehler['Badwordfilter'] != '') {
+            $output .= $fehler['Badwordfilter'];
         }
-        if (isset($fehler["Sendmail"]) && $fehler["Sendmail"] != '') {
-            $output .= $fehler["Sendmail"];
+        if (isset($fehler['Sendmail']) && $fehler['Sendmail'] != '') {
+            $output .= $fehler['Sendmail'];
         }
-        if (isset($fehler["upload"]) && $fehler["upload"] != '') {
-            $output .= $fehler["upload"];
+        if (isset($fehler['upload']) && $fehler['upload'] != '') {
+            $output .= $fehler['upload'];
         }
         $output .= "
 
@@ -531,10 +570,10 @@ $output .= "
 
 ";
 
-if (!empty($fehler["name"])) {
+if (!empty($fehler['name'])) {
     $output .= " error";
 }
-if (isset($_POST["name"]) && ''!=$_POST["name"]) {
+if (isset($_POST['name']) && ''!=$_POST['name']) {
     $output .= " not-empty-field";
 } else {
     $output .= "";
@@ -545,23 +584,23 @@ $output .= "
     <label class=\"control-label\" for=\"border-right\"><i id=\"user-icon\" class=\"fa fa-user\"></i></label>
     <input ";
 
-    if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
+    if ($cfg['HTML5_FEHLERMELDUNGEN']) {
         $output .= "required ";
     } else {
         $output .= "onchange=\"checkField(this)\" ";
     }
     $output .= "type=\"text\" name=\"name\" class=\"field\" placeholder=\"Name *\" value=\"".
-        $_POST["name"]."\" maxlength=\"".$zeichenlaenge_name."\" id=\"border-right\"
+        $_POST['name']."\" maxlength=\"".$zeichenlaenge_name."\" id=\"border-right\"
         onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />";
-    if (!empty($fehler["name"])) {
-        $output .= $fehler["name"];
+    if (!empty($fehler['name'])) {
+        $output .= $fehler['name'];
     }
 $output .= "
 
 </div>
 <div class=\"col-sm-4";
 
-if (isset($_POST["name"]) && ''!=$_POST["name"]) {
+if (isset($_POST['name']) && ''!=$_POST['name']) {
     $output .= " not-empty-field";
 } else {
     $output .= "";
@@ -570,14 +609,14 @@ $output .= "
 
     \">
     <label class=\"control-label\" for=\"border-right3\"><i id=\"user-icon\" class=\"fas fa-user\"></i></label>
-    <input aria-label=\"Name\" type=\"text\" name=\"name\" class=\"field\" placeholder=\"Name\" value=\"".$_POST["name"]."\" maxlength=\"".$zeichenlaenge_name."\" id=\"border-right\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />
+    <input aria-label=\"Name\" type=\"text\" name=\"name\" class=\"field\" placeholder=\"Name\" value=\"".$_POST['name']."\" maxlength=\"".$zeichenlaenge_name."\" id=\"border-right\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />
 </div>
 <div class=\"col-sm-4";
 
-if (!empty($fehler["email"])) {
+if (!empty($fehler['email'])) {
     $output .= " error";
 }
-if (isset($_POST["email"]) && ''!=$_POST["email"]) {
+if (isset($_POST['email']) && ''!=$_POST['email']) {
      $output .= " not-empty-field";
  } else {
     $output .= "";
@@ -588,20 +627,20 @@ $output .= "
 <label class=\"control-label\" for=\"border-right2\"><i id=\"email-icon\" class=\"fa fa-envelope\"></i></label>
 <input ";
 
-if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
+if ($cfg['HTML5_FEHLERMELDUNGEN']) {
     $output .= "required ";
 } else {
     $output .= "onchange=\"checkField(this)\" ";
 }
 $output .= "aria-label=\"E-Mail\" type=\"";
-if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
+if ($cfg['HTML5_FEHLERMELDUNGEN']) {
     $output .= "email";
 } else {
     $output .= "text";
 }
-$output .= "\" name=\"email\" class=\"field\" placeholder=\"E-Mail *\" value=\"".$_POST["email"]."\" maxlength=\"".$zeichenlaenge_email."\" id=\"border-right2\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />";
-if (!empty($fehler["email"])) {
-    $output .= $fehler["email"];
+$output .= "\" name=\"email\" class=\"field\" placeholder=\"E-Mail *\" value=\"".$_POST['email']."\" maxlength=\"".$zeichenlaenge_email."\" id=\"border-right2\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />";
+if (!empty($fehler['email'])) {
+    $output .= $fehler['email'];
 }
 $output .= "
 
@@ -610,10 +649,10 @@ $output .= "
 <div class=\"row\">
 <div class=\"col-sm-8 ";
 
-if (!empty($fehler["nachricht"])) {
+if (!empty($fehler['nachricht'])) {
     $output .= "error";
 } $output .= " ";
-if (isset($_POST["message"]) && ''!=$_POST["message"]) {
+if (isset($_POST['message']) && ''!=$_POST['message']) {
     $output .= "not-empty-field ";
 } else {
     $output .= "";
@@ -624,15 +663,15 @@ $output .= "
 <label  for=\"border-right3\" class=\"control-label textarea-label\"><i class=\"material-icons\">message</i></label>
 <textarea ";
 
-if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
+if ($cfg['HTML5_FEHLERMELDUNGEN']) {
     $output .= "required ";
 } else {
     $output .= " onchange=\"checkField(this)\" ";
 }
-$output .= " aria-label=\"Nachricht\" name=\"message\" class=\"field\" rows=\"5\" placeholder=\"Nachricht *\" style=\"height:100%;width:100%;\" id=\"border-right3\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" >".$_POST["message"]."</textarea>";
+$output .= " aria-label=\"Nachricht\" name=\"message\" class=\"field\" rows=\"5\" placeholder=\"Nachricht *\" style=\"height:100%;width:100%;\" id=\"border-right3\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" >".$_POST['message']."</textarea>";
 
-if (!empty($fehler["nachricht"])) {
-    $output .= $fehler["nachricht"];
+if (!empty($fehler['nachricht'])) {
+    $output .= $fehler['nachricht'];
 }
 $output .= "
 </div>
@@ -643,14 +682,17 @@ $output .= "
 
 
 // -------------------- DATEIUPLOAD START ----------------------
-if (0 < $cfg["NUM_ATTACHMENT_FIELDS"]) {
+if (0 < $cfg['NUM_ATTACHMENT_FIELDS']) {
     $output .= "
-        <div class='row upload-row' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;background-repeat: no-repeat;'>
+        <div class='row upload-row' style='background-position: 2.85rem center;
+        -webkit-text-size-adjust:none;background-repeat: no-repeat;'>
         <div class='col-sm-8'>
-            <label class='control-label' for='upload_field'><i id='fileupload-icon' class='fa fa-upload'></i></label>";
-    for ($i=0; $i < $cfg["NUM_ATTACHMENT_FIELDS"]; $i++) {
+            <label class='control-label' for='upload_field'><i id='fileupload-icon'
+            class='fa fa-upload'></i></label>";
+    for ($i=0; $i < $cfg['NUM_ATTACHMENT_FIELDS']; $i++) {
         $output .= "
-            <input aria-label='Dateiupload' type='file' size=12 name='f[]' id='upload_field' style='font-size:17px;' onclick='setActive(this);' onfocus='setActive(this);' />";
+            <input aria-label='Dateiupload' type='file' size=12 name='f[]' id='upload_field'
+            style='font-size:17px;' onclick='setActive(this);' onfocus='setActive(this);' />";
     }
     $output .= "
         </div>
@@ -660,131 +702,147 @@ if (0 < $cfg["NUM_ATTACHMENT_FIELDS"]) {
 
 
 // -------------------- SPAMPROTECTION START ----------------------
-if ($cfg["Honeypot"]) {
+if ($cfg['Honeypot']) {
     $output .= "
     <div style='height: 2px; overflow: hidden;'>
-        <label style='margin-top: 10px;'>Das nachfolgende Feld muss leer bleiben, damit die Nachricht gesendet wird!</label>
+        <label style='margin-top: 10px;'>
+        Das nachfolgende Feld muss leer bleiben, damit die Nachricht gesendet wird!</label>
         <div style='margin-top: 10px;'><input type='email' name='mail' value='' /></div>
     </div>";
 }
 
 
-if ($cfg["Zeitsperre"]) {
+if ($cfg['Zeitsperre']) {
     $output .= "
     <input type='hidden' name='chkspmtm' value='".time()."' />";
 }
 
 
-if ($cfg["Klick-Check"]) {
+if ($cfg['Klick-Check']) {
     $output .= "
     <input type='hidden' name='chkspmkc' value='chkspmbt' />";
 }
 
 
-if ($cfg["Sicherheitscode"]) {
+if ($cfg['Sicherheitscode']) {
     $output .= "
-    <div class='row captcha-row ";
-    if (!empty($fehler["captcha"])) {
+        <div class='row captcha-row ";
+    if (!empty($fehler['captcha'])) {
         $output .= "error_container";
     }
     $output .= "
-        ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;background-repeat: no-repeat;'>
+        ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;
+        background-repeat: no-repeat;'>
         <div class='col-sm-8 ";
-        if (!empty($fehler["captcha"])) {
-            $output .= "error";
-        }
-        $output .= "
+    if (!empty($fehler['captcha'])) {
+        $output .= "error";
+    }
+    $output .= "
         '>
         <br />
         <label class='control-label' for='answer2'>
         <div>
         <!-- <i id='securitycode-icon' class='fa fa fa-unlock-alt'></i>&nbsp; -->
-        <img aria-label='Captcha' src='/assets/inc/captcha.php' alt='Sicherheitscode' title='captcha code' id='captcha' />
-        <a href='javascript:void(0);' title='sicherheitscode' onclick=\"javascript:document.getElementById('captcha').src='/assets/inc/captcha.php?'+Math.random();cursor:pointer;\">
+        <img aria-label='Captcha' src='/assets/inc/captcha.php' alt='Sicherheitscode'
+        title='captcha code' id='captcha' />
+        <a href='javascript:void(0);' title='sicherheitscode' onclick=\"javascript:document.
+        getElementById('captcha').src='/assets/inc/captcha.php?'+Math.random();cursor:pointer;\">
         <span class='captchareload'><i style='color:grey;' class='fas fa-sync-alt'></i></span></a>
         </div></label>
         <input";
-        if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
-            $output .= " required";
-        } else {
-            $output .= " onchange='checkField(this)'";
-        }
-        $output .= " aria-label='Eingabe' id='answer2' placeholder='Sicherheitscode *' type='text' name='sicherheitscode' maxlength='150'  class='field";
-        if (!empty($fehler["captcha"])) {
-            $output .= " errordesignfields";
-        }
-        $output .= "  form-control' onclick='setActive(this);' onfocus='setActive(this);'/>";
-        if (!empty($fehler["captcha"])) {
-            $output .= $fehler["captcha"];
-        }
-        $output .= "
+    if ($cfg['HTML5_FEHLERMELDUNGEN']) {
+        $output .= " required";
+    } else {
+        $output .= " onchange='checkField(this)'";
+    }
+    # placeholder='Sicherheitscode *'
+    $output .= " aria-label='Eingabe' id='answer2' placeholder='Ergebnis Sicherheitsfrage *'
+        type='text' maxlength='150'  class='field ";
+    if (!empty($fehler['captcha'])) {
+        $output .= "errordesignfields ";
+    }
+    $output .= "form-control' name='sicherheitscode' onclick='setActive(this);'
+        onfocus='setActive(this);' spellcheck='false' />";
+    if (!empty($fehler['captcha'])) {
+        $output .= $fehler['captcha'];
+    }
+    $output .= "
         </div>
-    </div>";
+        </div>";
 }
 
-if ($cfg["Sicherheitsfrage"]) {
+if ($cfg['Sicherheitsfrage']) {
     $output .= "
-    <div class='row question-row ";
-    if (!empty($fehler["q_id12"])) {
+        <div class='row question-row ";
+    if (!empty($fehler['q_id12'])) {
         $output .= "error_container";
     }
-    $output .= "' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;background-repeat: no-repeat;'>
+    $output .= "
+        ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;
+        background-repeat: no-repeat;'>
         <div class='col-sm-8 ";
-    if (!empty($fehler["q_id12"])) {
+    if (!empty($fehler['q_id12'])) {
         $output .= "error";
     }
+    # <input type='hidden' name='question_id' value='{$question_id}' />
     $output .= "
         ' >
-            <br />
-            <label class='control-label' for='answer'>
-            <div aria-label='Sicherheitsfrage'>
-            <i id='securityquestion-icon' class='fa fa fa-unlock-alt'></i>&nbsp;
-            Sicherheitsfrage <span style='color:red'>*</span>
-            <input type='hidden' name='question_id' value='{$question_id}' />
-            </div></label>
-            <input ";
-            if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
-                $output .= " required ";
-            } else {
-                $output .= " onchange='checkField(this)' ";
-            }
-            $output .= " aria-label='Antwort' id='answer' placeholder='{$question}' type='text' class='field";
-            if (!empty($fehler["q_id12"])) {
-                $output .= " errordesignfields";
-            }
-            $output .= " form-control' name='answer' onclick='setActive(this);' onfocus='setActive(this);' />";
-            if (!empty($fehler["q_id12"])) {
-                $output .= $fehler["q_id12"];
-            }
-            $output .= "
+        <br />
+        <label class='control-label' for='answer'>
+        <div aria-label='Sicherheitsfrage'>
+        <i id='securityquestion-icon' class='fa fa fa-unlock-alt'></i>&nbsp;
+        Sicherheitsfrage <span style='color:red'>*</span>
+        </div></label>
+        <input ";
+    if ($cfg['HTML5_FEHLERMELDUNGEN']) {
+        $output .= " required ";
+    } else {
+        $output .= " onchange='checkField(this)' ";
+    }
+    $output .= " aria-label='Antwort' id='answer' placeholder='{$question}'
+        type='text' maxlength='150' class='field ";
+    if (!empty($fehler['q_id12'])) {
+        $output .= "errordesignfields ";
+    }
+    $output .= "form-control' name='answer' onclick='setActive(this);'
+        onfocus='setActive(this);' spellcheck='false' />";
+    if (!empty($fehler['q_id12'])) {
+        $output .= $fehler['q_id12'];
+    }
+    $output .= "
         </div>
-    </div>";
+        </div>";
 }
 // -------------------- SPAMPROTECTION ENDE ----------------------
 
 
 // -------------------- MAIL-COPY START ----------------------
-if (1 == $cfg["Kopie_senden"]) {
+if (1 == $cfg['Kopie_senden']) {
     $output .= "
-        <div class='row checkbox-row' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;background-repeat: no-repeat;'>
+        <div class='row checkbox-row' style='background-position: 2.85rem center;
+        -webkit-text-size-adjust:none;background-repeat: no-repeat;'>
         <div class='col-sm-8";
 
-    if (isset($_POST["mail-copy"]) && ''!=$_POST["mail-copy"]) {
+    if (isset($_POST['mail-copy']) && ''!=$_POST['mail-copy']) {
         $output .= " not-empty-field";
     } else {
         $output .= "";
     }
     $output .= "
         '>
-        <label for='inlineCheckbox11' class='control-label'><i id='mailcopy-icon' class='fa fa-envelope'></i></label>
+        <label for='inlineCheckbox11' class='control-label'><i id='mailcopy-icon'
+        class='fa fa-envelope'></i></label>
         <label class='checkbox-inline'>
-        <input aria-label='E-Mail-Kopie senden' type='checkbox' id='inlineCheckbox11' name='mail-copy' value='1' ";
+        <input aria-label='E-Mail-Kopie senden' type='checkbox'
+        id='inlineCheckbox11' name='mail-copy' value='1' ";
 
-    if (isset($_POST["mail-copy"]) && $_POST["mail-copy"]=='1') {
+    if (isset($_POST['mail-copy']) && $_POST['mail-copy']=='1') {
         $output .= "checked='checked' ";
     }
     $output .= "
-        onclick='setActive(this);' onfocus='setActive(this);' > <div style='padding-top:4px;padding-bottom:2px;'><span style='line-height:27px;'>Kopie der Nachricht per E-Mail senden</span></div>
+        onclick='setActive(this);' onfocus='setActive(this);' > <div style='padding-top:4px;
+        padding-bottom:2px;'><span style='line-height:27px;'>
+        Kopie der Nachricht per E-Mail senden</span></div>
         </label>
         </div>
         </div";
@@ -793,41 +851,52 @@ if (1 == $cfg["Kopie_senden"]) {
 
 
 // -------------------- DATAPROTECTION START ----------------------
-if ($cfg["Datenschutz_Erklaerung"]) { $output .= "
-    <div class='row checkbox-row ";
-    if (!empty($fehler["datenschutz"])) {$output .= "error_container";} $output .= "' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;background-repeat: no-repeat;'>
+if ($cfg['Datenschutz_Erklaerung']) {
+    $output .= "
+        <div class='row checkbox-row ";
+    if (!empty($fehler['datenschutz'])) {
+        $output .= "error_container";
+    }
+    $output .= "
+        ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;
+        background-repeat: no-repeat;'>
         <div class='col-sm-8 ";
-        if (!empty($fehler["datenschutz"])) {$output .= "error";}
-        if (isset($_POST["datenschutz"]) && '' != $_POST["datenschutz"]) {
-            $output .= "not-empty-field ";
-        } else {
-            $output .= "";
-        }
-        $output .= "
-            '>
-            <label for='inlineCheckbox12' class='control-label'><i id='dataprotection-icon' class='fas fa-user-shield '></i></label>
-            <label class='checkbox-inline'>
-            <input ";
-
-        if ($cfg["HTML5_FEHLERMELDUNGEN"]) {
-            $output .= " required ";
-        } else {
-            $output .= " onchange='checkField(this)' ";
-        }
-        $output .= "
-            aria-label='Datenschutz' type='checkbox' id='inlineCheckbox12' name='datenschutz' value='akzeptiert' ";
-        if ($_POST["datenschutz"]=='akzeptiert') {
-            $output .= " checked='checked' ";
-        }
-        $output .= "
-            onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;padding-bottom:2px;line-height:27px;'> <a href='".$datenschutzerklaerung."' target='_blank'>Ich stimme der Datenschutz&shy;erklärung zu.</a> *</div>
-            </label>";
-        if (!empty($fehler["datenschutz"])) {
-            $output .= $fehler["datenschutz"];
-        }
-        $output .= "
-        </div>
-        </div>";
+    if (!empty($fehler['datenschutz'])) {
+        $output .= "error";
+    }
+    if (isset($_POST['datenschutz']) && '' != $_POST['datenschutz']) {
+        $output .= "not-empty-field ";
+    } else {
+        $output .= "";
+    }
+    $output .= "
+        '>
+        <label for='inlineCheckbox12' class='control-label'><i id='dataprotection-icon'
+        class='fas fa-user-shield '></i></label>
+        <label class='checkbox-inline'>
+        <input ";
+    if ($cfg['HTML5_FEHLERMELDUNGEN']) {
+        $output .= " required ";
+    } else {
+        $output .= " onchange='checkField(this)' ";
+    }
+    $output .= "
+        aria-label='Datenschutz' type='checkbox' id='inlineCheckbox12'
+        name='datenschutz' value='akzeptiert' ";
+    if ($_POST['datenschutz']=='akzeptiert') {
+        $output .= " checked='checked' ";
+    }
+    $output .= "
+        onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;
+        padding-bottom:2px;line-height:27px;'> <a href='".$datenschutzerklaerung."'
+        target='_blank'>Ich stimme der Datenschutz&shy;erklärung zu.</a> *</div>
+        </label>";
+    if (!empty($fehler['datenschutz'])) {
+        $output .= $fehler['datenschutz'];
+    }
+    $output .= "
+    </div>
+    </div>";
 }
 // -------------------- DATAPROTECTION ENDE ----------------------
 
@@ -853,7 +922,8 @@ $output .= "
 
 $output .= "
 <br><br>
-    <button type='submit' class='btn btn-lg btn-primary btn-block' name='kf-km'>Nachricht senden</button>
+    <button type='submit' class='btn btn-lg btn-primary btn-block'
+    name='kf-km'>Nachricht senden</button>
 </form>
 
 <br><br><hr>
@@ -866,7 +936,7 @@ $output .= "
 <!-- ..................... --> ";
 
 
-if ($cfg["Loading_Spinner"]):
+if ($cfg['Loading_Spinner']):
     $output .= "
 
     <script type='text/javascript'>
@@ -910,7 +980,7 @@ if ($cfg["Loading_Spinner"]):
 
     ";
 endif;
-if ($cfg["Erfolgsmeldung"]):
+if ($cfg['Erfolgsmeldung']):
     $output .= "
 
     <script>
@@ -926,7 +996,7 @@ if ($cfg["Erfolgsmeldung"]):
 
     ";
 endif;
-if ($cfg["Klick-Check"]):
+if ($cfg['Klick-Check']):
     $output .= "
 
     <script type='text/javascript'>
@@ -952,7 +1022,7 @@ $output .= "
 
 
 ";
-if (!$cfg["HTML5_FEHLERMELDUNGEN"]):
+if (!$cfg['HTML5_FEHLERMELDUNGEN']):
     $output .= "
 
     <script type='text/javascript'>
@@ -1093,11 +1163,12 @@ $output .= "</div>";
 $output .= "</div>";
 
 
-
         ///////////////////////////////////////////////////
         // html Ausgabe
         //
         echo $output;
+
+
     }
 
 }
@@ -1106,6 +1177,8 @@ $output .= "</div>";
 
 
 ######################################
+#unset($_POST, $_GET, $_REQUEST);
+#var_dump($_POST);
 #foreach ($_POST AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
 #foreach ($_GET AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
 #foreach ($_REQUEST AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";

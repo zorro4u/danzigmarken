@@ -37,7 +37,7 @@ Zorro4U</a>&nbsp;
 <img src='/assets/pic/extlink.png' width='12' height='12'>
 -->
 
-<?php if (Auth::is_checked_in()): ?>
+<?php if (Auth::isCheckedIn()): ?>
 &emsp;|&emsp;
 <a href='https://github.com/zorro4u/danzigmarken'
     title='Code @ github.com' rel='noopener noreferrer nofollow'

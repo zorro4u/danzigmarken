@@ -42,7 +42,7 @@ class Logger
         // SQL-Abfrage geht nicht bei MariaDB.NAS
         if ($debug === False) {
 
-            $pdo = Database::connect_mariadb();
+            $pdo = Database::connectMyDB();
 
             $ip = $_SERVER['REMOTE_ADDR'];
             #$datum = date('Y-m-d H:i:s');  // wird in der DB gesetzt
@@ -127,7 +127,7 @@ class Logger
             exit;
         }
 
-        $pdo = Database::connect_mariadb();
+        $pdo = Database::connectMyDB();
         $out = "";
 
         // nur bei Seitenaufruf über admin.php anzeigen

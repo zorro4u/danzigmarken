@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 
 #require_once __DIR__.'/../functions/database.func.php';     // Datenbank-Verbindung $pdo
@@ -6,7 +6,7 @@ require_once __DIR__.'/../auth/includes/auth.func.php';
 
 /*
 // Nutzer angemeldet?
-if (!is_checked_in()) check_user();
+if (!isCheckedIn()) checkUser();
 
 // Nutzer nicht angemeldet? Dann weg hier ...
 if (!isset($_SESSION['userid'])) {
@@ -24,7 +24,7 @@ if ((int)$_SESSION['su'] !== 1) {
 
 class Download
 {
-    public static function pdf_download_seite()
+    public static function pdfDownloadSeite()
     {
         $file_dir = $_SERVER['DOCUMENT_ROOT']."/download";
         $file_name = "dzg_90";
@@ -44,9 +44,9 @@ class Download
             header("Content-Description: File Transfer");
             header("Content-Transfer-Encoding: binary");
             header("Content-Length: ".filesize($ffn));
-            
-            ob_clean(); 
-            flush(); 
+
+            ob_clean();
+            flush();
             readfile($ffn);
             #rename($ffn, $file_dir.'/'.$now.$file_ext);      # Datei umbenennen
             #unlink($ffn);                                    # Datei löschen
@@ -55,7 +55,7 @@ class Download
 }
 
 
-Download::pdf_download_seite();
+Download::pdfDownloadSeite();
 
 // DB-Verbindung schließen
 #require_once __DIR__.'/../includes/close_db.inc.php';

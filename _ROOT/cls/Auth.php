@@ -27,7 +27,7 @@ use Dzg\{Database, Tools};
  * sonst Probleme zB. mit css Aufruf
  * nötig für Cookies, Header, Footer
  */
-$_SESSION['rootdir'] = Tools::rootdir();
+$_SESSION['rootdir'] = Tools::rootDir();
 if (!isset($_SESSION['main']))
     $_SESSION['main'] = $_SESSION['rootdir'].'/index.php';
 
@@ -51,10 +51,10 @@ class Auth
     /***********************
      * Verbindung zur Datenbank
      */
-    private static function get_pdo(): PDO
+    private static function getPDO(): PDO
     {
         if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connect_mariadb();
+            self::$pdo = Database::connectMyDB();
         }
         return self::$pdo;
     }
@@ -63,14 +63,14 @@ class Auth
     /***********************
      * Timer
      */
-    public static function get_token_timer(int $duration_day=0): int
+    public static function getTokenTimer(int $duration_day=0): int
     {
         $day = (empty($duration_day))
             ? self::TOKEN_TIMER_DAY
             : $duration_day;
         return time() + 3600*24 * $day;
     }
-    public static function get_pwcode_timer(int $duration_day=0): int
+    public static function getPWcodeTimer(int $duration_day=0): int
     {
         $day = (empty($duration_day))
             ? self::PWCODE_TIMER_DAY
@@ -93,11 +93,11 @@ class Auth
             $error_arr = [];
 
             // Benutzerdaten aus DB holen
-            $usr_data = self::get_user_data($userid);
+            $usr_data = self::getUserData($userid);
 
             // UserID in DB gefunden, globale Login-Session-Werte setzen
             if ($usr_data) {
-                self::set_login_session($usr_data);
+                self::setLoginSession($usr_data);
 
             } else {
                 $error_arr []= "#login: User-ID nicht gefunden ";
@@ -149,7 +149,7 @@ class Auth
 
     private static function logout2(): bool
     {
-        $pdo = self::get_pdo();
+        $pdo = self::getPDO();
         $status = false;
 
         $error_arr = [];
@@ -163,7 +163,7 @@ class Auth
 
             } else {
                 // Cookies löschen --> DB ausloggen
-                if (self::plausi_check_autocookie()) {
+                if (self::checkAutocookie()) {
                     $identifier = $_COOKIE['auto_identifier'];
                     $token_hash = $_COOKIE['auto_token'];
 
@@ -177,7 +177,7 @@ class Auth
                         $qry->execute($data);
                     } catch(PDOException $e) {die($e->getMessage().": auth.logout()_del-user_1");}
 
-                    self::delete_autocookies();
+                    self::deleteAutocookies();
                     $status = true;
 
                 } else {
@@ -210,9 +210,9 @@ class Auth
 
 
     /***********************
-     * Summary of delete_autocookies
+     * Summary of deleteAutocookies
      */
-    private static function delete_autocookies()
+    private static function deleteAutocookies()
     {
         // Remove Cookies
         if (isset($_COOKIE['auto_identifier']) || isset($_COOKIE['auto_token'])) {
@@ -256,12 +256,12 @@ class Auth
     /***********************
      * Autologin-Cookies/Session löschen und aus Datenbank austragen
      */
-    private static function delete_autologin()
+    private static function deleteAutologin()
     {
-        $pdo = self::get_pdo();
+        $pdo = self::getPDO();
 
         // wenn Autologin-Cookies --> DB auslogen
-        if (self::plausi_check_autocookie()) {
+        if (self::checkAutocookie()) {
             $identifier = $_COOKIE['auto_identifier'];
             $token_hash = $_COOKIE['auto_token'];
 
@@ -273,17 +273,17 @@ class Auth
             try {
                 $qry = $pdo->prepare($stmt);
                 $qry->execute($data);
-            } catch(PDOException $e) {die($e->getMessage().": auth.delete_autologin()");}
+            } catch(PDOException $e) {die($e->getMessage().": auth.deleteAutologin()");}
 
-            self::delete_autocookies();
+            self::deleteAutocookies();
         }
     }
 
 
     /***********************
-     * Summary of plausi_check_autocookie
+     * Summary of checkAutocookie
      */
-    private static function plausi_check_autocookie(): bool
+    private static function checkAutocookie(): bool
     {
         if (isset($_COOKIE['auto_identifier'], $_COOKIE['auto_token'])) {
 
@@ -306,7 +306,7 @@ class Auth
             }
 
             if (!empty($error_arr)) {
-                self::delete_autocookies();  # Remove Autologin-Cookies
+                self::deleteAutocookies();  # Remove Autologin-Cookies
                 #self::logout();
             }
         } else $error_arr []= "keine Autologin-Cookies gefunden";
@@ -333,30 +333,30 @@ class Auth
 
 
     /***********************
-     * Summary of get_user_data
+     * Summary of getUserData
      * Benutzerdaten aus DB holen
      */
-    private static function get_user_data($userid): array
+    private static function getUserData($userid): array
     {
-        $pdo = self::get_pdo();
+        $pdo = self::getPDO();
         $stmt = "SELECT * FROM site_users WHERE userid = :userid";
         try {
             $qry = $pdo->prepare($stmt);
             $qry->bindParam(":userid", $userid, PDO::PARAM_INT);
             $qry->execute();
             $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": auth.get_user_data");}
+        } catch(PDOException $e) {die($e->getMessage().": auth.getUserData");}
         return $usr_data;
     }
 
 
     /***********************
-     * Summary of get_login_data
+     * Summary of getLoginData
      * Login-Daten aus DB holen
      */
-    private static function get_login_data(int $userid=0): array
+    private static function getLoginData(int $userid=0): array
     {
-        $pdo = self::get_pdo();
+        $pdo = self::getPDO();
 
         // mit Autologin
         if (!$userid) {
@@ -375,7 +375,7 @@ class Auth
                 $login_data = $qry->fetch(PDO::FETCH_ASSOC);
 
             } catch(PDOException $e) {
-                die($e->getMessage().": auth.get_login_data()_1");
+                die($e->getMessage().": auth.getLoginData()_1");
             }
 
         // ohne Autologin
@@ -388,7 +388,7 @@ class Auth
                 $qry->execute();
                 $login_data = $qry->fetch(PDO::FETCH_ASSOC);
 
-            } catch(PDOException $e) {die($e->getMessage().": auth.get_login_data()_2");}
+            } catch(PDOException $e) {die($e->getMessage().": auth.getLoginData()_2");}
         }
 
         return $login_data;
@@ -396,9 +396,9 @@ class Auth
 
 
     /***********************
-     * Summary of set_login_session
+     * Summary of setLoginSession
      */
-    public static function set_login_session($usr_data)
+    public static function setLoginSession($usr_data)
     {
         $_SESSION['userid'] = $usr_data['userid'];
         $_SESSION['loggedin'] = true;
@@ -410,9 +410,9 @@ class Auth
     }
 
     /***********************
-     * Summary of set_login_session
+     * Summary of setLoginSession
      */
-    public static function set_autologin_session($login_id, $identifier)
+    public static function setAutologinSession($login_id, $identifier)
     {
         $_SESSION['login_id'] = $login_id;
         $_SESSION['ident'] = $identifier;
@@ -421,7 +421,7 @@ class Auth
 
 
     /***********************
-     * Summary of refresh_autologin
+     * Summary of refreshAutologin
      *
      * neuen Token & Gültigkeitsdauer setzen
      * DB, Cookies, Autologin-Session aktualisieren
@@ -429,20 +429,20 @@ class Auth
      *
      * @param mixed $login_data
      */
-    private static function refresh_autologin(&$login_data)
+    private static function refreshAutologin(&$login_data)
     {
-        $pdo = self::get_pdo();
-        #if (self::plausi_check_autocookie()):
+        $pdo = self::getPDO();
+        #if (self::checkAutocookie()):
 
         $identifier = $_COOKIE['auto_identifier'];
         $token_hash = $_COOKIE['auto_token'];
-        $token_timer = self::get_token_timer();  # gültig für 1 Jahr
+        $token_timer = self::getTokenTimer();  # gültig für 1 Jahr
 
         $token_endtime = date('Y-m-d H:i:s', $token_timer);
-        $ip = self::remote_addr();
+        $ip = self::remoteAddr();
 
         // neuen Token setzen
-        $newtoken_hash = sha1(self::random_string());
+        $newtoken_hash = sha1(self::generateRandomString());
         $stmt = "UPDATE site_login
             SET token_hash = :newtoken, token_endtime = :token_endtime, login = 1, autologin = 1, ip = :ip
             WHERE token_hash = :oldtoken AND identifier = :ident";
@@ -462,7 +462,7 @@ class Auth
             $qry->execute([":ident" => $identifier]);
             $login_id = $qry->fetch()[0];
 
-        } catch(PDOException $e) {die($e->getMessage().": auth.refresh_autologin()");}
+        } catch(PDOException $e) {die($e->getMessage().": auth.refreshAutologin()");}
 
         // Cookies neu setzen
         #session_regenerate_id();
@@ -472,7 +472,7 @@ class Auth
         $_COOKIE['auto_token'] = $newtoken_hash;
 
         // Session-Autologin-Werte setzen
-        self::set_autologin_session($login_id, $identifier);
+        self::setAutologinSession($login_id, $identifier);
 
         // Cookie Variante, LocalStorage
         /*echo "<script>
@@ -492,18 +492,18 @@ class Auth
 
 
     /***********************
-     * Summary of check_user
+     * Summary of checkUser
      *
      * Checks that the user is logged in.
      * Returns the row of the logged in user
      *
      * @return array<array|array|string>
      */
-    public static function check_user(): array
+    public static function checkUser(): array
     {
-        $pdo = self::get_pdo();
+        $pdo = self::getPDO();
 
-        $ip = self::remote_addr();
+        $ip = self::remoteAddr();
         $now = time();
 
         $usr_data = [];
@@ -542,39 +542,39 @@ class Auth
         // -0- Heimnetz -> ohne Anmeldung
 
         // -1- nicht angemeldet, aber Cookies (dauerhaft) --> anmelden
-        if (!isset($_SESSION['userid']) && self::plausi_check_autocookie()):
+        if (!isset($_SESSION['userid']) && self::checkAutocookie()):
 
             // mit den Autologin-Cookies die DB-Login-Daten holen
-            $login_data = self::get_login_data();
+            $login_data = self::getLoginData();
 
             // die Kombi Identifier/Token nicht in der DB gefunden  --> no login
             if (empty($login_data)) {
-                self::delete_autocookies();
+                self::deleteAutocookies();
                 $error_arr []= $error_txt['1.0'];
                 #$exit = true;
 
             // Token ist veraltet --> no login
             } elseif (strtotime($login_data['token_endtime']) < $now) {
-                self::delete_autologin();
+                self::deleteAutologin();
                 $error_arr []= $error_txt['1.1'];
                 #$exit = true;
 
             // Cookie-ID/Token in DB gefunden, aber abgemeldet auto=0
             } elseif (empty($login_data['autologin'])) {
-                self::delete_autocookies();
+                self::deleteAutocookies();
                 $error_arr []= $error_txt['1.2'];
                 #$exit = true;
 
             // Cookie-Ident/Token korrekt --> einloggen
             } else {
-                self::refresh_autologin($login_data);
+                self::refreshAutologin($login_data);
                 [$usr_data, $error_X] = self::login($login_data['userid']);
                 $success_msg = $success_txt['1'];
             }
 
 
         // -2- angemeldet, mit Autologin-Cookies
-        elseif (!empty($_SESSION['userid']) && self::plausi_check_autocookie()):
+        elseif (!empty($_SESSION['userid']) && self::checkAutocookie()):
 
             $userid = $_SESSION['userid'];
 
@@ -591,35 +591,35 @@ class Auth
             } else {
 
                 // mit den Autologin-Cookies die DB-Login-Daten holen
-                $login_data = self::get_login_data();
+                $login_data = self::getLoginData();
 
                 // die Kombi Identifier/Token nicht in der DB gefunden  --> ausloggen
                 if (empty($login_data)) {
-                    self::delete_autocookies();
+                    self::deleteAutocookies();
                     $error_arr []= $error_txt['2.2'];
                     $exit = true;
 
                 // Token ist veraltet --> ausloggen
                 } elseif (strtotime($login_data['token_endtime']) < $now) {
-                    self::delete_autologin();
+                    self::deleteAutologin();
                     $error_arr []= $error_txt['2.3'];
                     $exit = true;
 
                 // Cookie-ID/Token in DB gefunden, aber abgemeldet auto=0
                 } elseif (empty($login_data['autologin'])) {
-                    self::delete_autocookies();
+                    self::deleteAutocookies();
                     $error_arr []= $error_txt['2.4'];
                     $exit = true;
 
                 // DB_login.UserID <> Session_UserID verschieden --> ausloggen
                 } elseif ($login_data['userid'] != $userid) {
-                    self::delete_autocookies();
+                    self::deleteAutocookies();
                     $error_arr []= $error_txt['2.5'];
                     $exit = true;
 
                 // UserID & Cookie-Ident/Token korrekt --> einloggen
                 } else {
-                    self::refresh_autologin( $login_data);
+                    self::refreshAutologin( $login_data);
                     [$usr_data, $error_X] = self::login($login_data['userid']);
                     $success_msg = $success_txt['2'];
                 }
@@ -628,7 +628,7 @@ class Auth
 
 
         // -3- angemeldet, ohne Cookie
-        elseif (!empty($_SESSION['userid']) && !self::plausi_check_autocookie()):
+        elseif (!empty($_SESSION['userid']) && !self::checkAutocookie()):
 
             $userid = $_SESSION['userid'];
 
@@ -650,7 +650,7 @@ class Auth
                     $qry->execute();
                     $usr_id = $qry->fetch()[0];
 
-                } catch(PDOException $e) {die($e->getMessage().": auth.check_user()_3-userid");}
+                } catch(PDOException $e) {die($e->getMessage().": auth.checkUser()_3-userid");}
 
                 // wenn Benutzer vorhanden, Login setzen
                 if (!empty($usr_id)) {
@@ -664,11 +664,11 @@ class Auth
                         $qry->execute();
 
                     } catch(PDOException $e) {
-                        die($e->getMessage().": auth.check_user()_3-storelogin");
+                        die($e->getMessage().": auth.checkUser()_3-storelogin");
                     }
 
                     [$usr_data, $error_X] = self::login($userid);
-                    $login_data = self::get_login_data($userid);
+                    $login_data = self::getLoginData($userid);
                     $success_msg = $success_txt['3'];
 
                 } else {
@@ -709,11 +709,11 @@ class Auth
     /***********************
      * Returns true when the user is checked in, else false
      */
-    public static function is_checked_in(): bool
+    public static function isCheckedIn(): bool
     {
         #if (!isset($_SESSION['userid'])) {
         if (!isset($_SESSION['loggedin'])) {
-            self::check_user();
+            self::checkUser();
         };
         #return isset($_SESSION['userid']);
         return isset($_SESSION['loggedin']);
@@ -723,7 +723,7 @@ class Auth
     /***********************
      * abfragende Adresse
      */
-    public static function remote_addr(): string
+    public static function remoteAddr(): string
     {
         return $_SERVER['REMOTE_ADDR'];
     }
@@ -732,29 +732,29 @@ class Auth
     /***********************
      * Returns a random string
      */
-    public static function random_string(): string
+    public static function generateRandomString(): string
     {
         if (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes(16);
             $str = bin2hex($bytes);
         } else {
-            //Replace 'your_secret_string' with a string of your choice (>12 characters) ... Die_Sonne_Der_Mond_Hurz
+            // Replace 'your_secret_string' with a string of your choice (>12 characters) ... Die_Sonne_Der_Mond_Hurz
             $str = md5(uniqid('M;0bAP&2hsS(8nxJS5~S6=kuC', true));
-            echo '--> auth.functions.inc.php -> func -> random_string() -> (Zeile 353)';
+            echo '--> auth.functions.inc.php -> func -> generateRandomString() -> (Zeile 353)';
         }
         return $str;
     }
 
-    private static function generateRandomString($length = 10) {
+    private static function generateRandomString0($length = 10) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
-        $randomString = '';
+        $random_string = '';
 
         for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+            $random_string .= $characters[random_int(0, $charactersLength - 1)];
         }
 
-        return $randomString;
+        return $random_string;
     }
 }
 

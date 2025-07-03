@@ -25,7 +25,7 @@ E-Mail:
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>
 
 
-<?php if (Auth::is_checked_in()): ?>
+<?php if (Auth::isCheckedIn()): ?>
 
 <br />
 <p><span style='font-style:italic;text-decoration:underline'>

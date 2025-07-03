@@ -140,20 +140,20 @@ class Footer
     }
 
     // die neueste/letzte Änderungszeit einer Projektdatei
-    private static string $lastchanged;
-    public static function lastchanged(): string
+    private static string $last_changed;
+    public static function lastChanged(): string
     {
-        if (empty(self::$lastchanged)) {
-            self::set_lastchanged(self::PROJECT_DIRS, self::PROJECT_EXT);
+        if (empty(self::$last_changed)) {
+            self::setLastChanged(self::PROJECT_DIRS, self::PROJECT_EXT);
         }
-        return self::$lastchanged;
+        return self::$last_changed;
     }
-    private static function set_lastchanged(array $dirs, array $ext)
+    private static function setLastChanged(array $dirs, array $ext)
     {
-        self::$lastchanged = self::get_lastchanged($dirs, $ext);
+        self::$last_changed = self::getLastChanged($dirs, $ext);
     }
 
-    private static function get_lastchanged(array $dirs, array $file_extensions)
+    private static function getLastChanged(array $dirs, array $file_extensions)
     {
         $times = 0;
         $fullrootpath = $_SERVER['DOCUMENT_ROOT'].$_SESSION['rootdir'];
@@ -195,7 +195,7 @@ class Footer
         // Standard-Mitteltext
         $mitte = self::CC_COPY . self::CC_COM . self::ABOUT . self::CC_PIC . self::CC_ICO;
         $version = self::version();
-        $lastchanged = self::lastchanged();
+        $last_changed = self::lastChanged();
 
         $output = "
             <footer class='container'>
@@ -205,8 +205,8 @@ class Footer
                     <a class='info' title='Datenstand vom {$version}'>
                     <i class='fa fa-database'></i>&emsp;<i>{$version}</i></a>
                     <br>
-                    <a class='info' title='Webseite vom {$lastchanged}'>
-                    <i class='fa fa-pencil'></i>&emsp;<i>{$lastchanged}</i></a></div>
+                    <a class='info' title='Webseite vom {$last_changed}'>
+                    <i class='fa fa-pencil'></i>&emsp;<i>{$last_changed}</i></a></div>
                 <div class='mitte kleingrau cc'>{$mitte}</div>
                 <div class='rechts kleingrau'>
                     <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
@@ -240,7 +240,7 @@ class Footer
 
         // die neueste/letzte Änderungszeit einer Kontakt-Projektdatei
         $project_dirs = ['/assets/css'];
-        $lastchanged = self::get_lastchanged($project_dirs, self::PROJECT_EXT);
+        $last_changed = self::getLastChanged($project_dirs, self::PROJECT_EXT);
 
 
         $output = "
@@ -248,8 +248,8 @@ class Footer
             <hr>
             <div class='last'>
                 <div class='links kleingrau'>
-                    <a class='info' title='Webseite vom {$lastchanged}'>
-                    <i class='fa fa-pencil'></i>&emsp;<i>{$lastchanged}</i></a></div>
+                    <a class='info' title='Webseite vom {$last_changed}'>
+                    <i class='fa fa-pencil'></i>&emsp;<i>{$last_changed}</i></a></div>
                 <div class='mitte kleingrau cc'>{$mitte}</div>
                 <div class='rechts kleingrau'>
                     <a class='foot-link' href='/index' title='Startseite www.danzigmarken.de'>
@@ -272,7 +272,7 @@ class Footer
 
         // die neueste/letzte Änderungszeit einer Auth-Projektdatei
         $project_dirs = ['/assets/css', '/auth'];
-        $lastchanged = self::get_lastchanged($project_dirs, self::PROJECT_EXT);
+        $last_changed = self::getLastChanged($project_dirs, self::PROJECT_EXT);
 
         $output = "
             <footer class='container'>
@@ -280,8 +280,8 @@ class Footer
             <hr>
             <div class='last'>
                 <div class='links kleingrau'>
-                    <a class='info' title='Webseite vom {$lastchanged}'>
-                    <i class='fa fa-pencil'></i>&emsp;<i>{$lastchanged}</i></a></div>
+                    <a class='info' title='Webseite vom {$last_changed}'>
+                    <i class='fa fa-pencil'></i>&emsp;<i>{$last_changed}</i></a></div>
                 <div class='mitte kleingrau cc'>{$mitte}</div>
                 <div class='rechts kleingrau'>
                     <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
@@ -303,7 +303,7 @@ class Footer
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
         $project_dirs = ['/assets/css', '/account'];
-        $lastchanged = self::get_lastchanged($project_dirs, self::PROJECT_EXT);
+        $last_changed = self::getLastChanged($project_dirs, self::PROJECT_EXT);
 
         $output = "
             <footer class='container'>
@@ -311,8 +311,8 @@ class Footer
             <hr>
             <div class='last'>
                 <div class='links kleingrau'>
-                    <a class='info' title='Webseite vom {$lastchanged}'>
-                    <i class='fa fa-pencil'></i>&emsp;<i>{$lastchanged}</i></a></div>
+                    <a class='info' title='Webseite vom {$last_changed}'>
+                    <i class='fa fa-pencil'></i>&emsp;<i>{$last_changed}</i></a></div>
                 <div class='mitte kleingrau cc'>{$mitte}</div>
                 <div class='rechts kleingrau'>
                     <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
@@ -335,7 +335,7 @@ class Footer
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
         #$project_dirs = ['/about'];
         $project_dirs = ['/'];
-        $lastchanged = self::get_lastchanged($project_dirs, self::PROJECT_EXT);
+        $last_changed = self::getLastChanged($project_dirs, self::PROJECT_EXT);
 
         $output = "
             <footer class='container'>
@@ -343,8 +343,8 @@ class Footer
             <hr>
             <div class='last'>
                 <div class='links kleingrau'>
-                    <a class='info' title='Webseite vom {$lastchanged}'>
-                    <i class='fa fa-pencil'></i>&emsp;<i>{$lastchanged}</i></a></div>
+                    <a class='info' title='Webseite vom {$last_changed}'>
+                    <i class='fa fa-pencil'></i>&emsp;<i>{$last_changed}</i></a></div>
                 <div class='mitte kleingrau cc'>{$mitte}</div>
                 <div class='rechts kleingrau'>
                     <a class='foot-link' href='/index' title='Startseite www.danzigmarken.de'>

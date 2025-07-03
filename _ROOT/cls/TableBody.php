@@ -11,24 +11,24 @@ use Dzg\{Table, TableData};
  * Tabellenkopf & Tabellenkörper
  *
  * __public__
- * tabkopf_html()
- * tabelle_html()
+ * htmlTabkopf()
+ * htmlTabelle()
  */
 class TableBody
 {
     /***********************
-     * Summary of tabkopf_html
+     * Summary of htmlTabkopf
      * Tabellenkopf erstellen
      *
      * IN: $_SESSION['dir'], $_SESSION['col'], $DBspalten, $spaltennamen;
      */
-    public static function tabkopf_html(): string
+    public static function htmlTabkopf(): string
     {
         $DBspalten = Table::DBspalten;
         $spaltennamen = Table::spaltennamen();
         $dir = Table::$_session['dir'];
         $col = Table::$_session['col'];
-        $is_checked_in = Auth::is_checked_in();
+        $is_checked_in = Auth::isCheckedIn();
         #$is_checked_in = $_SESSION['su'];
 
         $output = "<thead><tr class='head-row'><th>&nbsp;</th>";
@@ -86,7 +86,7 @@ class TableBody
                 }
 
                 // wenn angemeldet, dann Spaltenkopf sortierbar
-                #if (Auth::is_checked_in()) {
+                #if (Auth::isCheckedIn()) {
                 if (1) {
 
                     // aufsteigend -> absteigend
@@ -174,17 +174,17 @@ class TableBody
 
 
     /***********************
-     * Summary of tabelle_html
+     * Summary of htmlTabelle
      * Tabellen erstellen, Werte ausgeben
      *
      * IN: $stamps_db, $spaltennamen, $mainpage2;
      */
-    public static function tabelle_html(): string
+    public static function htmlTabelle(): string
     {
         $stamps_db = Table::$stamps_db;
         $spaltennamen = Table::spaltennamen();
         $idx2 = Table::$_session['idx2'];
-        $is_checked_in = Auth::is_checked_in();
+        $is_checked_in = Auth::isCheckedIn();
 
         if (!$is_checked_in) {
             unset($spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
@@ -286,8 +286,8 @@ class TableBody
                 $title = "details";
 
                 // Thumbs der Einzeldateien holen
-                # $thumb_liste = hole_thumb($stamp['gid']);
-                $thumb_liste = TableData::hole_thumb_ffn($stamp['gid']);
+                # $thumb_liste = getThumbBlob($stamp['gid']);
+                $thumb_liste = TableData::getThumbPath($stamp['gid']);
 
                 // Anzahl Dateien (Bilder) pro Gruppe
                 $maxfile = count($thumb_liste);
