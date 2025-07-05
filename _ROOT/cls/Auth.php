@@ -45,19 +45,6 @@ class Auth
     private const PWCODE_TIMER_DAY = 30;  # PW-Code gültig für 30 Tage
 
     private static array $error_arr;
-    private static $pdo;
-
-
-    /***********************
-     * Verbindung zur Datenbank
-     */
-    private static function getPDO(): PDO
-    {
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-        return self::$pdo;
-    }
 
 
     /***********************
@@ -149,7 +136,6 @@ class Auth
 
     private static function logout2(): bool
     {
-        $pdo = self::getPDO();
         $status = false;
 
         $error_arr = [];
@@ -172,11 +158,7 @@ class Auth
                     $stmt = "DELETE FROM site_login WHERE identifier = :identifier";
 
                     $data = [":identifier" => $identifier];
-                    try {
-                        $qry = $pdo->prepare($stmt0);
-                        $qry->execute($data);
-                    } catch(PDOException $e) {die($e->getMessage().": auth.logout()_del-user_1");}
-
+                    Database::sendSQL($stmt0, $data);
                     self::deleteAutocookies();
                     $status = true;
 
@@ -185,12 +167,8 @@ class Auth
                         WHERE userid = :userid AND identifier IS NULL";  # dadurch Info 'last.seen'
                     $stmt = "DELETE FROM site_login WHERE userid = :userid AND identifier IS NULL";
 
-                    try {
-                        $qry = $pdo->prepare($stmt0);
-                        $qry->bindParam(":userid", $userid, PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": auth.logout()_del-user_2");}
-
+                    $data = [":userid" => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $status = true;
                 }
             }
@@ -203,7 +181,6 @@ class Auth
             unset($_SESSION[$i]);
         }
         #unset($_REQUEST, $_POST, $_GET);
-        $pdo = NULL;
 
         return $status;
     }
@@ -258,8 +235,6 @@ class Auth
      */
     private static function deleteAutologin()
     {
-        $pdo = self::getPDO();
-
         // wenn Autologin-Cookies --> DB auslogen
         if (self::checkAutocookie()) {
             $identifier = $_COOKIE['auto_identifier'];
@@ -268,13 +243,8 @@ class Auth
             #$stmt = "DELETE FROM site_login WHERE identifier=:ident AND token_hash=:token_hash";
             $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                 WHERE identifier = :ident AND token_hash = :token_hash";
-
             $data = [':ident' => $identifier, ':token_hash' => $token_hash];
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->execute($data);
-            } catch(PDOException $e) {die($e->getMessage().": auth.deleteAutologin()");}
-
+            Database::sendSQL($stmt, $data);
             self::deleteAutocookies();
         }
     }
@@ -338,14 +308,9 @@ class Auth
      */
     private static function getUserData($userid): array
     {
-        $pdo = self::getPDO();
         $stmt = "SELECT * FROM site_users WHERE userid = :userid";
-        try {
-            $qry = $pdo->prepare($stmt);
-            $qry->bindParam(":userid", $userid, PDO::PARAM_INT);
-            $qry->execute();
-            $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": auth.getUserData");}
+        $data = [":userid" => $userid];     # int
+        $usr_data = Database::sendSQL($stmt, $data, 'fetch');
         return $usr_data;
     }
 
@@ -356,8 +321,6 @@ class Auth
      */
     private static function getLoginData(int $userid=0): array
     {
-        $pdo = self::getPDO();
-
         // mit Autologin
         if (!$userid) {
 
@@ -368,27 +331,13 @@ class Auth
             $stmt = "SELECT * FROM site_login
                     WHERE token_hash = :token_hash AND identifier = :ident";
             $data = [':token_hash' => $token_hash, ':ident' => $identifier];
-
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->execute($data);
-                $login_data = $qry->fetch(PDO::FETCH_ASSOC);
-
-            } catch(PDOException $e) {
-                die($e->getMessage().": auth.getLoginData()_1");
-            }
+            $login_data = Database::sendSQL($stmt, $data, 'fetch');
 
         // ohne Autologin
         } else {
             $stmt = "SELECT * FROM site_login WHERE userid = :userid AND identifier IS NULL";
-
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->bindParam(":userid", $userid, PDO::PARAM_INT);
-                $qry->execute();
-                $login_data = $qry->fetch(PDO::FETCH_ASSOC);
-
-            } catch(PDOException $e) {die($e->getMessage().": auth.getLoginData()_2");}
+            $data = [':userid', $userid];   # int
+            $login_data = Database::sendSQL($stmt, $data, 'fetch');
         }
 
         return $login_data;
@@ -431,7 +380,6 @@ class Auth
      */
     private static function refreshAutologin(&$login_data)
     {
-        $pdo = self::getPDO();
         #if (self::checkAutocookie()):
 
         $identifier = $_COOKIE['auto_identifier'];
@@ -443,26 +391,23 @@ class Auth
 
         // neuen Token setzen
         $newtoken_hash = sha1(self::generateRandomString());
-        $stmt = "UPDATE site_login
+
+        $stmt1 = "UPDATE site_login
             SET token_hash = :newtoken, token_endtime = :token_endtime, login = 1, autologin = 1, ip = :ip
             WHERE token_hash = :oldtoken AND identifier = :ident";
 
-        $stmt1 = "SELECT id FROM site_login WHERE identifier = :ident";
+        $data1 = [
+            ':newtoken' => $newtoken_hash,
+            ':oldtoken' => $token_hash,
+            ':ident' => $identifier,
+            ':token_endtime' => $token_endtime,
+            ':ip' => $ip
+        ];
+        Database::sendSQL($stmt1, $data1);
 
-        try {
-            $qry = $pdo->prepare($stmt);
-            $qry->bindParam(":newtoken", $newtoken_hash, PDO::PARAM_STR);
-            $qry->bindParam(":oldtoken", $token_hash, PDO::PARAM_STR);
-            $qry->bindParam(":ident", $identifier, PDO::PARAM_STR);
-            $qry->bindParam(":token_endtime", $token_endtime, PDO::PARAM_STR);
-            $qry->bindParam(":ip", $ip, PDO::PARAM_STR);
-            $qry->execute();
-
-            $qry = $pdo->prepare($stmt1);
-            $qry->execute([":ident" => $identifier]);
-            $login_id = $qry->fetch()[0];
-
-        } catch(PDOException $e) {die($e->getMessage().": auth.refreshAutologin()");}
+        $stmt2 = "SELECT id FROM site_login WHERE identifier = :ident";
+        $data2 = [':ident' => $identifier];
+        $login_id = Database::sendSQL($stmt2, $data2, 'fetch', 'num')[0];
 
         // Cookies neu setzen
         #session_regenerate_id();
@@ -501,8 +446,6 @@ class Auth
      */
     public static function checkUser(): array
     {
-        $pdo = self::getPDO();
-
         $ip = self::remoteAddr();
         $now = time();
 
@@ -512,7 +455,6 @@ class Auth
         $error_msg = "";
         $success_msg = "";
         $exit = false;
-
 
         $_1 = "#1.chkusr:";
         $_2 = "#2.chkusr:";
@@ -537,7 +479,6 @@ class Auth
             '2' => "{$_2} auto.login",
             '3' => "{$_3} login",
             '4' => "" ];
-
 
         // -0- Heimnetz -> ohne Anmeldung
 
@@ -643,29 +584,16 @@ class Auth
                 // userid in DB suchen
                 $stmt = "SELECT userid FROM site_login
                         WHERE userid=:userid AND identifier IS NULL";
-
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(":userid", $userid, PDO::PARAM_INT);
-                    $qry->execute();
-                    $usr_id = $qry->fetch()[0];
-
-                } catch(PDOException $e) {die($e->getMessage().": auth.checkUser()_3-userid");}
+                $data = [':userid' => $userid];     # int
+                $usr_id = Database::sendSQL($stmt, $data, 'fetch', 'num')[0];
 
                 // wenn Benutzer vorhanden, Login setzen
                 if (!empty($usr_id)) {
 
                     $stmt = "UPDATE site_login SET login=1, ip=:ip
                         WHERE userid=:userid AND identifier IS NULL";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(":userid", $userid, PDO::PARAM_INT);
-                        $qry->bindParam(":ip", $ip, PDO::PARAM_STR);
-                        $qry->execute();
-
-                    } catch(PDOException $e) {
-                        die($e->getMessage().": auth.checkUser()_3-storelogin");
-                    }
+                    $data = [':userid' => $userid, ':ip' => $ip];
+                    Database::sendSQL($stmt, $data);
 
                     [$usr_data, $error_X] = self::login($userid);
                     $login_data = self::getLoginData($userid);

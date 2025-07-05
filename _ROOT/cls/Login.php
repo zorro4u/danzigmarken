@@ -138,13 +138,7 @@ class Login
                 // Nutzerdaten in DB finden & holen
                 $stmt = "SELECT * FROM site_users WHERE email = :email OR username = :username";
                 $data = [':email' => $input_email1, ':username' => $input_usr];
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    #$qry->bindParam(':email', $input_email1, PDO::PARAM_STR);
-                    #$qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                    $qry->execute($data);
-                    $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-                } catch(PDOException $e) {die($e->getMessage());}
+                $usr_data = Database::sendSQL($stmt, $data, 'fetch');
 
                 // Nutzer gefunden und Passwort korrekt
                 if($usr_data !== False) {
@@ -164,14 +158,11 @@ class Login
                                 #$pw_hash = password_hash($input_pw, PASSWORD_BCRYPT, ['cost' => 12]);
 
                                 $stmt = "UPDATE site_users SET pw_hash=:pw_hash, chg_ip=:ip, chg_by=:userid WHERE userid=:userid";
-
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                    $qry->bindParam(':ip', $ip, PDO::PARAM_STR);
-                                    $qry->bindParam(':pw_hash', $pw_hash, PDO::PARAM_STR);
-                                    $qry->execute();
-                                } catch(PDOException $e) {die($e->getMessage().': login.inc_newpwhash');}
+                                $data = [
+                                    ':userid'   => $userid,
+                                    ':ip'       => $ip,
+                                    ':pw_hash'  => $pw_hash ];
+                                Database::sendSQL($stmt, $data);
                             }
 
                             // Nutzer möchte angemeldet bleiben (1 Jahr)
@@ -185,19 +176,27 @@ class Login
                                 $stmt = "INSERT INTO site_login (userid, identifier, token_hash, token_endtime, login, autologin, ip)
                                     VALUES (:userid, :identifier, :token_hash, :token_endtime, 1, 1, :ip)";
 
-                                #$data = [':userid' => $userid, ':identifier' => $identifier, ':token_hash' => $token_hash ':token_endtime' => $token_endtime, 'ip'=>$ip,];
-                                #execute_stmt($stmt, $data);  // in DB eintragen
+                                $data = [
+                                    ':userid'        => $userid,   # int
+                                    ':identifier'    => $identifier,
+                                    ':token_hash'    => $token_hash,
+                                    ':token_endtime' => $token_endtime,
+                                    ':ip'            => $ip ];
+
+                                // TODO: Funktioniert dann lastinsertId() ?
+                                #Database::sendSQL($stmt, $data);
 
                                 try {
                                     $qry = $pdo->prepare($stmt);
-
-                                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                    $qry->bindParam(':identifier', $identifier, PDO::PARAM_STR);
-                                    $qry->bindParam(':token_hash', $token_hash, PDO::PARAM_STR);
-                                    $qry->bindParam(':token_endtime', $token_endtime, PDO::PARAM_STR);
-                                    $qry->bindParam(':ip', $ip, PDO::PARAM_STR);
-
+                                    foreach ($data AS $k => &$v) {
+                                        if (is_int($v)) {
+                                            $qry->bindParam($k, $v, PDO::PARAM_INT);
+                                        } else {
+                                            $qry->bindParam($k, $v);
+                                        }
+                                    }
                                     $qry->execute();
+
                                     $login_id = (int)$pdo->lastInsertId();
 
                                 } catch(PDOException $e) {die($e->getMessage().': login.inc_storetoken');}
@@ -245,13 +244,8 @@ class Login
                                 // Login speichern
                                 $stmt = "INSERT INTO site_login (userid, login, ip)
                                         VALUES (:userid, 1, :ip)";
-
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                                    $qry->bindParam(':ip', $ip, PDO::PARAM_STR);
-                                    $qry->execute();
-                                } catch(PDOException $e) {die($e->getMessage().': login.inc_storelogin');}
+                                $data = [':userid' => $userid, ':ip' => $ip];
+                                Database::sendSQL($stmt, $data);
                             }
                             $success_msg = "Du bist angemeldet";
 

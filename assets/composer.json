@@ -1,0 +1,7 @@
+{
+    "require": {
+        "gregwar/captcha": "1.*",
+        "phpauth/phpauth.l10n": "^0.2.0",
+        "phpauth/phpauth": "^1.5"
+    }
+}

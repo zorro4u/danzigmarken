@@ -17,7 +17,6 @@ class Settings
     /****************************
      * Klassenvariablen / Eigenschaften
      */
-    public static $pdo;
     public static $active;
     public static $userid;
     public static $usr_data;
@@ -33,11 +32,6 @@ class Settings
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::siteEntryCheck();
         self::dataPreparation();
         self::formEvaluation();
@@ -45,9 +39,6 @@ class Settings
         Header::show();
         self::siteOutput();
         Footer::show("account");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -74,8 +65,12 @@ class Settings
 
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!Auth::isCheckedIn()) {
-            header("location: /auth/login.php");
-            exit;
+            #header("location: /auth/login.php");
+            #exit;
+
+            header('HTTP/1.0 403 Forbidden');
+            echo "Forbidden";
+            exit();
         }
 
         // globale Variablen setzen
@@ -103,7 +98,6 @@ class Settings
         $userid = self::$userid;
         $identifier = self::$identifier;
         $show_form = self::$show_form;
-        $pdo = self::$pdo;
         $usr_data = [];
         $userliste = [];
 
@@ -120,14 +114,8 @@ class Settings
                 WHERE userid = :userid AND login=1 && autologin=1 AND identifier != :ident
             ) AS ct1 ON ct1.userid = site_users.userid
             ";
-
-        try {
-            $qry = $pdo->prepare($stmt);
-            $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-            $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-            $qry->execute();
-            $results = $qry->fetchALL(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().': settings.inc_ct-autologins');}
+        $data = [':userid' => $userid, ':ident' => $identifier];
+        $results = Database::sendSQL($stmt, $data, 'fetchall');
 
         // Daten separieren
         foreach ($results as $user) {
@@ -157,7 +145,6 @@ class Settings
      */
     public static function formEvaluation()
     {
-        $pdo = self::$pdo;
         $identifier = self::$identifier;
         $usr_data = self::$usr_data;
         $userliste = self::$userliste;
@@ -258,43 +245,26 @@ class Settings
             if ($error_msg === "" && $success_msg === "") {
                 if ($update_email && $update_username) {
                     $stmt = "UPDATE site_users SET email = :email, username = :username  WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                        $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {
-                        die($e->getMessage().': settings.inc_update-email.name');
-                    }
+                    $data = [
+                        ':userid'   => $userid,
+                        ':username' => $input_usr,
+                        ':email'    => $input_email ];
+                    Database::sendSQL($stmt, $data);
                     $usr_data['username'] = $input_usr;
                     $usr_data['email'] = $input_email;
                     $success_msg = "Benutzername und E-Mail-Adresse erfolgreich gespeichert.";
 
-
                 } elseif ($update_email) {
                     $stmt = "UPDATE site_users SET email = :email WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {
-                        die($e->getMessage().': settings.inc_update-email');
-                    }
+                    $data = [':userid' => $userid, ':email' => $input_email];
+                    Database::sendSQL($stmt, $data);
                     $usr_data['email'] = $input_email;
                     $success_msg = "E-Mail-Adresse erfolgreich gespeichert.";
 
                 } elseif ($update_username) {
                     $stmt = "UPDATE site_users SET username = :username WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {
-                        die($e->getMessage().': settings.inc_update-usrname');
-                    }
+                    $data = [':userid' => $userid, ':username' => $input_usr];
+                    Database::sendSQL($stmt, $data);
                     $usr_data['username'] = $input_usr;
                     $success_msg = "Benutzername erfolgreich geändert.";
                 }
@@ -325,14 +295,8 @@ class Settings
             else {
                 $passwort_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
                 $stmt = "UPDATE site_users SET pw_hash = :pw_hash WHERE userid = :userid";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                    $qry->bindParam(':pw_hash', $passwort_hash, PDO::PARAM_STR);
-                    $qry->execute();
-                } catch(PDOException $e) {
-                    die($e->getMessage().': settings.inc_update-pwhash');
-                }
+                $data = [':userid' => $userid, ':pw_hash' => $passwort_hash];
+                Database::sendSQL($stmt, $data);
                 $usr_data['pw_hash'] = $passwort_hash;
                 $success_msg = "Passwort erfolgreich gespeichert.";
             }
@@ -356,15 +320,11 @@ class Settings
             if (empty($error_msg)){
                 if ($input_vor != $usr_data['vorname'] || $input_nach != $usr_data['nachname']) {
                     $stmt = "UPDATE site_users SET vorname = :vorname, nachname = :nachname WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->bindParam(':vorname', $input_vor, PDO::PARAM_STR);
-                        $qry->bindParam(':nachname', $input_nach, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {
-                        die($e->getMessage().': settings.inc_update-name');
-                    }
+                    $data = [
+                        ':userid'   => $userid,
+                        ':vorname'  => $input_vor,
+                        ':nachname' => $input_nach ];
+                    Database::sendSQL($stmt, $data);
                     $usr_data['vorname'] = $input_vor;
                     $usr_data['nachname'] = $input_nach;
                     $success_msg = "Persönliche Daten geändert.";
@@ -379,14 +339,8 @@ class Settings
             $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                 WHERE userid = :userid AND (login = 1 && autologin = 1) AND identifier != :ident";
             #$stmt = "DELETE FROM site_login WHERE userid=:userid AND autologin=1";
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                $qry->execute();
-            } catch(PDOException $e) {
-                die($e->getMessage().': settings.inc_del-autologin');
-            }
+            $data = [':userid' => $userid, ':ident' => $identifier];
+            Database::sendSQL($stmt, $data);
             $usr_data['count3'] = "";
             $success_msg = "alle meine anderen Autologins beendet.";
         break;
@@ -406,25 +360,15 @@ class Settings
             if ($error_msg === "") {
                 $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
                 #$stmt = "DELETE FROM site_users WHERE userid=:userid";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                    $qry->execute();
-                } catch(PDOException $e) {
-                    die($e->getMessage().': settings.inc_del-user-1');
-                }
+                $data = [':userid' => $userid];     # int
+                Database::sendSQL($stmt, $data);
 
                 // wenn auf 'deaktiv' gesetzt, dann auch alle Anmeldungen löschen/beenden, (sonst bei DELETE automatisch per Verknüpfung gelöscht).
                 #$stmt = "DELETE FROM site_login WHERE userid = :userid";
                 $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                     WHERE userid = :userid AND (login = 1 || autologin = 1)";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                    $qry->execute();
-                } catch(PDOException $e) {
-                    die($e->getMessage().': settings.inc_del-user-2');
-                }
+                $data = [':userid' => $userid];     # int
+                Database::sendSQL($stmt, $data);
                 $usr_data = [];
                 $success_msg = "Nutzer gelöscht.";
 

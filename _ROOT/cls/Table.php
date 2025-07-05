@@ -28,7 +28,6 @@ use Dzg\{Database, Auth, Tools, TableData, TableBody, TableNavi, Header, Footer}
  * $maxID
  * $stamps_db
  * $_session
- * $pdo
  */
 class Table
 {
@@ -37,28 +36,17 @@ class Table
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = $pdo = Database::connectMyDB();
-        } else {
-            $pdo = self::$pdo;
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show();
-
-        // Datenbank schließen
-        self::$pdo = $pdo = Null;
     }
 
 
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    public static $pdo;
     public static int $maxID;
     public static array $stamps_db;
     private static array $spaltennamen;
@@ -192,17 +180,8 @@ class Table
     }
 
 
-
-    function __construct() {
-        if (!is_object(self::$pdo)) {
-            // Datenbank öffnen
-            #$this->pdo = Database::connectMyDB();
-        }
-    }
-    function __destruct() {
-        // Datenbank schließen
-        unset($this->pdo);
-    }
+    function __construct() {}
+    function __destruct() {}
 
 
     /***********************

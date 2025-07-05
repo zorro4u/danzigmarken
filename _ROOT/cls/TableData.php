@@ -38,7 +38,6 @@ class TableData
      */
     public static function getMaxID(string $filter): int
     {
-        $pdo = Table::$pdo;
         $idx2 = Table::$_session['idx2'];
 
         //-------------------------------------------------
@@ -60,11 +59,7 @@ class TableData
             {$sql_comment1} GROUP BY sta.id
             ) AS summary";
 
-        try {
-            $qry = $pdo->query($stmt);
-            $maxID = $qry->fetch()[0];
-        } catch(PDOException $e) {'TableData.getMaxID(): '.die($e->getMessage());}
-        unset($pdo);
+        $maxID = Database::sendSQL($stmt, [], 'fetch', 'num')[0];
 
         return (int)$maxID;
     }
@@ -75,14 +70,13 @@ class TableData
      * Zentral-Werte aus Datenbank auslesen
      *
      * IN:  $_SESSION['start'], $_SESSION['proseite'], $_SESSION['sort'],
-     *      $_SESSION['filter'], $_SESSION['idx2'], $pdo;
+     *      $_SESSION['filter'], $_SESSION['idx2'];
      * OUT: $_SESSION['jump']
      *
      * @return array
      */
     public static function getData(): array
     {
-        $pdo = Table::$pdo;
         $start = Table::$_session['start'];
         $proseite = Table::$_session['proseite'];
         $sort = Table::$_session['sort'];
@@ -135,26 +129,8 @@ class TableData
                 ORDER BY {$sort}
                 LIMIT :start, :proseite";
 
-        #$data = [':start' => $start, ':proseite' => $proseite];
-
-        try {
-            $qry = $pdo->prepare($stmt);
-            $qry->bindParam(":start", $start, PDO::PARAM_INT);
-            $qry->bindParam(":proseite", $proseite, PDO::PARAM_INT);
-            $qry->execute();
-            $stamps_db = $qry->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {'TableData.getData(): '.die($e->getMessage());}
-        unset($pdo);
-
-        // fetch()/fetchAll() Modus einmal nach execute() festlegen
-        # $qry->setFetchMode(PDO::FETCH_BOTH);  // standard: {key}: Name, Nummer
-        # $qry->setFetchMode(PDO::FETCH_NUM);   // {key}: Spaltennummer
-        # $qry->setFetchMode(PDO::FETCH_ASSOC); // {key}: Spaltenname
-
-        // memDB wird bei jedem neue Seitenaufruf neu erstellt :-/
-        #$mem_db = mem_daten($pdo, $filter);
-        #return($mem_db);
-
+        $data = [':start' => $start, ':proseite' => $proseite];
+        $stamps_db = Database::sendSQL($stmt, $data, 'fetchall');
 
         // Abfrage verarbeiten
         //
@@ -197,14 +173,11 @@ class TableData
      * alle Verzeichnispfade der Thumb-Bilder einer Gruppe holen
      * und zum Fullfilename zusammensetzen
      *
-     * IN: $pdo;
      * @param mixed $gid
      * @return array[]
      */
     public static function getThumbPath(int $gid): array
     {
-        $pdo = Table::$pdo;
-
         $sort = "sta.kat10, sta.datum, sta.kat11, sta.kat12, sta.kat13, sta.kat14, sta.kat15,
                 sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23,
                 sta.id, dat.id";
@@ -224,17 +197,8 @@ class TableData
             WHERE sta.id=:id AND pre.prefix='t_' AND dat.deakt=0
             ORDER BY {$sort}";
 
-        try {
-            $qry = $pdo->prepare($stmt);
-            $qry->bindParam(":id", $gid, PDO::PARAM_INT);
-            $qry->execute();
-            $stamps = $qry->fetchAll(PDO::FETCH_ASSOC); // {key}: Spaltenname
-        } catch(PDOException $e) {'TableData.getThumbPath()'.die($e->getMessage());}
-        unset($pdo);
-
-        #foreach (){}
-        #$tmp_fid = array_key_first($_SESSION['jump'][$gid]);
-        #$tmp = $_SESSION['jump'][$gid][$tmp_fid];     // Sprungmarke zur nächsten Gruppe
+        $data = [":id" => $gid];      # int
+        $stamps = Database::sendSQL($stmt, $data, 'fetchall');
 
         foreach ($stamps as $k => $v) {
             $thb_ffn[$k]['fid'] = $v['fid'];
@@ -255,13 +219,12 @@ class TableData
      * Thumbs der Einzeldateien der Gruppe abrufen,
      * die ganzen JOINs wegen dem Filter
      *
-     * IN: $pdo, $filter;
+     * IN: $filter;
      * @param mixed $gid
      * @return array
      */
     public static function getThumbBlob(int $gid): array
     {
-        $pdo = Table::$pdo;
         $filter = Table::$_session['filter'];
 
         $stmt =
@@ -276,13 +239,8 @@ class TableData
             WHERE sta.id=:gid AND {$filter} AND dat.deakt=0
             ORDER BY dat.kat20 DESC";
 
-        try {
-            $qry = $pdo->prepare($stmt);
-            $qry->bindParam(':gid', $gid, PDO::PARAM_INT);
-            $qry->execute();
-            $thumb_liste = $qry->fetchAll(PDO::FETCH_ASSOC);   # {key}: Spaltenname
-        } catch(PDOException $e) {'TableData.getThumbBlob(): '.die($e->getMessage());}
-        unset($pdo);
+        $data = [':gid' => $gid];     # int
+        $thumb_liste = Database::sendSQL($stmt, $data, 'fetchall');
 
         return $thumb_liste;
     }
@@ -291,20 +249,12 @@ class TableData
     /***********************
      * Summary of kategorieBezeichnungen
      *
-     * IN: $pdo;
      * @return array
      */
     public static function kategorieBezeichnungen()
     {
-        $pdo = Table::$pdo;
-
         $stmt = "SELECT * FROM dzg_katbezeichnung";
-        try {
-            $qry = $pdo->query($stmt);
-            $result = $qry->fetchAll();        # (PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {'TableData.kategorieBezeichnungen(): '.die($e->getMessage());}
-        unset($pdo);
-
+        $result = Database::sendSQL($stmt, [], 'fetchall', 'num');
         return $result;
     }
 

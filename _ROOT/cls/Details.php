@@ -29,7 +29,6 @@ class Details
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    protected static $pdo;
     protected static int $akt_file_id;
     protected static int $akt_file_idx;
     protected static array $spaltennamen;
@@ -48,33 +47,17 @@ class Details
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::siteEntryCheck();
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show();
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
-    function __construct() {
-        if (!is_object(self::$pdo)) {
-            // Datenbank öffnen
-            #$this->pdo = Database::connectMyDB();
-        }
-    }
-    function __destruct() {
-        // Datenbank schließen
-        unset($this->pdo);
-    }
+    function __construct() {}
+    function __destruct() {}
 
 
     /***********************
@@ -174,7 +157,6 @@ class Details
         // $_SESSION['start'],$_SESSION['proseite'], $_SESSION['filter'], $_SESSION['sort'],
         // $_SESSION['idx2'], $_SESSION['fileid']
 
-        $pdo_db = self::$pdo;
         #$fids = [-1,-1];
 
         if (isset($_SESSION['start'], $_SESSION['proseite'])) {
@@ -293,17 +275,8 @@ class Details
         #  AND pre.prefix='t_'
 
         // Datenabfrage Einzel-, Gruppen-ID (fid, gid)
-        try {
-            $qry = $pdo_db->prepare($stmt);
-            $qry->bindParam(":id", $current_id, PDO::PARAM_INT);
-            #$qry->bindParam(":start", $start, PDO::PARAM_INT);
-            #$qry->bindParam(":proseite", $proseite, PDO::PARAM_INT);
-            $qry->execute();
-            $results = $qry->fetchAll(PDO::FETCH_NUM);
-        } catch(PDOException $e) {echo'details_siteJump: ';die($e->getMessage());}
-
-        // Datenbank schließen
-        unset($pdo_db);
+        $data = [':id' => $current_id];     # int
+        $results = Database::sendSQL($stmt, $data, 'fetchall', 'num');
 
         // results = [ Bild_VOR=>[fid,sid], Bild_AKT=>[fid,sid], Bild_NACH=>[fid,sid]]
         switch (count($results)) {
@@ -374,7 +347,6 @@ class Details
         self::$next = -1;
         self::$status_message = "";
 
-        $pdo_db = self::$pdo;
         $show_form = self::$show_form;
         $error_arr = self::$error_arr;
         $success_msg = "";
@@ -444,11 +416,7 @@ class Details
 
         // Kateg.bezeichnung (kat10-kat29) aus DB holen
         $stmt = "SELECT * FROM dzg_katbezeichnung";
-        try {
-            $qry = $pdo_db->query($stmt);
-            $result = $qry->fetchAll();
-        } catch(PDOException $e) {die($e->getMessage().': details_katbezeichnung');}
-
+        $result = Database::sendSQL($stmt, [], 'fetchall', 'num');
 
         foreach ($result AS $entry) {
             $nameof_col_db[$entry[1]] = $entry[2];
@@ -514,15 +482,8 @@ class Details
             WHERE sta.id=(SELECT id_stamp FROM dzg_file WHERE id=:id) AND dat.deakt=0
             ORDER BY {$sort}";
 
-        try {
-            $qry = $pdo_db->prepare($stmt);
-            $qry->bindParam(':id', $akt_file_id, PDO::PARAM_INT);
-            $qry->execute();
-            $results = $qry->fetchAll(PDO::FETCH_ASSOC);  # {key}: Spaltenname
-        } catch(PDOException $e) {'details_Hauptdatenabfrage: '.die($e->getMessage());}
-
-        // Datenbank schließen
-        unset($pdo_db);
+        $data = [':id' => $akt_file_id];     # int
+        $results = Database::sendSQL($stmt, $data, 'fetchall');
 
         // Abfrage verarbeiten
         //

@@ -57,9 +57,6 @@ class Download
 
 Download::pdfDownloadSeite();
 
-// DB-Verbindung schließen
-#require_once __DIR__.'/../includes/close_db.inc.php';
-$pdo = null;
 
 
 

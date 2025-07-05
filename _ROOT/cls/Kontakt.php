@@ -12,6 +12,10 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 #require_once __DIR__.'/../mail/Captcha.php';
 use Dzg\Mail\{Mailcfg, Mail, AntiSpam};
 
+require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
+use Gregwar\Captcha\CaptchaBuilder;
+use Gregwar\Captcha\PhraseBuilder;
+
 
 /***********************
  * Webseite: Kontaktformular
@@ -47,6 +51,7 @@ class Kontakt
     private static $fehler;
     private static $question;
     private static $datenschutzerklaerung;
+    public static $captcha;
 
 
     private static function siteClose()
@@ -74,23 +79,27 @@ class Kontakt
             if (empty($_POST['answer']))
                 $_SESSION['Sicherheitsfrage'] = $question[0];
         }
-
+/*
         if ($cfg['Sicherheitscode']) {
             $question = AntiSpam::getRandomQuestion();      # [id, question]
 
             if (empty($_POST['sicherheitscode']))
                 $_SESSION['captcha_frage'] = $question;
-        }
 
+            #$captcha = new CaptchaBuilder;
+            #$captcha->build();
+        }
+*/
         // ggf. übrig gebliebene Werte löschen
         if ($cfg['Sicherheitscode'] && empty($_POST['sicherheitscode'])) {
-            unset($_SESSION['captcha_code'], $_SESSION['captcha']);
+            unset($_SESSION['captcha_code'], $_SESSION['captcha'], $_SESSION['phrase']);
         }
 
         // Herkunftsseite speichern
         Tools::lastSite(['index', 'index2', 'details', 'settings', 'admin']);
 
         self::$question = $question;
+        #self::$captcha = $captcha;
     }
 
 
@@ -121,11 +130,6 @@ class Kontakt
         $input_email = "";
         $input_message_first = "";
         $fehler = [];
-
-#var_dump($_SESSION['captcha']);#echo'<br>';
-#var_dump($_SESSION['captcha_code']);echo'<br>';
-#var_dump($_POST['sicherheitscode']);#echo'<br>';
-#var_dump(AntiSpam::encrypt($_POST['sicherheitscode']));
 
         // Formularwerte empfangen
         # (isset($_GET['send']) && strtoupper($_SERVER['REQUEST_METHOD'] === "POST")
@@ -226,20 +230,20 @@ class Kontakt
             if ($cfg['Aufrufe_limitieren'])
                 AntiSpam::rateLimiting();
 
-#var_dump($_SESSION['captcha']);echo'<br>';
-#var_dump($_SESSION['captcha_code']);echo'<br>';
-#var_dump($_POST['sicherheitscode']);echo'<br>';
-#var_dump(AntiSpam::encrypt($_POST['sicherheitscode']));
-            if ($cfg['Sicherheitscode'] && !empty($_SESSION['captcha_frage'])) {
-                #$answer = $_SESSION['captcha_code'];   # wurde in AntiSpam::loadCaptchaPic() gesetzt
-                $answer = AntiSpam::getAnswerById($_SESSION['captcha_frage'][0]);
-                #unset($_SESSION['captcha_frage']);
+            if ($cfg['Sicherheitscode']) {
+                // mit CAPTCHA Bibliothek (sicherer, teilsweise aber schwer zu lesen)
+                // muss in Captcha.php auch aktiviert sein
+                #$compare = (PhraseBuilder::comparePhrases($_SESSION['phrase'], $_POST['sicherheitscode'])) ? true : false;
+                $compare = ($_SESSION['phrase'] == $_POST['sicherheitscode']) ? true : false;
 
-                if (empty($_POST['sicherheitscode']) ||
-                    $answer != $_POST['sicherheitscode'])
+                // Session wurde in AntiSpam::loadCaptchaPic() gesetzt
+                if (!isset($_POST['sicherheitscode'], $_SESSION['phrase'])
+                    || $compare)
                 {
-                    unset($_SESSION['captcha_code']);
                     $fehler['captcha'] = "<span class='errormsg'>Der <strong>Sicherheitscode</strong> wurde falsch eingegeben.</span>";
+                    unset($_SESSION['phrase']);
+                } elseif (isset($_POST['sicherheitscode'])) {
+                    unset($_SESSION['phrase']);
                 }
             }
 
@@ -467,6 +471,7 @@ class Kontakt
         [$question_id, $question] = self::$question;
         $datenschutzerklaerung = self::$datenschutzerklaerung;
         $success_msg = self::$success_msg;
+        $captcha = self::$captcha;
 
         $output = "<div class='container'>";
         #$output = "<div class='container main-container registration-form'>";

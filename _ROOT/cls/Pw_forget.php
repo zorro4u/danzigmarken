@@ -25,7 +25,6 @@ class Pw_forget
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $pdo;
     private static $show_form;
     private static string $status_message;
     private static $success_msg;
@@ -37,19 +36,11 @@ class Pw_forget
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -58,8 +49,6 @@ class Pw_forget
      */
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
-
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details', 'login'];
         if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
@@ -98,14 +87,10 @@ class Pw_forget
             // und okay...
             if(empty($error_msg)):
 
+                // Email in DB suchen
                 $stmt = "SELECT userid, email, username, vorname, nachname FROM site_users WHERE email = :email";
                 $data = [':email' => $input_email];
-                // Email in DB suchen
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->execute($data);
-                    $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-                } catch(PDOException $e) {die($e->getMessage().': pwforget.inc_#1');}
+                $usr_data = Database::sendSQL($stmt, $data, 'fetch');
 
                 if(!$usr_data) {
                     $error_msg = "Keine solche E-Mail-Adresse im System hinterlegt.";
@@ -121,14 +106,12 @@ class Pw_forget
                     $stmt = "UPDATE site_users
                         SET pwcode_hash = :pwcode_hash, pwcode_endtime = :pwcode_endtime, notiz = :notiz
                         WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                        $qry->bindParam(':notiz', $pwcode_url, PDO::PARAM_STR);
-                        $qry->bindParam(':pwcode_hash', $pwcode_hash, PDO::PARAM_STR);
-                        $qry->bindParam(':pwcode_endtime', $pwcode_endtime, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().': pwforget.inc_#2');}
+                    $data = [
+                        ':userid'         => $usr_data['userid'],   # int
+                        ':notiz'          => $pwcode_url,
+                        ':pwcode_hash'    => $pwcode_hash,
+                        ':pwcode_endtime' => $pwcode_endtime ];
+                    Database::sendSQL($stmt, $data);
 
                     // Anrede
                     if (!empty($usr_data['vorname']))

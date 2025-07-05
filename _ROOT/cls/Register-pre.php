@@ -25,7 +25,6 @@ class Register_pre
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $pdo;
     private static $show_form;
     private static string $status_message;
 
@@ -35,19 +34,11 @@ class Register_pre
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -56,8 +47,6 @@ class Register_pre
      */
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
-
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details'];
 
@@ -120,12 +109,12 @@ class Register_pre
                 INTO site_users (username, email, status, pwcode_endtime, notiz)
                 VALUES (:username, :email, :status, :pwcode_endtime, :notiz)";
             $data = [
-                ':username' => $input_usr, ':email' => $input_email,
-                ':status' => $status, ':pwcode_endtime' => $pwcode_endtime, ':notiz' => $notiz];
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->execute($data);
-            } catch(PDOException $e) {die($e->getMessage().': register-pre.inc');}
+                ':username'       => $input_usr,
+                ':email'          => $input_email,
+                ':status'         => $status,
+                ':pwcode_endtime' => $pwcode_endtime,
+                ':notiz'          => $notiz ];
+            Database::sendSQL($stmt, $data);
 
             // Email-Versand vorbereiten ...
             $success_msg = 'Registrierungs-Link für www.danzigmarken.de <hr>'.

@@ -6,18 +6,21 @@ use Dzg\Database;
 $data = json_decode(file_get_contents('php://input'));
 $_POST = $_POST ?: $data;
 
-if (isset($_POST['id']) && isset($_POST['prn'])) :
+if (isset($_POST['id']) && isset($_POST['prn'])) {
 
     $id = (int)$_POST['id'];
     $prn = (int)$_POST['prn'];
     $ip = $_SERVER['REMOTE_ADDR'];
     $userid = $_SESSION['userid'];
 
-    $sql = "UPDATE dzg_file SET print=?, chg_ip=?, chg_by=? WHERE id=?";
-
-    Database::fetchDB($sql, [$prn, $ip, $userid, $id]);
-
-endif;
+    $stmt = "UPDATE dzg_file SET print=:prn, chg_ip=:ip, chg_by=:by WHERE id=:id";
+    $data = [
+        ':prn' => $prn,
+        ':ip'  => $ip,
+        ':by'  => $userid,
+        ':id'  => $id ];
+    Database::sendSQL($stmt, $data);
+}
 
 
 
@@ -135,8 +138,8 @@ mit JAVA, AJAX $_POST['print'] 1/0 an PHP senden, dann in DB eintragen
 $id = (int)$_GET['id'];
 $prn = (int)$_GET['prn'];
 $ip = $_SERVER['REMOTE_ADDR'];
-$sql = "UPDATE dzg_file SET print=?, chg_ip=? WHERE id=?";
-Database::fetchDB($sql, [$prn,$ip,$id]);
+$stmt = "UPDATE dzg_file SET print=?, chg_ip=? WHERE id=?";
+Database::fetchDB($stmt, [$prn,$ip,$id]);
 
 <script>
 function prn_toogle(id, prn) {

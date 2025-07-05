@@ -385,20 +385,15 @@ class TableNavi
      * Summary of feldThemenwahl
      * "Dropdown Thema"
      *
-     * IN: $pdo
      * @return string
      */
     public static function feldThemenwahl()
     {
-        $pdo = Table::$pdo;
         $thema = Table::$_session['thema'];
 
         $theme_db = ['- alle -'];
         $stmt = "SELECT sub2 FROM dzg_dirsub2 ORDER BY sub2 DESC";
-        try {
-            $qry = $pdo->query($stmt);
-            $theme_qry = $qry->fetchAll(PDO::FETCH_NUM);
-        } catch(PDOException $e) {die($e->getMessage().': TableNavi.feldThemenwahl()');}
+        $theme_qry = Database::sendSQL($stmt, [], 'fetchall', 'num');
 
         foreach ($theme_qry AS $entry) {
             foreach ($entry AS $theme) {

@@ -9,8 +9,15 @@ namespace Dzg\Mail;
 #	I-Net: http://www.knothemedia.de                            		#
 #########################################################################
 
-require_once __DIR__.'/QuestionBlocker.php';
-use Dzg\Mail\QuestionBlocker;
+#require_once __DIR__.'/QuestionBlocker.php';
+#use Dzg\Mail\QuestionBlocker;
+
+#require_once __DIR__.'/../cls/Kontakt.php';
+#use Dzg\Kontakt;
+
+require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
+use Gregwar\Captcha\CaptchaBuilder;
+
 
 /***********************
  * Summary of Captcha
@@ -91,15 +98,19 @@ class Captcha
 	 */
 	public static function getPic()
 	{
+		// Buchstaben-Kombi
 		#$text = self::getText();
-		#$_SESSION['captcha_code'] = self::encrypt($text);
-		if (empty($_SESSION['captcha_frage'])) exit;
+		#$_SESSION['phrase'] = $text;
+		#$_SESSION['phrase'] = self::encrypt($text);
 
-		$quest = $_SESSION['captcha_frage'][1];
-		# [$id, $quest] = QuestionBlocker::getRandomQuestion();
-		#$answ = QuestionBlocker::getAnswerById($id);
+		// Rechenaufgabe
+		# $quest = $_SESSION['captcha_frage'][1];
+		# [$id, $quest] = $_SESSION['captcha_frage'];
+		[$id, $quest] = QuestionBlocker::getRandomQuestion();
+		$answ = QuestionBlocker::getAnswerById($id);
 		$text = str_replace(" = ?", "", $quest);
-		#$_SESSION['captcha_code'] = self::encrypt($answ);
+		$_SESSION['phrase'] = $answ;
+		#$_SESSION['phrase'] = self::encrypt($answ);
 		#$_SESSION['captcha'] = [$id, $quest, $answ];
 
 		#header('Content-type: text/plain; charset=utf-8');
@@ -119,6 +130,18 @@ class Captcha
 		imagepng($img);
 		imagedestroy($img);
 	}
+
+	// mit CAPTCHA Bibliothek (sicherer, teilsweise aber schwer zu lesen)
+	// muss in Kontakt.php auch aktiviert sein
+	public static function getPic0()
+	{
+		$captcha = new CaptchaBuilder;
+		$_SESSION['phrase'] = $captcha->getPhrase();
+
+		header('Content-Type: image/jpeg');
+		$captcha->build()->output();
+	}
+
 
 
 	private static function getText(): string

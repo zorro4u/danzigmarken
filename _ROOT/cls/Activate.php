@@ -23,7 +23,6 @@ class Activate
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $pdo;
     private static $show_form;
     private static string $status_message;
     private static $usr_data;
@@ -34,19 +33,11 @@ class Activate
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -55,8 +46,6 @@ class Activate
      */
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
-
         $success_msg = "";
         $error_msg = "";
 
@@ -94,11 +83,7 @@ class Activate
             // Nutzer mit Aktivierungscode suchen
             $stmt = 'SELECT userid, username, pwcode_endtime FROM site_users WHERE status = :code';
             $data = [':code' => $input_code];
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->execute($data);
-                $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-            } catch(PDOException $e) {die($e->getMessage().': activate_code-suchen');}
+            $usr_data = Database::sendSQL($stmt, $data, 'fetch');
 
             // Nutzer (code) gefunden
             if ($usr_data) {
@@ -108,11 +93,8 @@ class Activate
 
                     // Status auf 'activated' setzen -> zur späteren Auswertung
                     $stmt = "UPDATE site_users SET status = 'activated', pwcode_endtime = Null, notiz = Null WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().': activate_set-status');}
+                    $data = [':userid' => $usr_data['userid']];     # int
+                    Database::sendSQL($stmt, $data);
 
                     $success_msg = 'Dein Konto ist aktiviert. Du kannst dich jetzt <a href="login.php?usr='.$usr_data['username'].'">anmelden</a>!';
 
@@ -120,11 +102,8 @@ class Activate
                     // veralteten Eintrag löschen
                     #$stmt0 = "UPDATE site_users SET status=NULL, pwcode_endtime=NULL, notiz=NULL, pwc=NULL WHERE userid=:userid";
                     $stmt = "DELETE FROM site_users WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().': activate_del-old');}
+                    $data = [':userid' => $usr_data['userid']];     # int
+                    Database::sendSQL($stmt, $data);
 
                     $error_msg = 'Die Aktivierungsfrist von 4 Wochen ist am '.date("d.m.y", $usr_data['pwcode_endtime']).' abgelaufen.';
                 }

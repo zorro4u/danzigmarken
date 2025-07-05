@@ -23,7 +23,6 @@ class Pw_reset
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $pdo;
     private static $show_form;
     private static string $status_message;
     private static $success_msg;
@@ -37,19 +36,11 @@ class Pw_reset
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -58,8 +49,6 @@ class Pw_reset
      */
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
-
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details'];
         if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
@@ -108,11 +97,7 @@ class Pw_reset
             $pwcode_hash = sha1($input_code);
             $stmt = "SELECT userid, username, email, vorname, nachname, pwcode_endtime FROM site_users WHERE pwcode_hash = :pwcode_hash";
             $data = [':pwcode_hash' => $pwcode_hash];
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->execute($data);
-                $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-            } catch(PDOException $e) {die($e->getMessage().': pwreset_#1');}
+            $usr_data = Database::sendSQL($stmt, $data, 'fetch');
 
             if (!$usr_data)
                 $error_msg = "Der Benutzer wurde nicht gefunden oder hat kein neues Passwort angefordert bzw. der übergebene Code war ungültig. ".
@@ -122,11 +107,8 @@ class Pw_reset
             elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {  // +1 Std. Karenz
                 // Passcode abgelaufen, veralteten Eintrag löschen
                 $stmt = "UPDATE site_users SET pwcode_hash = NULL, pwcode_endtime = NULL, pwc = NULL, notiz = NULL WHERE userid = :userid";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                    $qry->execute();
-                } catch(PDOException $e) {die($e->getMessage().': pwreset_pwc_delete');}
+                $data = [':userid' => $usr_data['userid']];     # int
+                Database::sendSQL($stmt, $data);
 
                 $error_msg = "Dein Code ist leider am ".date('d.m.y H:i', $usr_data['pwcode_endtime']).
                     " abgelaufen. Benutze die <a href='pwforget'>Passwortvergessen-Funktion</a> erneut.";
@@ -177,12 +159,8 @@ class Pw_reset
                     $stmt = "UPDATE site_users
                         SET pw_hash = :pw_hash, status = 'activated', pwcode_hash = NULL, pwcode_endtime = NULL, pwc = NULL, notiz = NULL
                         WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                        $qry->bindParam(':pw_hash', $passwort_hash, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().': pwreset_storePW');}
+                    $data = [':userid' => $usr_data['userid'], ':pw_hash' => $passwort_hash];
+                    Database::sendSQL($stmt, $data);
 
                     $success_msg = "Dein Passwort wurde geändert";
                     $show_form = False;

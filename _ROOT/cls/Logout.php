@@ -16,26 +16,17 @@ class Logout
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    public static $pdo;
     private static $show_form;
     private static $root_site;
     private static string $status_message;
@@ -43,7 +34,6 @@ class Logout
 
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
         $success_msg = "";
         $error_msg = "";
 
@@ -109,13 +99,9 @@ class Logout
                     SET login = NULL, autologin = NULL
                     WHERE userid = :userid AND (login = 1)";
 
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                    $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                    $qry->execute();
+                $data = [':userid' => $userid, ':ident' => $identifier];
+                Database::sendSQL($stmt, $data);
 
-                } catch(PDOException $e) {die($e->getMessage().': settings.inc_del-autologin');}
                 $success_msg = "Alle meine anderen Autologins beendet.";
             }
 

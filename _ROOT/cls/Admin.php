@@ -22,7 +22,6 @@ class Admin
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    public static $pdo;
     public static $status_message;
     public static $error_msg;
     public static $active;
@@ -53,11 +52,6 @@ class Admin
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::siteEntryCheck();
         self::dataPreparation();
         self::formEvaluation();
@@ -67,9 +61,6 @@ class Admin
         Footer::show("account");
 
         self::lastScriptAusgeben();
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -124,16 +115,10 @@ class Admin
      */
     protected static function getDBregistryLink(): array
     {
-        $pdo = self::$pdo;  # Verbindung zur Datenbank
         $reglinks = [];
-
         $stmt = "SELECT userid, email, username, vorname, nachname, notiz, pwcode_endtime
             FROM site_users WHERE email LIKE '%dummy%' ORDER BY pwcode_endtime";
-        try {
-            $qry = $pdo->query($stmt);
-            $reglinks = $qry->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": admin.inc.getDBregistryLink()");}
-
+        $reglinks = Database::sendSQL($stmt, [], 'fetchall');
         return $reglinks;
     }
 
@@ -143,7 +128,6 @@ class Admin
      */
     protected static function getDBlastAccess(): array
     {
-        $pdo = self::$pdo;  # Verbindung zur Datenbank
         $last_access = [];
 
         // letzter 'Fremd'-Log
@@ -160,10 +144,8 @@ class Admin
                     GROUP BY log.ip)
                 ORDER BY date DESC, id DESC
                 LIMIT 1";
-        try {
-            $qry = $pdo->query($stmt);
-            $last_access = $qry->fetch(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": admin.inc_lastaccess");}
+
+        $last_access = Database::sendSQL($stmt, [], 'fetch');
 
         return $last_access;
     }
@@ -174,7 +156,6 @@ class Admin
      */
     protected static function getDBuserList($userid, $identifier): array
     {
-        $pdo = self::$pdo;  # Verbindung zur Datenbank
         $user_list = [];
 
         // --- TAB: Nutzer/Autologin (/Info) ---
@@ -359,15 +340,8 @@ class Admin
 
                 ORDER BY username
                 ";
-        try {
-            $qry = $pdo->prepare($stmt);
-
-            $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-            $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-            $qry->execute();
-
-            $user_list = $qry->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $e) {die($e->getMessage().": admin.inc.getDBuserList()");}
+        $data = [':userid' => $userid, ':ident' => $identifier];
+        $user_list = Database::sendSQL($stmt, $data, 'fetchall');
 
         return $user_list;
     }
@@ -467,7 +441,6 @@ class Admin
      */
     public static function formEvaluation()
     {
-        $pdo = self::$pdo;
         $error_msg = self::$error_msg;
         $identifier = self::$identifier;
         $reglinks = self::$reglinks;
@@ -495,47 +468,32 @@ class Admin
                     $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                         WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
                     #$stmt = "DELETE FROM site_login WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#11");}
+                    $data = [':userid' => $userid, ':ident' => $identifier];
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle meine anderen aktiven Autologins beendet.";
                 break;
 
                 case 10:        // alle meine ausgeloggten Anmeldungen
                     $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                         WHERE userid = :userid AND (login IS NULL && autologin IS NOT NULL) AND identifier != :ident";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->bindParam(':ident', $identifier, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#10");}
+                    $data = [':userid' => $userid, ':ident' => $identifier];
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle meine ausgeloggten Logins beendet.";
                 break;
 
                 case 12:     // alle meine beendeten Anmeldungen (tot)  #AND identifier IS NOT NULL
                     $stmt = "DELETE FROM site_login
                         WHERE userid = :userid AND (login IS NULL && autologin IS NULL)";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#12");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle meine beendeten Logins gelöscht.";
                 break;
 
                 case 13:        // alle meine abgelaufenen Anmeldungen (tot)
                     $stmt = "DELETE FROM site_login
                         WHERE userid = :userid AND token_endtime < NOW()";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        #$qry->bindParam(':now', $now, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#13");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle meine abgelaufenen Logins gelöscht.";
                 break;
 
@@ -543,45 +501,32 @@ class Admin
                 case 21:        // alle anderen aktiven
                     $stmt = "UPDATE site_login SET login = NULL
                         WHERE userid != :userid AND (login IS NOT NULL && autologin IS NOT NULL)";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#21");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle aktiven Autologins der anderen Nutzer beendet.";
                 break;
 
                 case 20:        // alle anderen ausgeloggten Anmeldung
                     $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                         WHERE userid != :userid AND (login IS NULL && autologin IS NOT NULL)";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#20");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle ausgeloggten Autologins der anderen Nutzer beendet.";
                 break;
 
                 case 22:        // alle anderen beendeten Anmeldung (tot)  #AND identifier IS NOT NULL
                     $stmt = "DELETE FROM site_login
                         WHERE userid != :userid AND (login IS NULL && autologin IS NULL)";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#22");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle anderen toten Logins gelöscht.";
                 break;
 
                 case 23:        // alle anderen abgelaufenen (tot)
                     $stmt = "DELETE FROM site_login
                         WHERE userid != :userid AND token_endtime < NOW()";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        #$qry->bindParam(':now', $now, PDO::PARAM_STR);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#23");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle anderen abgelaufenen Logins gelöscht.";
                 break;
 
@@ -589,11 +534,8 @@ class Admin
                 case 25:        // alle anderen Nutzer
                     $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
                         WHERE userid != :userid AND identifier IS NOT NULL";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $userid, PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_autologin-#25");}
+                    $data = [':userid' => $userid];     # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Alle Autologins der anderen Nutzer beendet.";
                 break;
 
@@ -620,15 +562,13 @@ class Admin
             $stmt = "INSERT
                 INTO site_users (username, email, status, pwcode_endtime, notiz)
                 VALUES (:username, :email, :status, :pwcode_endtime, :notiz)";
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                $qry->bindParam(':status', $status, PDO::PARAM_STR);
-                $qry->bindParam(':pwcode_endtime', $pwcode_endtime, PDO::PARAM_STR);
-                $qry->bindParam(':notiz', $notiz, PDO::PARAM_STR);
-                $qry->execute();
-            } catch(PDOException $e) {die($e->getMessage().": admin.inc_make_reglink");}
+            $data = [
+                ':username' => $input_usr,
+                ':email' => $input_email,
+                ':status' => $status,
+                ':pwcode_endtime' => $pwcode_endtime,
+                ':notiz' => $notiz ];
+            Database::sendSQL($stmt, $data);
             $success_msg = "Registrierungs-Link erzeugt.";
         break;
 
@@ -655,11 +595,8 @@ class Admin
             if (isset($_POST['regchoise'])) {
                 $i = (int)$_POST['regchoise'] - 1;
                 $stmt = "DELETE FROM site_users WHERE userid = :userid";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $reglinks[$i]['userid'], PDO::PARAM_INT);
-                    $qry->execute();
-                } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_reg");}
+                $data = [':userid' => $reglinks[$i]['userid']];     # int
+                Database::sendSQL($stmt, $data);
                 $success_msg = "Registrierungslink gelöscht.";
             }
         break;
@@ -670,11 +607,7 @@ class Admin
                 // DB Integritätsprüfung: PRAGMA integrity_check;
                 // Zähler zurücksetzen: "DELETE FROM sqlite_sequence WHERE name = '{tab_name}'"  # autoincrement zurücksetzen
                 $stmt = "DELETE FROM site_users WHERE email LIKE '%dummy%'";
-                try {
-                    $pdo->exec($stmt);
-                    if (empty($_SESSION['mariaDB']))
-                        $pdo->exec("DELETE FROM sqlite_sequence WHERE name = 'site_users'");
-                } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_allregs");}
+                Database::sendSQL($stmt, []);
                 $success_msg = "alle Registrierungslinks gelöscht.";
             }
         break;
@@ -688,26 +621,15 @@ class Admin
                 if ($user_list[$i]['userid'] !== $_SESSION['userid']) {
                     $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
                     #$stmt = "DELETE FROM site_users WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $user_list[$i]['userid'], PDO::PARAM_INT);
-                        $qry->execute();
-
-                        // SQLite
-                        if (empty($_SESSION['mariaDB']))
-                            $pdo->exec("DELETE FROM sqlite_sequence WHERE name = 'site_users'");
-
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_user");}
+                    $data = [':userid' => $user_list[$i]['userid']];        # int
+                    Database::sendSQL($stmt, $data);
                     $success_msg = "Nutzer gelöscht.";
 
                     // wenn Variante 'deaktiv setzen', dann auch alle Anmeldungen löschen,
                     // (sonst bei DELETE automatisch per Verknüpfung gelöscht).
                     $stmt = "DELETE FROM site_login WHERE userid = :userid";
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->bindParam(':userid', $user_list[$i]['userid'], PDO::PARAM_INT);
-                        $qry->execute();
-                    } catch(PDOException $e) {die($e->getMessage().": admin.inc_delete_user");}
+                    $data = [':userid' => $user_list[$i]['userid']];        # int
+                    Database::sendSQL($stmt, $data);
                 }
                 else $error_msg = "Kann mich nicht selbst löschen.";
             }

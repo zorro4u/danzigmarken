@@ -42,8 +42,6 @@ class Logger
         // SQL-Abfrage geht nicht bei MariaDB.NAS
         if ($debug === False) {
 
-            $pdo = Database::connectMyDB();
-
             $ip = $_SERVER['REMOTE_ADDR'];
             #$datum = date('Y-m-d H:i:s');  // wird in der DB gesetzt
             #$remote = getenv("REMOTE_ADDR");
@@ -62,7 +60,6 @@ class Logger
             $server[20] = isset($_SESSION['userid']) ? $_SESSION['userid'] : NULL;
             $server[21] = isset($_SESSION['login_id']) ? $_SESSION['login_id'] : NULL;
             $server[22] = isset($_SESSION['ident']) ? $_SESSION['ident'] : NULL;
-
 
             /*
             $stmt = "INSERT INTO site_log
@@ -83,31 +80,21 @@ class Logger
                 :url, :referer, :userid, :login, :ident
                 WHERE :ip NOT IN (SELECT ip FROM site_login WHERE userid = 2 GROUP BY ip)
                 ";
-
-            try {
-                $qry = $pdo->prepare($stmt);
-
-                $qry->bindParam(":ip", $ip, PDO::PARAM_STR);
-                $qry->bindParam(":browser", $server[0], PDO::PARAM_STR);
-                $qry->bindParam(":lang", $server[1], PDO::PARAM_STR);
-                $qry->bindParam(":accept", $server[2], PDO::PARAM_STR);
-                $qry->bindParam(":platform", $server[3], PDO::PARAM_STR);
-                $qry->bindParam(":mobile", $server[4], PDO::PARAM_STR);
-                $qry->bindParam(":ua", $server[5], PDO::PARAM_STR);
-                $qry->bindParam(":cache", $server[6], PDO::PARAM_STR);
-                $qry->bindParam(":url", $server[7], PDO::PARAM_STR);
-                $qry->bindParam(":referer", $server[8], PDO::PARAM_STR);
-
-                $qry->bindParam(":userid", $server[20], PDO::PARAM_INT);
-                $qry->bindParam(":login", $server[21], PDO::PARAM_INT);
-                $qry->bindParam(":ident", $server[22], PDO::PARAM_STR);
-
-                $qry->execute();
-                #$qry->execute($data);
-
-            } catch(PDOException $e) {die($e->getMessage().': logged.inc');}
-
-            $pdo = Null;
+            $data = [
+                ":ip"       => $ip,
+                ":browser"  => $server[0],
+                ":lang"     => $server[1],
+                ":accept"   => $server[2],
+                ":platform" => $server[3],
+                ":mobile"   => $server[4],
+                ":ua"       => $server[5],
+                ":cache"    => $server[6],
+                ":url"      => $server[7],
+                ":referer"  => $server[8],
+                ":userid"   => $server[20],   # int
+                ":login"    => $server[21],   # int
+                ":ident"    => $server[22] ];
+            Database::sendSQL($stmt, $data);
         }
     }
 
@@ -127,19 +114,18 @@ class Logger
             exit;
         }
 
-        $pdo = Database::connectMyDB();
         $out = "";
 
         // nur bei Seitenaufruf über admin.php anzeigen
         //
         if (isset($_SERVER['HTTP_REFERER'])
-            && basename($_SERVER['HTTP_REFERER']) === "admin")
-        {
+            && basename($_SERVER['HTTP_REFERER']) === "admin"):
+
             // nur die letzten x Einträge zeigen
             $cut = 300;
 
             // Logs ohne userid=2 (admin)
-            $stmt =
+            $stmt1 =
                 "SELECT ip, date, url, referer
                 FROM site_log WHERE
 
@@ -160,22 +146,12 @@ class Logger
                 WHERE ip IN (SELECT ip FROM site_login)
                 GROUP BY ip ORDER BY ip";
 
-
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->bindParam(":cut", $cut, PDO::PARAM_INT);
-                $qry->execute();
-                $results = $qry->fetchAll(PDO::FETCH_ASSOC);
-            } catch(PDOException $e) {die($e->getMessage());}
-
-            try {
-                $qry = $pdo->query($stmt2);
-                $results2 = $qry->fetchAll(PDO::FETCH_NUM);
-            } catch(PDOException $e) {die($e->getMessage());}
-
+            $data1 = [":cut" => $cut,];  # int
+            $results = Database::sendSQL($stmt1, $data1, 'fetchall');
+            $results2 = Database::sendSQL($stmt2, [], 'fetchall', 'num');
 
             // wenn Log-Einträge
-            if (!empty($results)) {
+            if (!empty($results)):
 
                 // Array-Anpassung [[],[]] -> [,]
                 $login_ips = [];
@@ -199,7 +175,7 @@ class Logger
                 }
 
                 // Log-Protokoll anzeigen
-                foreach($show AS $entry) {
+                foreach($show AS $entry):
                     $out .= "<table>";
                     foreach($entry AS $key=>$value) {
                         if ($key === "id" or $key === "created") continue;
@@ -227,7 +203,7 @@ class Logger
                     #$out .= "<tr><td colspan=2 style=''></td></tr>";
                     $out .= "</table>";
                     $out .= "<hr>";
-                }
+                endforeach;
 
 
                 // abschließend: Einträge älter als 200 Tage löschen, oder userid=2 (admin)
@@ -237,20 +213,16 @@ class Logger
                 // 'admin' Abfrage dauert ca. 50sec !
                 # OR ip IN (SELECT log.ip FROM site_log AS log JOIN site_login AS login ON log.ip=login.ip WHERE login.userid = 2 GROUP BY log.ip)
 
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(":cut", $time_cut, PDO::PARAM_STR);
-                    $qry->execute();
-                } catch(PDOException $e) {die($e->getMessage().": logged");}
+                $data = [":cut" => $time_cut];  # string
+                Database::sendSQL($stmt, $data);
 
+            else:
+                $out .= "nichts...";
+            endif;
 
-            } else $out .= "nichts...";
-
-        } else {
+        else:
             $out .= "Du hast den 'rechten' Pfad verlassen und wirst hier nix sehen.";
-        }
-
-        $pdo = null;
+        endif;
 
 
         /*

@@ -25,7 +25,6 @@ class Register
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $pdo;
     private static $show_form;
     private static string $status_message;
     private static $usr_data;
@@ -40,19 +39,11 @@ class Register
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -61,8 +52,6 @@ class Register
      */
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
-
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details'];
 
@@ -117,11 +106,7 @@ class Register
             // Registrierungs-Link auf Gültigkeit prüfen
             $stmt = "SELECT userid, email, pwcode_endtime FROM site_users WHERE status = :status";
             $data = [':status' => $input_code];
-            try {
-                $qry = $pdo->prepare($stmt);
-                $qry->execute($data);
-                $usr_data = $qry->fetch(PDO::FETCH_ASSOC);
-            } catch(PDOException $e) {die($e->getMessage().': register.inc_status');}
+            $usr_data = Database::sendSQL($stmt, $data, 'fetch');
 
             if (!$usr_data) {
                 $error_msg = "Registrierungs-Link wurde verändert oder ist nicht gültig.";
@@ -130,11 +115,9 @@ class Register
                 // veralteten Eintrag löschen
                 $stmt0 = "UPDATE site_users SET status=NULL, pwcode_endtime=NULL, notiz=NULL, pwc=NULL WHERE userid=:userid";
                 $stmt = "DELETE FROM site_users WHERE userid=:userid";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                    $qry->execute();
-                } catch(PDOException $e) {die($e->getMessage().': register.inc_del-old-link');}
+                $data = [':userid' => $usr_data['userid']];     # int
+                Database::sendSQL($stmt, $data);
+
                 $error_msg = "Registrierungs-Link ist nach 4 Wochen am ".date('d.m.Y', $usr_data['pwcode_endtime'])." abgelaufen.";
 
             } else {}
@@ -179,11 +162,7 @@ class Register
                     // usernamen/email im Bestand suchen
                     $stmt = "SELECT username, email FROM site_users WHERE status='activated' AND (username = :username OR email = :email)";
                     $data = [':username' => $input_usr, ':email' => $input_email];
-                    try {
-                        $qry = $pdo->prepare($stmt);
-                        $qry->execute($data);
-                        $userliste = $qry->fetchALL(PDO::FETCH_ASSOC);
-                    } catch(PDOException $e) {die($e->getMessage().': register.inc_name-mail-suchen');}
+                    $userliste = Database::sendSQL($stmt, $data, 'fetchall');
 
                     // Benutzername vergeben
                     if ($input_usr !== "") {
@@ -268,17 +247,15 @@ class Register
                     SET username = :username, email = :email, pw_hash = :pw_hash,
                         status = :status, pwcode_endtime = :pwcode_endtime, notiz = :notiz
                     WHERE userid = :userid";
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->bindParam(':userid', $usr_data['userid'], PDO::PARAM_INT);
-                    $qry->bindParam(':username', $input_usr, PDO::PARAM_STR);
-                    $qry->bindParam(':email', $input_email, PDO::PARAM_STR);
-                    $qry->bindParam(':pw_hash', $passwort_hash, PDO::PARAM_STR);
-                    $qry->bindParam(':pwcode_endtime', $pwcode_endtime, PDO::PARAM_STR);
-                    $qry->bindParam(':status', $status, PDO::PARAM_STR);
-                    $qry->bindParam(':notiz', $notiz, PDO::PARAM_STR);
-                    $qry->execute();
-                } catch(PDOException $e) {die($e->getMessage().': register.inc_store-user');}
+                $data = [
+                    ':userid'         => $usr_data['userid'],   # int
+                    ':username'       => $input_usr,
+                    ':email'          => $input_email,
+                    ':pw_hash'        => $passwort_hash,
+                    ':pwcode_endtime' => $pwcode_endtime,
+                    ':status'         => $status,
+                    ':notiz'          => $notiz ];
+                Database::sendSQL($stmt, $data);
 
                 // wenn Konto-Email anders als Anfrage-Email,
                 // dann noch Verifizierung per Aktivierungs-Mail

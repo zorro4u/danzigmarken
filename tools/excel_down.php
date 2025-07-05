@@ -13,7 +13,7 @@ require_once __DIR__.'/assets/templates/download.temp.php';
 require_once __DIR__.'/assets/templates/footer.temp.php';
 */
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/functions/database.func.php';     // Datenbank-Verbindung $pdo
+require_once $_SERVER['DOCUMENT_ROOT'].'/functions/database.func.php';     // Datenbank-Verbindung
 
 // php composer.phar update
 // php composer.phar install
@@ -25,9 +25,6 @@ use avadim\FastExcelWriter\Excel as wExcel;
 
 Download::excelDownload();
 
-
-// DB-Verbindung schließen
-$pdo = null;
 
 
 
@@ -115,13 +112,8 @@ class Download
     /**
      * importiert den gesamten DB-Bestand
      */
-    public static function bestandsabfrage($pdo=Null)
+    public static function bestandsabfrage()
     {
-        // Verbindung zur Datenbank herstellen
-        $db_connect = (is_object($pdo))
-            ? $pdo
-            : Database::connectMyDB();
-
         $col = "the.sub2 thema, sta.datum,
             sta.kat10, sta.kat11, sta.kat12, sta.kat13, sta.kat14,
             sta.kat15, sta.kat16, sta.kat17, sta.kat18, sta.kat19,
@@ -155,7 +147,7 @@ class Download
             $proseite = 5;
         }
 
-        $sql = "SELECT {$col}
+        $stmt1 = "SELECT {$col}
             FROM dzg_fileplace ort
             LEFT JOIN dzg_file dat ON dat.id=ort.id_datei
             LEFT JOIN dzg_group sta ON sta.id=dat.id_stamp
@@ -169,19 +161,15 @@ class Download
             ORDER BY {$sort}";
 # LIMIT :start, :proseite";
 
-        $dblist = Database::fetchDB($sql, "all", $db_connect);
+        $dblist = Database::sendSQL($stmt1, [], 'fetchall', 'num');
 
         // DB-Spaltennamen holen
-        $sql2 = $sql." LIMIT 1";
-        try {
-            $qry = $db_connect->prepare($sql2);
-            $qry->execute();
-            $colname = array_keys($qry->fetch(PDO::FETCH_ASSOC));
-        } catch(PDOException $e) {die($e->getMessage());}
+        $stmt2 = $stmt1." LIMIT 1";
+        $colname = array_keys(Database::sendSQL($stmt2, [], 'fetch'));
 
         // Kat-Bezeichnung holen
-        $sql3 = "SELECT spalte, bezeichnung FROM dzg_katbezeichnung ORDER BY spalte";
-        $kat_name = Database::fetchDB($sql3, "all", $db_connect);
+        $stmt3 = "SELECT spalte, bezeichnung FROM dzg_katbezeichnung ORDER BY spalte";
+        $kat_name = Database::sendSQL($stmt3, [], 'fetchall', 'num');
 
         // und tauschen
         foreach ($kat_name as $v) {
@@ -191,10 +179,6 @@ class Download
                 }
             }
         }
-
-        // DB schliessen
-        if (!is_object($pdo)) {$db_connect = Null;}
-
 
         // Speicherort (thumb) bilden und an DB-Liste hängen, [webroot,sub1,sub2,name,suffix]
         $colname []= "thumbnail";

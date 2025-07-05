@@ -10,9 +10,6 @@ use Dzg\{Database, Auth, Tools, Header};
 // Seite anzeigen
 PrintView::show();
 
-// Datenbank schließen
-$pdo = Null;
-
 
 /***********************
  * Webseite:
@@ -27,7 +24,6 @@ class PrintView
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    protected static $pdo;
     protected static array $sub2_list;
     private static int $akt_file_id;
     private static int $akt_file_idx;
@@ -41,19 +37,10 @@ class PrintView
 
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        } else {
-        }
-
         self::siteEntryCheck();
 
         Header::loadHtmlMeta();
         self::seitenausgabe();
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -86,10 +73,9 @@ class PrintView
     }
     protected static function sub2ListeHolen(): array
     {
-        $pdo_db = self::$pdo;
         $sql = "SELECT sub2 FROM dzg_dirsub2";
 
-        $sub2_array = Database::fetchDB($sql, "all", $pdo_db);
+        $sub2_array = Database::sendSQL($sql, [], 'fetchall', 'num');
 
         // [[x],[y],...] -> [x,y,...]
         foreach ($sub2_array as $entry_array) {
@@ -99,15 +85,12 @@ class PrintView
 
         self::$sub2_list = $sub2_list;
 
-        // Datenbank schließen
-        unset($pdo_db);
         return $sub2_list;
     }
 
 
     protected static function idListeHolen(string $sub2=''): array
     {
-        $pdo_db = self::$pdo;
         $col = "ort.id oid, dat.id did, sta.id sid";
         $col = "dat.id";
         $idlist = [];
@@ -145,15 +128,12 @@ class PrintView
             WHERE {$filter} AND pre.prefix='t_' AND dat.print=1
             ORDER BY {$sort}";
 
-        $result = Database::fetchDB($sql, "all", $pdo_db);
+        $result = Database::sendSQL($sql, [], 'fetchall', 'num');
 
         // [[x],[y],...] -> [x,y,...]
         foreach ($result as $entry_array) {
             $idlist []= $entry_array[0];
         }
-
-        // Datenbank schließen
-        unset($pdo_db);
 
         return $idlist;
     }
@@ -161,7 +141,6 @@ class PrintView
 
     protected static function dataPreparation(int $file_id)
     {
-        $pdo_db = self::$pdo;
         $error_arr = [];
         $success_msg = "";
 
@@ -206,11 +185,7 @@ class PrintView
 
         // Kateg.bezeichnung (kat10-kat29) aus DB holen
         $stmt = "SELECT * FROM dzg_katbezeichnung";
-        try {
-            $qry = $pdo_db->query($stmt);
-            $result = $qry->fetchAll();
-        } catch(PDOException $e) {die($e->getMessage().': details.inc_katbezeichnung');}
-
+        $result = Database::sendSQL($stmt, [], 'fetchall', 'num');
         foreach ($result AS $entry)
             $nameof_col_db[$entry[1]] = $entry[2];
 
@@ -259,15 +234,8 @@ class PrintView
             WHERE sta.id=(SELECT id_stamp FROM dzg_file WHERE id=:id) AND dat.deakt=0
             ORDER BY {$sort}";
 
-        try {
-            $qry = $pdo_db->prepare($stmt);
-            $qry->bindParam(':id', $akt_file_id, PDO::PARAM_INT);
-            $qry->execute();
-            $results = $qry->fetchAll(PDO::FETCH_ASSOC);  // {key}: Spaltenname
-        } catch(PDOException $e) {die($e->getMessage().': details.inc_Hauptdatenabfrage');}
-
-        // Datenbank schließen
-        unset($pdo_db);
+        $data = [':id' => $akt_file_id];    # int
+        $results = Database::sendSQL($stmt, $data, 'fetchall');
 
         // Abfrage verarbeiten
         //

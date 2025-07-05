@@ -254,8 +254,6 @@ class Tools
         # ip4: 45.10.26.7
         # ip6: 2a0a:51c0:0:18::3
 
-        $pdo = Database::getPDO();
-
         $username = "ORXcbjSAlkVmoGV";
         $password = "xI154a2NCsTzFXr";
         $current_ip = $_SERVER['SERVER_ADDR'];
@@ -269,21 +267,17 @@ class Tools
 
 
         $stmt = "SELECT notiz FROM site_users WHERE userid = 2";
-        try {
-            $qry = $pdo->query($stmt);
-            $last_ip = $qry->fetch()[0];
-        } catch(PDOException $e) {die($e->getMessage().': auth.func_updater-lesen');}
+        $last_ip = Database::sendSQL($stmt, [], 'fetch', 'num')[0];
 
         if ($current_ip !== $last_ip) {
             // send update to $url
             echo "Server IP hat sich geändert zu: {$current_ip} --> goip.de aktualisieren";
 
             // $last_ip = current_ip;
-            $stmt = "UPDATE site_users SET notiz = ? WHERE userid = 2";
-            try {
-                $qry = $pdo->prepare($stmt);
-                #$qry->execute([$current_ip]);
-            } catch(PDOException $e) {die($e->getMessage().': auth.func_updater-schreiben');}
+            $stmt = "UPDATE site_users SET notiz = :notiz WHERE userid = 2";
+
+            $data = [':notiz' => $current_ip];
+            #Database::sendSQL($stmt, $data);
         }
     }
 

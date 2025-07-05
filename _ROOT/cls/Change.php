@@ -20,6 +20,7 @@ class Change extends Details
     /***********************
      * Klassenvariablen / Eigenschaften
      */
+    protected static $pdo;
     protected static array $abfrage_db;
 
 
@@ -42,7 +43,7 @@ class Change extends Details
         Footer::show();
 
         // Datenbank schließen
-        self::$pdo = $pdo = Null;
+        self::$pdo = Null;
     }
 
 
@@ -50,7 +51,6 @@ class Change extends Details
     {
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!Auth::isCheckedIn()) {
-            self::$pdo = Null;
             header("location: /auth/login.php");
             exit;
         }
@@ -69,7 +69,6 @@ class Change extends Details
         if (self::$show_form):
 
         # self:: kommt hier von Details
-        $pdo_db = self::$pdo;
         $max_file = self::$max_file;
         $spaltennamen = self::$spaltennamen;
         $abfrage_db = [];
@@ -103,7 +102,7 @@ class Change extends Details
             SELECT kat20 FROM dzg_kat20 ORDER BY kat20 DESC) AS s3, (
             SELECT kat21 FROM dzg_kat21 ORDER BY kat21) AS s4";
 
-        $results = Database::fetchDB($stmt, 'all', $pdo_db);
+        $results = Database::sendSQL($stmt, [], 'fetchall', 'num');
 
         $qry_arr = [];
         // abfrage_array nach Spalten (select Statement) aufsplitten
@@ -191,55 +190,39 @@ class Change extends Details
             unset($_POST['restore']);
             $_POST = [];
 
-            $stmt1 = "UPDATE dzg_file SET deakt=1, chg_ip=?, chg_by=? WHERE id=?";
-            $stmt2 = "UPDATE dzg_fileplace SET deakt=1, chg_ip=?, chg_by=? WHERE id=?";
-            $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=?, chg_by=? WHERE id=?";
+            $data = [
+                ':by' => $userid,       # int
+                ':id' => $akt_file_id,  # int
+                ':ip' => $remaddr ];
+            $stmt1 = "UPDATE dzg_file SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
+            $stmt2 = "UPDATE dzg_fileplace SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
+            $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=;ip, chg_by=:by WHERE id=:id";
 
+            Database::sendSQL($stmt1, $data);
+            Database::sendSQL($stmt2, $data);
 
-            try {
-
-                $qry = $pdo_db->prepare($stmt1);
-                $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $userid, PDO::PARAM_INT);
-                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
-                $qry->execute();
-
-                $qry = $pdo_db->prepare($stmt2);
-                $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $userid, PDO::PARAM_INT);
-                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
-                $qry->execute();
-
-                // wenn nur 1 Datei, dann auch Gruppeneintrag löschen
-                if ($max_file < 2) {
-                    $qry = $pdo_db->prepare($stmt3);
-                    $qry->bindParam(1, $remaddr);
-                    $qry->bindParam(2, $userid, PDO::PARAM_INT);
-                    $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
-                    $qry->execute();
-                }
-
-                // zum vorherigen Element wechseln
-                # data-ajax=false
-                header("Location: /change.php?id={$_SESSION['prev']}");
-                exit;
-
-
-                // wenn Datei "gelöscht", dann
-                // komplett leere Anzeige, statt sofort zur Übersicht zu wechseln
-                // Anzeige des Wiederherstellen-Buttons
-                // -- wird nicht weiter verwendet / 22.5.25 --
-                // Problem mit Rücksprung, Sprungmarken, ...
-                foreach ($ffn AS $k=>$v)
-                    $ffn[$k] = '';      # Bildpfade löschen
-                foreach ($stamps[$akt_file_idx] AS $k=>$v)
-                    $stamps[$akt_file_idx][$k] = '';
-                $stamps[$akt_file_idx]['deakt'] = '1';
-                $success_msg = 'gelöscht';
-
-            } catch(PDOException $e) {
-                $error_arr []= '--- nix deaktiviert ---'.$e->getMessage();
+            // wenn nur 1 Datei, dann auch Gruppeneintrag löschen
+            if ($max_file < 2) {
+                Database::sendSQL($stmt3, $data);
             }
+
+            // zum vorherigen Element wechseln
+            # data-ajax=false
+            header("Location: /change.php?id={$_SESSION['prev']}");
+            exit;
+
+            // wenn Datei "gelöscht", dann
+            // komplett leere Anzeige, statt sofort zur Übersicht zu wechseln
+            // Anzeige des Wiederherstellen-Buttons
+            // -- wird nicht weiter verwendet / 22.5.25 --
+            // Problem mit Rücksprung, Sprungmarken, ...
+            foreach ($ffn AS $k=>$v)
+                $ffn[$k] = '';      # Bildpfade löschen
+            foreach ($stamps[$akt_file_idx] AS $k=>$v)
+                $stamps[$akt_file_idx][$k] = '';
+            $stamps[$akt_file_idx]['deakt'] = '1';
+            $success_msg = 'gelöscht';
+
         }   # ende Delete-Button
 
 
@@ -254,38 +237,25 @@ class Change extends Details
             unset($_POST['delete']);
             $_POST = [];
 
-            $stmt1 = "UPDATE dzg_file SET deakt=0, chg_ip=?, chg_by=? WHERE id=?";
-            $stmt2 = "UPDATE dzg_fileplace SET deakt=0, chg_ip=?, chg_by=? WHERE id=?";
-            $stmt3 = "UPDATE dzg_group SET deakt=0, chg_ip=?, chg_by=? WHERE id=?";
+            $data = [
+                ':by' => $userid,       # int
+                ':id' => $akt_file_id,  # int
+                ':ip' => $remaddr ];
+            $stmt1 = "UPDATE dzg_file SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
+            $stmt2 = "UPDATE dzg_fileplace SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
+            $stmt3 = "UPDATE dzg_group SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
 
-            try {
-                $qry = $pdo_db->prepare($stmt1);
-                $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $userid, PDO::PARAM_INT);
-                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
-                $qry->execute();
+            Database::sendSQL($stmt1, $data);
+            Database::sendSQL($stmt2, $data);
 
-                $qry = $pdo_db->prepare($stmt2);
-                $qry->bindParam(1, $remaddr);
-                $qry->bindParam(2, $userid, PDO::PARAM_INT);
-                $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
-                $qry->execute();
-
-                // wenn nur 1 Datei, dann auch Gruppe wieder aktivieren
-                if ($max_file < 2) {
-                    $qry = $pdo_db->prepare($stmt3);
-                    $qry->bindParam(1, $remaddr);
-                    $qry->bindParam(2, $userid, PDO::PARAM_INT);
-                    $qry->bindParam(3, $akt_file_id, PDO::PARAM_INT);
-                    $qry->execute();
-                }
-
-                $stamps[$akt_file_idx]['deakt'] = '0';
-                $success_msg = 'wiederhergestellt';
-
-            } catch(PDOException $e) {
-                $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
+            // wenn nur 1 Datei, dann auch Gruppe wieder aktivieren
+            if ($max_file < 2) {
+                Database::sendSQL($stmt3, $data);
             }
+
+            $stamps[$akt_file_idx]['deakt'] = '0';
+            $success_msg = 'wiederhergestellt';
+
         }   # ende Wiederherstellen-Button
 
 
@@ -305,12 +275,12 @@ class Change extends Details
 
                 // neuen Datensatz 'Marke' anlegen
                 $stmt1 = "INSERT INTO dzg_group (id_thema, datum, kat10, kat11, kat12, kat13,
-                                kat14, kat15, kat16, kat17, chg_ip, chg_by, mirror)
+                            kat14, kat15, kat16, kat17, chg_ip, chg_by, mirror)
                     VALUES (:id_thema, :datum, :kat10, :kat11, :kat12, :kat13, :kat14, :kat15,
-                            :kat16, :kat17, :ip, :uid, 1)";
+                            :kat16, :kat17, :ip, :by, 1)";
 
                 $data1 = [
-                    ':id_thema' => (int)$stamps[$akt_file_idx]['id_sub2'],
+                    ':id_thema' => (int)$stamps[$akt_file_idx]['id_sub2'],  # int
                     ':datum'    => $stamps[$akt_file_idx]['datum'],
                     ':kat10'    => $stamps[$akt_file_idx]['kat10'],
                     ':kat11'    => $stamps[$akt_file_idx]['kat11'],
@@ -321,16 +291,18 @@ class Change extends Details
                     ':kat16'    => $stamps[$akt_file_idx]['kat16'],
                     ':kat17'    => $stamps[$akt_file_idx]['kat17'],
                     ':ip'       => $remaddr,
-                    ':uid'      => $userid
-                ];
+                    ':by'       => $userid ];
+
+                // TODO: Funktioniert dann lastinsertId() ?
+                #Database::sendSQL($stmt1, $data1);
 
                 try {
                     $qry = $pdo_db->prepare($stmt1);
-                    foreach ($data1 AS $spalte => &$wert) {
-                        if ($spalte == 'id_thema') {
-                            $qry->bindParam($spalte, $wert, PDO::PARAM_INT);
+                    foreach ($data1 AS $k => &$v) {
+                        if (is_int($v)) {
+                            $qry->bindParam($k, $v, PDO::PARAM_INT);
                         } else {
-                            $qry->bindParam($spalte, $wert);
+                            $qry->bindParam($k, $v);
                         }
                     }
                     $qry->execute();
@@ -342,26 +314,14 @@ class Change extends Details
                 }
 
                 // Datei mit neuer Marke verknüpfen
-                $stmt2 = "UPDATE dzg_file SET id_stamp=:new_gid, chg_ip=:ip, chg_by=:uid
+                $stmt2 = "UPDATE dzg_file SET id_stamp=:new_gid, chg_ip=:ip, chg_by=:by
                             WHERE id=:akt_file_id";
                 $data2 = [
-                        'new_gid' => $new_gid,
-                        'ip'      => $remaddr,
-                        'uid'     => $userid,
-                        'akt_file_id' => $akt_file_id];
-                try {
-                    $qry = $pdo_db->prepare($stmt2);
-                    foreach ($data2 AS $spalte => &$wert) {
-                        if ($spalte == 'new_gid' || $spalte == 'akt_file_id') {
-                            $qry->bindParam($spalte, $wert, PDO::PARAM_INT);
-                        } else {
-                            $qry->bindParam($spalte, $wert);
-                        }
-                    }
-                    $qry->execute();
-                } catch(PDOException $e) {
-                    $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
-                }
+                    ':akt_file_id'  => $akt_file_id,    # int
+                    ':new_gid'      => $new_gid,  # int
+                    ':ip'           => $remaddr,
+                    ':by'           => $userid ];
+                Database::sendSQL($stmt2, $data2);
 
                 $success_msg = 'aus Gruppe gelöst';
                 header ("Location: /change.php?id={$akt_file_id}");
@@ -485,13 +445,7 @@ class Change extends Details
                     // id holen
                     $stmt = "SELECT id FROM dzg_dirsub2 WHERE sub2 = :sub2";
                     $data = [':sub2' => $input['thema']];
-                    try {
-                        $qry = $pdo_db->prepare($stmt);
-                        $qry->execute($data);
-                        $id_sub2 = (int)$qry->fetch()[0];
-                    } catch(PDOException $e) {
-                        $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
-                    }
+                    $id_sub2 = (int)Database::sendSQL($stmt, $data, 'fetch', 'num')[0];
                     $s['id_thema'] = $id_sub2;
                     $d['id_thema'] = $id_sub2;
                 }
@@ -510,25 +464,10 @@ class Change extends Details
 
                     // letzten 2 Zeichen (Komma) löschen, Leerz. anhängen
                     $set = substr($set, 0, -2)." ";
-                    $data += ['id' => $gid];
+                    $data += [':id' => $gid];    # int
                     $stmt = "UPDATE dzg_group SET {$set} WHERE id=:id";
-                    try {
-                        $qry = $pdo_db->prepare($stmt);
-                        // Werte an entspr. Typus binden, !!! auf &-Zeichen bei $wert achten !!!
-                        foreach ($data AS $spalte => &$wert) {
-                            if ($spalte == 'id') {
-                                $qry->bindParam($spalte, $wert, PDO::PARAM_INT);
-                            } else {
-                                $qry->bindParam($spalte, $wert);
-                            }
-                        }
-                        $qry->execute();
-
-                        $success_msg = 'Änderung ausgeführt.';
-
-                    } catch(PDOException $e) {
-                        $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
-                    }
+                    Database::sendSQL($stmt, $data);
+                    $success_msg = 'Änderung ausgeführt.';
                 }
 
                 // update datei
@@ -544,14 +483,14 @@ class Change extends Details
 
                     // letzten 2 Zeichen (Komma) löschen, Leerz. anhängen
                     $set1 = substr($set1, 0, -2)." ";
-                    $data1 += ['id' => $akt_file_id];
+                    $data1 += [':id' => $akt_file_id];
                     $stmt1 = "UPDATE dzg_file SET {$set1} WHERE id=:id";
 
                     # trouble mit UNIQUE key
                     $stmt2 = "UPDATE dzg_group SET deakt=1, mirror=1 WHERE id=:id";
                     #$stmt2 = "DELETE FROM dzg_group WHERE id = :id";
                     #$stmt2 = "DELETE FROM dzg_group WHERE id = :id AND kat17 LIKE '%_ALT:%';";
-                    $data2 = ['id' => $gid];
+                    $data2 = [':id' => $gid];
 
                     $stmt3 = "UPDATE sqlite_sequence SET seq=(SELECT MAX(id) FROM dzg_group)
                               WHERE name='dzg_group'";      # -> lastNR
@@ -560,50 +499,14 @@ class Change extends Details
                     # "DELETE FROM sqlite_sequence WHERE name = 'dzg_group'";
                     # "SELECT * FROM sqlite_sequence ORDER BY name";    # -> view autoincrement
 
-                    try {
-                        $qry = $pdo_db->prepare($stmt1);
-                        // Werte an entspr. Typus binden
-                        // !!! &-Zeichen: pdo Eigenart bei bindParam !!!
-                        foreach ($data1 AS $spalte => &$wert) {
-                            if ($spalte == 'id' ||
-                                $spalte == 'id_stamp' ||
-                                $spalte == 'id_thema' ||
-                                $spalte == 'deakt' ||
-                                $spalte == 'print')
-                            {
-                                $qry->bindParam($spalte, $wert, PDO::PARAM_INT);
-                            } else {
-                                $qry->bindParam($spalte, $wert);
-                            }
-                        }
-                        $qry->execute();
+                    Database::sendSQL($stmt1, $data1);
 
-                        // wenn MarkenID geändert wird, und ($max_file < 2) dann auch Marke löschen
-                        if (isset($input['gid']) && ($max_file < 2)) {
-                            $qry = $pdo_db->prepare($stmt2);
-                            foreach ($data2 AS $spalte => &$wert) {
-                                if ($spalte == 'id' ||
-                                    $spalte == 'id_thema' ||
-                                    $spalte == 'deakt' ||
-                                    $spalte == 'mirror' ||
-                                    $spalte == 'print')
-                                {
-                                    $qry->bindParam($spalte, $wert, PDO::PARAM_INT);
-                                } else {
-                                    $qry->bindParam($spalte, $wert);
-                                }
-                            }
-                            $qry->execute();
-
-                            // SQLITE
-                            #$pdo_db->exec($stmt3);
-                        }
-
-                        $success_msg = 'Änderung ausgeführt.';
-
-                    } catch(Exception $e) {
-                        $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
+                    // wenn MarkenID geändert wird, und ($max_file < 2) dann auch Marke löschen
+                    if (isset($input['gid']) && ($max_file < 2)) {
+                        Database::sendSQL($stmt2, $data2);
                     }
+
+                    $success_msg = 'Änderung ausgeführt.';
                 }
             }
         } # ende Ändern-Button

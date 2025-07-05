@@ -28,7 +28,6 @@ class Register_info
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    private static $pdo;
     private static $show_form;
     private static string $status_message;
     private static $success_msg;
@@ -43,19 +42,11 @@ class Register_info
      */
     public static function show()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         self::dataPreparation();
 
         Header::show();
         self::siteOutput();
         Footer::show("auth");
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 
 
@@ -64,8 +55,6 @@ class Register_info
      */
     private static function dataPreparation()
     {
-        $pdo = self::$pdo;
-
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details'];
         if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
@@ -180,13 +169,14 @@ class Register_info
                     INTO site_users (username, email, status, pwcode_endtime, notiz, vorname, nachname)
                     VALUES (:username, :email, :status, :pwcode_endtime, :notiz, :vorname, :nachname)";
                 $data = [
-                    ':username' => $input_usr_temp, ':email' => $input_email_temp,
-                    ':status' => $status, ':pwcode_endtime' => $pwcode_endtime, ':notiz' => $notiz,
-                    ':vorname' => $input_vor, ':nachname' => $input_nach];
-                try {
-                    $qry = $pdo->prepare($stmt);
-                    $qry->execute($data);
-                } catch(PDOException $e) {die($e->getMessage().': register-info.inc');}
+                    ':username'       => $input_usr_temp,
+                    ':email'          => $input_email_temp,
+                    ':status'         => $status,
+                    ':pwcode_endtime' => $pwcode_endtime,
+                    ':notiz'          => $notiz,
+                    ':vorname'        => $input_vor,
+                    ':nachname'       => $input_nach ];
+                Database::sendSQL($stmt, $data);
 
                 // === EMAIL ===
                 //
