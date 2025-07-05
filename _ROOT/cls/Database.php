@@ -4,17 +4,6 @@ use PDO, PDOException, Exception;
 
 date_default_timezone_set('Europe/Berlin');
 
-// Unterverzeichnis für debug- / Entwicklungs-Mode / NAS-Server
-unset($_SESSION['debug']);
-$debug = "/_prepare";
-if (strpos(__DIR__, $debug) !== False) {
-    $_SESSION['debug'] = $debug;
-};
-
-
-function X_version() {return Database::version();}
-
-
 
 /***********************
  * Summary of Database
@@ -44,23 +33,12 @@ class Database
     protected static function setPDO()
     {
         // Anmeldedaten laden
-        #require $_SERVER['DOCUMENT_ROOT']."/db/account_data.php";
         require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/db/account_data.php";
 
-        if (empty($_SESSION['debug'])) {
-            $user = $dbuser;
-            $password = $dbpw;
-            $host = "localhost:3306";
-            $database = $dbase;
-
-        } else {
-            // debug-Modus, NAS-Server
-            $user = $dbuser0;
-            $password = $dbpw0;
-            $host = "localhost:3307";
-            $database = $dbase0;
-        }
-
+        $user = $dbuser;
+        $password = $dbpw;
+        $host = "localhost:3306";
+        $database = $dbase;
         $charset = 'utf8mb4';
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -98,10 +76,9 @@ class Database
     public static function sendSQL(
         string $sql,
         array $data_array,
-        string $fetch_mode='no',
+        string|true $fetch_mode='no',
         string $pdo_mode='assoc',
-        bool $many=false
-        )
+        bool $many=false )
     {
         // in 'execute_many' Routine springen
         if ($many) {
@@ -185,6 +162,7 @@ class Database
                 case "fetch":
                 case "yes":
                 case "true":
+                case true:
                     $query = $qry->fetch();
                     break;
 

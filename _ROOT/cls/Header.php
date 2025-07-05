@@ -257,7 +257,6 @@ class Header
     private const MAIN_PAGES = [1 => 'index.php', 2 => 'index2.php'];
 
     private static string $rootdir;
-    private static $debug;
     private static $main;
     private static $stepout;
     private static string $site_name;
@@ -360,18 +359,6 @@ class Header
         // sonst Probleme zB. mit css Aufruf
         // wird in auth.func.php gesetzt
         self::$rootdir = $rootdir = $_SESSION['rootdir'];
-
-        // spezielle Menü-Formatierung debug-Mode und für Admin
-        if (isset($_SESSION['su']) && $_SESSION['su'] === 1) {
-            $color = " <span style='color:red;'>*</span>";
-        } elseif (isset($_SESSION['loggedin'])) {
-            $color = " <span style='color:yellow;'>*</span>";
-        } else {
-            $color = " *";
-        }
-
-        $debug = (strpos($rootdir, "/_prepare") !== False)
-            ? $color : "";
 
 
         // Startseite festlegen, $_SESSION['main'], siehe auch: list-func
@@ -527,7 +514,6 @@ class Header
         endswitch;
 
         self::$rootdir = $rootdir;
-        self::$debug = $debug;
         self::$main = $main;
         self::$stepout = $stepout;
     }
@@ -539,7 +525,6 @@ class Header
     private static function showNavigation()
     {
         $rootdir = self::$rootdir;
-        $debug = self::$debug;
         $main = self::$main;
         $main_pages = self::MAIN_PAGES;
         $stepout = self::$stepout;
@@ -573,7 +558,7 @@ class Header
         // links den Titel immer anzeigen
         $output .= "
             <a class='navbar-brand' style='color:#fff;' {$href}>
-                Danzig Sammlung{$debug}{$symb}</a>
+                Danzig Sammlung{$symb}</a>
             </div>";    # ende -- navbar-header --
 
 
