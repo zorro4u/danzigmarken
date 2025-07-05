@@ -5,12 +5,11 @@ class Starter
 {
     public static function run($site='table')
     {
-        #$dir = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/";
         $class_site = __DIR__."/".ucfirst($site).".php";
         require_once $class_site;
 
-        switch (strtolower($site))
-        {
+        switch (strtolower($site)):
+
             case "admin":
                 Admin::show();
                 break;
@@ -40,23 +39,23 @@ class Starter
                 break;
 
             case "pwforget":
-
+                Pw_forget::show();
                 break;
 
             case "pwreset":
-
+                Pw_reset::show();
                 break;
 
-            case "register-info":
-
+            case "register_info":
+                Register_info::show();
                 break;
 
             case "register":
-
+                Register::show();
                 break;
 
             case "activate":
-
+                Activate::show();
                 break;
 
             case "kontakt":
@@ -71,12 +70,20 @@ class Starter
                 Upload::show();
                 break;
 
-            case "impressum":
+            case "logger":
+                Logger::show();
+                break;
 
+            case "impressum":
+                Impressum::show();
+                break;
+
+            case "about":
+                About::show();
                 break;
 
             default:
 
-        }
+        endswitch;
     }
 }

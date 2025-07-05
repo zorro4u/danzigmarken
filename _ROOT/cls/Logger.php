@@ -1,10 +1,6 @@
 <?php
 namespace Dzg;
-
 require_once __DIR__."/Database.php";
-
-use Dzg\Database;
-use PDO, PDOException;
 
 
 /***********************

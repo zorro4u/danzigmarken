@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Europe/Berlin');
 session_start();
 
 #require_once __DIR__.'/../functions/database.func.php';     // Datenbank-Verbindung $pdo

@@ -1,9 +1,7 @@
 <?php
 namespace Dzg;
-
 require_once __DIR__.'/Table.php';
 require_once __DIR__.'/TableData.php';
-use Dzg\{Table, TableData};
 
 
 /***********************

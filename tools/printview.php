@@ -1,9 +1,7 @@
 <?php
-session_start();
 date_default_timezone_set('Europe/Berlin');
+session_start();
 
-// Datenbank- & Auth-Funktionen laden
-#require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Auth.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Header.php";
 use Dzg\{Database, Auth, Tools, Header};
 

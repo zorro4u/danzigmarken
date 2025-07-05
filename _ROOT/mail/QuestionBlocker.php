@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Mail;
+namespace Dzg;
 
 #header('Content-type: text/html; charset=utf-8');
 /*

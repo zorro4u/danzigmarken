@@ -1,16 +1,11 @@
 <?php
 namespace Dzg;
-
-// Datenbank- & Auth-Funktionen laden
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-use Dzg\{Tools, Header, Footer};
-
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/AntiSpam.php';
 #require_once __DIR__.'/../mail/RateLimiting.php';
 #require_once __DIR__.'/../mail/Captcha.php';
-use Dzg\Mail\{Mailcfg, Mail, AntiSpam};
 
 require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
 use Gregwar\Captcha\CaptchaBuilder;

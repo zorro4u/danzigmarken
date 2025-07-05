@@ -21,3 +21,10 @@ composer require phpauth/phpauth.l10n --ignore-platform-req=ext-gd
 $config = new \PHPAuth\Config($dbh, null, \PHPAuth\Config::CONFIG_TYPE_SQL);
 $config = $config->setLocalization( (new \PHPAuth\PHPAuthLocalization('de_DE'))->use() );
 $auth   = new \PHPAuth\Auth($dbh, $config);
+
+
+
+
+// php composer.phar update
+// php composer.phar install
+// php composer.phar dump-autoload

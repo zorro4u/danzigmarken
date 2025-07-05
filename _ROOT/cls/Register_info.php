@@ -10,14 +10,8 @@ error_reporting(E_ERROR | E_PARSE);
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Auth.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/mail/Mail.php';
-
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
-
-use Dzg\{Database, Auth, Tools, Header, Footer};
-use Dzg\Mail\{Mailcfg, Mail};
-use PDO, PDOException;
-
 
 
 /***********************

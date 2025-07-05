@@ -18,9 +18,6 @@ require_once __DIR__.'/Database.php';
 include_once __DIR__.'/../inc/auth.password.func.php';
 include_once __DIR__.'/Tools.php';
 
-use PDO, PDOException;
-use Dzg\{Database, Tools};
-
 
 /****************************
  * Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)

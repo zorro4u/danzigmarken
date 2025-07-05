@@ -1,12 +1,7 @@
 <?php
 namespace Dzg;
-
-#require_once __DIR__.'/includes/login.inc.php';
-#require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-use Dzg\{Database, Auth, Tools, Header, Footer};
-use PDO, PDOException;
 
 
 class Logout

@@ -1,17 +1,10 @@
 <?php
 namespace Dzg;
-
-// Datenbank- & Auth-Funktionen laden
-#require_once __DIR__.'/Auth.php';
-
 require_once __DIR__.'/TableData.php';   // Datenbank-Abfrage
 require_once __DIR__.'/TableBody.php';   // Tabellen-Erzeugung
 require_once __DIR__.'/TableNavi.php';   // Tabellen-Navigation
-
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-
-use Dzg\{Database, Auth, Tools, TableData, TableBody, TableNavi, Header, Footer};
 
 
 /***********************

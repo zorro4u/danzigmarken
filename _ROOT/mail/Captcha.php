@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Mail;
+namespace Dzg;
 
 #########################################################################
 #	Kontaktformular.com         					                    #
@@ -10,10 +10,7 @@ namespace Dzg\Mail;
 #########################################################################
 
 #require_once __DIR__.'/QuestionBlocker.php';
-#use Dzg\Mail\QuestionBlocker;
-
 #require_once __DIR__.'/../cls/Kontakt.php';
-#use Dzg\Kontakt;
 
 require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
 use Gregwar\Captcha\CaptchaBuilder;

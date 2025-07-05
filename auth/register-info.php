@@ -1,11 +1,7 @@
 <?php
-session_start();
 date_default_timezone_set('Europe/Berlin');
+session_start();
 
-#require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Starter.php";
-#Starter::run("register-info");
+require_once $_SERVER['DOCUMENT_ROOT']."/assets/inc/start.php";
+run("register_info");
 
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Register_info.php";
-use Dzg\Register_info;
-
-Register_info::show();

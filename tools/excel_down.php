@@ -1,23 +1,12 @@
 <?php
+date_default_timezone_set('Europe/Berlin');
 session_start();
+
 $_SESSION['siteid'] = 15;
 
-/*
-require_once __DIR__.'/includes/download.inc.php';   // zentrale Datenvorbereitung
+require_once __DIR__.'/Database.php';
+use Dzg\Database;
 
-require_once __DIR__.'/assets/templates/html-head-details.php';
-require_once __DIR__.'/assets/templates/html-body.php';
-
-require_once __DIR__.'/assets/templates/download.temp.php';
-
-require_once __DIR__.'/assets/templates/footer.temp.php';
-*/
-
-require_once $_SERVER['DOCUMENT_ROOT'].'/functions/database.func.php';     // Datenbank-Verbindung
-
-// php composer.phar update
-// php composer.phar install
-// php composer.phar dump-autoload
 require_once $_SERVER['DOCUMENT_ROOT'].'/static/vendor/autoload.php';
 #use avadim\FastExcelReader\Excel as rExcel;
 use avadim\FastExcelWriter\Excel as wExcel;

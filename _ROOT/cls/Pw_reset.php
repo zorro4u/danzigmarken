@@ -4,15 +4,12 @@ namespace Dzg;
 
 // TODO: alle Autologins beenden
 
-session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
+session_start();
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/../data/dzg/cls/Footer.php';
-
-use Dzg\{Database, Tools, Header, Footer};
-use PDO, PDOException;
 
 
 /***********************

@@ -5,7 +5,7 @@ namespace Dzg;
 
 require_once __DIR__.'/Header.php';
 require_once __DIR__.'/Footer.php';
-use Dzg\{Database, Auth, Tools, Kontakt, Header, Footer};
+
 
 /***********************
  * Summary of Upload
