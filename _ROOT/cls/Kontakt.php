@@ -463,7 +463,7 @@ class Kontakt
         $input_message_first = self::$input_message_first;
         $cfg = self::$cfg;
         $fehler = self::$fehler;
-        [$question_id, $question] = self::$question;
+        $question = self::$question[1];
         $datenschutzerklaerung = self::$datenschutzerklaerung;
         $success_msg = self::$success_msg;
         $captcha = self::$captcha;
