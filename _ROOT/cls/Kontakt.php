@@ -63,7 +63,7 @@ class Kontakt
     private static function dataPreparation()
     {
         $cfg = MailConfig::$cfg;
-        $question = [];
+        $question = [[],[]];
 
         if ($cfg['Sicherheitsfrage']) {
             $question = AntiSpam::getRandomQuestion();      # [id, question]
