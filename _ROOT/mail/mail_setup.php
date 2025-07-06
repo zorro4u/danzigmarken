@@ -104,7 +104,7 @@ $zeichenlaenge_telefon = "50";  // Maximale Zeichen - Feld "Telefon" (zwischen d
 $zeichenlaenge_betreff = "50";  // Maximale Zeichen - Feld "Betreff" (zwischen den Anführungszeichen)
 
 
-$maillogFile = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/maillog.txt";
+$mail_logfile = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/maillog.txt";
 
 
 

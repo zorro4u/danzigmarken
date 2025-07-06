@@ -1,7 +1,7 @@
 <?php
 namespace Dzg;
 
-require __DIR__.'/Mailcfg.php';
+require __DIR__.'/MailConfig.php';
 
 
 /***********************
@@ -19,22 +19,29 @@ class Mail
                         $mailto,
                         $subject,
                         $mailcontent);
-     * @param mixed $fromMail
-     * @param mixed $fromName
-     * @param mixed $toMail
+     * @param mixed $from_mail_address
+     * @param mixed $from_name
+     * @param mixed $to_mail_address
      * @param mixed $subject
      * @param mixed $content
      * @param mixed $attachments
      * @return bool
      */
-    public static function sendMyMail($fromMail, $fromName, $toMail, $subject, $content, $attachments=array()): bool
+    public static function sendMyMail(
+        $from_mail_address,
+        $from_name,
+        $to_mail_address,
+        $subject,
+        $content,
+        $attachments=array()
+        ): bool
     {
         $boundary = md5(uniqid(time()));
         $eol = PHP_EOL;
 
         // header
-        $header = "From: =?UTF-8?B?".base64_encode(stripslashes($fromName))."?= <".$fromMail.">".$eol;
-        $header .= "Reply-To: <".$fromMail.">".$eol;
+        $header = "From: =?UTF-8?B?".base64_encode(stripslashes($from_name))."?= <".$from_mail_address.">".$eol;
+        $header .= "Reply-To: <".$from_mail_address.">".$eol;
         $header .= "MIME-Version: 1.0".$eol;
         if (is_array($attachments) && 0<count($attachments)) {
             $header .= "Content-Type: multipart/mixed; boundary=\"".$boundary."\"";
@@ -53,7 +60,7 @@ class Mail
             $message .= $content.$eol;
 
             // attachments
-            foreach ($attachments as $filename=>$filecontent) {
+            foreach ($attachments as $filename => $filecontent) {
                 $filecontent = chunk_split(base64_encode($filecontent));
                 $message .= "--".$boundary.$eol;
                 $message .= "Content-Type: application/octet-stream; name=\"".$filename."\"".$eol;
@@ -73,7 +80,7 @@ class Mail
         $subject = "=?UTF-8?B?".base64_encode($subject)."?=";
 
         // send mail
-        return mail($toMail, $subject, $message, $header);
+        return mail($to_mail_address, $subject, $message, $header);
     }
 
 }

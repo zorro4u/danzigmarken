@@ -2,8 +2,8 @@
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/Mailcfg.php";
-use Dzg\Mailcfg;
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/MailConfig.php";
+use Dzg\MailConfig;
 
 // Überprüfen, ob der Benutzer eingeloggt ist
 if (isset($_SESSION['loggedin'])
@@ -11,14 +11,14 @@ if (isset($_SESSION['loggedin'])
 
 
 // Datei zum Leeren der IP-Adressen
-#$logFile = 'log/ip_log.txt';
-$logFile = Mailcfg::$maillogFile;
+#$logfile = 'log/ip_log.txt';
+$logfile = MailConfig::$mail_logfile;
 
 // Überprüfe, ob die Datei existiert
-if (file_exists($logFile)) {
+if (file_exists($logfile)) {
 
     // die Datei leeren
-    file_put_contents($logFile, "", LOCK_EX);
+    file_put_contents($logfile, "", LOCK_EX);
     echo '
     <div style="font-family: Verdana; color: green; border: 1px solid black; padding: 10px; border-radius: 5px; margin: 20 auto 20px auto; text-align: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 90%; width: 390px;line-height:31px;font-size:22px;">
     Die IP-Logdatei wurde geleert.<br><br>

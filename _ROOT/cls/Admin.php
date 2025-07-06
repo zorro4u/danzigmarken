@@ -33,7 +33,6 @@ class Admin
     public static $count23;
     public static $count24;
     public static $count25;
-
     public static $userid;
     protected static $show_form;
 

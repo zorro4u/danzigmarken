@@ -2,25 +2,25 @@
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/Mailcfg.php";
-use Dzg\Mailcfg;
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/MailConfig.php";
+use Dzg\MailConfig;
 
 // Überprüfen, ob der Benutzer eingeloggt ist
 if (isset($_SESSION['loggedin'])
     && $_SESSION['loggedin'] === true):
 
     // Der Pfad zur Logdatei
-    #$logFile = 'log/ip_log.txt';
-    $logFile = Mailcfg::$maillogFile;
+    #$logfile = 'log/ip_log.txt';
+    $logfile = MailConfig::$mail_logfile;
 
     // Überprüfen, ob die Datei existiert
-    if (file_exists($logFile)) {
+    if (file_exists($logfile)) {
 
         // Lese den Inhalt der Logdatei
-        $logData = file_get_contents($logFile);
+        $log_data = file_get_contents($logfile);
 
         // Überprüfen, ob die Logdatei leer ist
-        if (trim($logData) === "") {
+        if (trim($log_data) === "") {
             echo '
             <div style="font-family: Verdana; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin: 20px auto; text-align: center; border: 1px solid #ccc; background-color: #f9f9f9; max-width: 90%; width: 300px;">
             Keine Eintr&auml;ge vorhanden.
@@ -30,26 +30,26 @@ if (isset($_SESSION['loggedin'])
             // Gib den Inhalt der Logdatei aus
             echo '
             <div style="font-family: Verdana; font-size:15px; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin: 20px auto; text-align: center; border: 1px solid #ccc; background-color: #f9f9f9; max-width: 90%; width: 80%;">
-            <pre>' . htmlspecialchars($logData) . '</pre>
+            <pre>' . htmlspecialchars($log_data) . '</pre>
             </div>';
 
 
             // Hole die Dateigröße in Bytes
-            $fileSize = filesize($logFile);
+            $file_size = filesize($logfile);
             $unit = "Byte";
 
             // Hier wird die Größe in Kilobytes (KB) berechnet
-            $fileSizeKB = $fileSize / 1024;
+            $file_size_kB = $file_size / 1024;
 
             // Hier wird die Größe in Megabytes (MB) berechnet
-            $fileSizeMB = $fileSize / (1024 * 1024);
+            $file_size_MB = $file_size / (1024 * 1024);
 
 
-            if ($fileSizeMB > 1){
-                $fileSize = $fileSizeMB;
+            if ($file_size_MB > 1){
+                $file_size = $file_size_MB;
                 $unit = "MByte";
-            } elseif ($fileSizeKB > 1) {
-                $fileSize = $fileSizeKB;
+            } elseif ($file_size_kB > 1) {
+                $file_size = $file_size_kB;
                 $unit = "kByte";
             }
 
@@ -74,7 +74,7 @@ if (isset($_SESSION['loggedin'])
             Log-Datei leeren
             </a><br />
             <span style='font-size:14px;line-height:30px;'>
-            Dateigr&ouml;&szlig;e: {$fileSize} {$unit}</span>
+            Dateigr&ouml;&szlig;e: {$file_size} {$unit}</span>
             </p><br />";
         }
     }

@@ -25,6 +25,13 @@ $auth   = new \PHPAuth\Auth($dbh, $config);
 
 
 
-// php composer.phar update
-// php composer.phar install
-// php composer.phar dump-autoload
+php composer.phar update
+php composer.phar install
+php composer.phar dump-autoload
+
+VSC Farbschema: CTRL+SHFT+P Color, Preferences: Color Theme, dark+
+VSC Farbschema: CTRL+, Color Theme, Workbench: Color Theme, dark_modern
+VSC Schriftgröße: CTRL+, Editor Font Size 16, Zoom: mouse wheel zoom
+
+Editorfenster: STRG+MausRad
+allg: STR+PLUS/MINUS

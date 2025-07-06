@@ -1,6 +1,6 @@
 <?php
 namespace Dzg;
-require_once __DIR__.'/Mailcfg.php';
+require_once __DIR__.'/MailConfig.php';
 
 
 /***********************
@@ -10,32 +10,32 @@ class RateLimiting
 {
     public static function run()
     {
-        $cfg = Mailcfg::$cfg;
-        $Maximale_Aufrufe = Mailcfg::$Maximale_Aufrufe;
+        $cfg = MailConfig::$cfg;
+        $maximale_aufrufe = MailConfig::$maximale_aufrufe;
 
         // Datei zum Speichern der IP-Adressen
-        #$logFile = __DIR__.'/log/ip_log.txt';
-        $logFile = Mailcfg::$maillogFile;
+        #$logfile = __DIR__.'/log/ip_log.txt';
+        $logfile = MailConfig::$mail_logfile;
 
         if ($cfg['Aufrufe_limitieren']):
 
         // Hole die IP-Adresse des Besuchers
-        $visitorIP = $_SERVER['REMOTE_ADDR'];
+        $visitor_ip = $_SERVER['REMOTE_ADDR'];
 
         // Lese die Logdatei, um die bisherigen IP-Einträge zu zählen
-        $logData = file_exists($logFile) ? file_get_contents($logFile) : '';
-        $ipList = explode("\n", trim($logData));
+        $log_data = file_exists($logfile) ? file_get_contents($logfile) : '';
+        $ip_list = explode("\n", trim($log_data));
 
         // Zähle, wie oft die IP-Adresse bereits eingetragen ist
-        $ipCount = 0;
-        foreach ($ipList as $line) {
-            if ($line === $visitorIP) {
-                $ipCount++;
+        $ip_count = 0;
+        foreach ($ip_list as $line) {
+            if ($line === $visitor_ip) {
+                $ip_count++;
             }
         }
 
         // Wenn die IP-Adresse mehr als 100 Mal aufgerufen wurde, zeige eine Warnung
-        if ($ipCount >= $Maximale_Aufrufe) {
+        if ($ip_count >= $maximale_aufrufe) {
             $output = '
             <style>
                 .centered-container {
@@ -82,7 +82,7 @@ class RateLimiting
 
         else {
             // Füge die IP-Adresse in die Logdatei ein
-            file_put_contents($logFile, $visitorIP . "\n", FILE_APPEND | LOCK_EX);
+            file_put_contents($logfile, $visitor_ip . "\n", FILE_APPEND | LOCK_EX);
         }
 
         endif;

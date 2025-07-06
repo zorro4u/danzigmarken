@@ -62,7 +62,7 @@ class Kontakt
      */
     private static function dataPreparation()
     {
-        $cfg = Mailcfg::$cfg;
+        $cfg = MailConfig::$cfg;
         $question = [];
 
         if ($cfg['Sicherheitsfrage']) {
@@ -107,11 +107,11 @@ class Kontakt
         #require $_SERVER['DOCUMENT_ROOT'].'/kontakt/mail-setup.php';
         #global $cfg, $smtp;
 
-        #Mailcfg::load();
-        $cfg = Mailcfg::$cfg;
-        $smtp = Mailcfg::$smtp;
-        #$smtp = array_merge(Mailcfg::$smtp, Mailcfg::$smtp1);
-        $datenschutzerklaerung = Mailcfg::$datenschutzerklaerung;
+        #MailConfig::load();
+        $cfg = MailConfig::$cfg;
+        $smtp = MailConfig::$smtp;
+        #$smtp = array_merge(MailConfig::$smtp, MailConfig::$smtp1);
+        $datenschutzerklaerung = MailConfig::$datenschutzerklaerung;
 
         $success = false;
         $formMessage = '';

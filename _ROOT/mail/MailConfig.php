@@ -3,13 +3,13 @@ namespace Dzg;
 
 date_default_timezone_set('Europe/Berlin');
 
-Mailcfg::load();
+MailConfig::load();
 
 
 /***********************
- * Summary of Mailcfg
+ * Summary of MailConfig
  */
-class Mailcfg
+class MailConfig
 {
 
     public static $smtp;
@@ -18,7 +18,7 @@ class Mailcfg
     public static $cfg;
     public static $danke;
     public static $datenschutzerklaerung;
-    public static $Maximale_Aufrufe;
+    public static $maximale_aufrufe;
     public static $Passwort_fuer_Login_Bereich;
     public static $zeichenlaenge_firma;
     public static $zeichenlaenge_vorname;
@@ -26,12 +26,12 @@ class Mailcfg
     public static $zeichenlaenge_email;
     public static $zeichenlaenge_telefon;
     public static $zeichenlaenge_betreff;
-    public static $maillogFile;
+    public static $mail_logfile;
 
 
     public static function load()
     {
-        require "mail-setup.php";
+        require "mail_setup.php";
 /*
         global
         $smtp,
@@ -55,7 +55,7 @@ class Mailcfg
         self::$cfg = $cfg;
         self::$danke = $danke;
         self::$datenschutzerklaerung = $datenschutzerklaerung;
-        self::$Maximale_Aufrufe = $Maximale_Aufrufe;
+        self::$maximale_aufrufe = $Maximale_Aufrufe;
         self::$Passwort_fuer_Login_Bereich = $Passwort_fuer_Login_Bereich;
         self::$zeichenlaenge_firma = $zeichenlaenge_firma;
         self::$zeichenlaenge_vorname = $zeichenlaenge_vorname;
@@ -63,7 +63,7 @@ class Mailcfg
         self::$zeichenlaenge_email = $zeichenlaenge_email;
         self::$zeichenlaenge_telefon = $zeichenlaenge_telefon;
         self::$zeichenlaenge_betreff = $zeichenlaenge_betreff;
-        self::$maillogFile = $maillogFile;
+        self::$mail_logfile = $mail_logfile;
 
     }
 }

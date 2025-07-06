@@ -1,4 +1,6 @@
 <?php
+// --> Auth.php //
+
 /**
  * A Compatibility library with PHP 5.5's simplified password hashing API.
  *
@@ -12,7 +14,7 @@ namespace {
     if (!defined('PASSWORD_BCRYPT')) {
         /**
          * PHPUnit Process isolation caches constants, but not function declarations.
-         * So we need to check if the constants are defined separately from 
+         * So we need to check if the constants are defined separately from
          * the functions to enable supporting process isolation in userland
          * code.
          */

@@ -119,8 +119,8 @@ class Pw_forget
 
                 // === EMAIL ===
                 //
-                $cfg = Mailcfg::$cfg;
-                $smtp = Mailcfg::$smtp;
+                $cfg = MailConfig::$cfg;
+                $smtp = MailConfig::$smtp;
 
                 $ip = $_SERVER['REMOTE_ADDR'];
                 $host = getHostByAddr($ip);
