@@ -377,7 +377,7 @@ class Details
             'datum',  // 'Datum',
             'kat12',  // 'StempNr.',
             'kat13',  // 'Wolff',
-            'kat14',  // 'Michel',
+            #'kat14',  // 'Michel',  # ALT!!
             'kat15',  // 'Frankatur',
             'kat16',  // 'Zielort',
             'kat17',  // 'Notiz.1', # Gruppe
@@ -386,7 +386,7 @@ class Details
             'kat20',  // 'Ansicht',
             'kat21',  // 'Attest',
             #'kat22',  // 'Notiz.2', # Bild
-            #'kat23',  // 'Bildherkunft',
+            'kat23',  // 'Michel',  # NEU!!
             #'kat24',  // '',
             'created', // 'erfasst',
             'changed', // 'geändert',
@@ -405,7 +405,7 @@ class Details
             'thema' => 'Thema',
             'datum' => 'Datum',
             'kat17' => 'Notiz',
-            'kat23' => 'Bildherkunft',
+            #'kat23' => 'Michel',
         ];
 
         // Kateg.bezeichnung (kat10-kat29) aus DB holen

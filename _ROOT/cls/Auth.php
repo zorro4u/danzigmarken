@@ -18,6 +18,10 @@ require_once __DIR__.'/Database.php';
 include_once __DIR__.'/../inc/auth.password.func.php';
 include_once __DIR__.'/Tools.php';
 
+require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
+use PHPAuth\Config as PHPAuthConfig;
+use PHPAuth\Auth as PHPAuth;
+
 
 /****************************
  * Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
