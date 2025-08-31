@@ -279,4 +279,19 @@ class Tools
         }
     }
 
+
+    public static function move_k14_k23()
+    {
+        $stmt = "SELECT id, kat14 FROM dzg_group WHERE kat14 <> '' ORDER BY id";
+        $result = Database::sendSQL($stmt, [], 'fetchall');
+
+        $stmt = "UPDATE dzg_file SET kat23=:kat14 WHERE id_stamp=:id";
+        foreach ($result as $data) {
+            Database::sendSQL($stmt, $data);
+        }
+        $stmt = "UPDATE dzg_group SET kat14=Null";
+        #Database::sendSQL($stmt, []);
+
+    }
+
 }

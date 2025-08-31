@@ -8,7 +8,6 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 #require_once __DIR__.'/../mail/Captcha.php';
 
 require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
-use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
 
 
@@ -74,17 +73,7 @@ class Kontakt
             if (empty($_POST['answer']))
                 $_SESSION['Sicherheitsfrage'] = $question[0];
         }
-/*
-        if ($cfg['Sicherheitscode']) {
-            $question = AntiSpam::getRandomQuestion();      # [id, question]
 
-            if (empty($_POST['sicherheitscode']))
-                $_SESSION['captcha_frage'] = $question;
-
-            #$captcha = new CaptchaBuilder;
-            #$captcha->build();
-        }
-*/
         // ggf. übrig gebliebene Werte löschen
         if ($cfg['Sicherheitscode'] && empty($_POST['sicherheitscode'])) {
             unset($_SESSION['captcha_code'], $_SESSION['captcha'], $_SESSION['phrase']);
@@ -94,7 +83,6 @@ class Kontakt
         Tools::lastSite(['index', 'index2', 'details', 'settings', 'admin']);
 
         self::$question = $question;
-        #self::$captcha = $captcha;
     }
 
 

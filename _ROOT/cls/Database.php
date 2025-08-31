@@ -45,7 +45,7 @@ class Database
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NUM,
             #PDO::ATTR_EMULATE_PREPARES   => false,
         ];
-        # vs. PDO::FETCH_BOTH, PDO::FETCH_ASSOC / PDO::FETCH_COLUMN
+        # vs. PDO::FETCH_BOTH, PDO::FETCH_ASSOC / PDO::FETCH_COLUMN, PDO::FETCH_KEY_PAIR
 
         $maria_host  = "mysql:host=$host;dbname=$database;charset=$charset";
 
@@ -109,7 +109,7 @@ class Database
             default:
                 $qry->setFetchMode(PDO::FETCH_ASSOC);
 
-            // PDO::FETCH_NAMED PDO::FETCH_CLASS PDO::FETCH_OBJ PDO::FETCH_BOUND PDO::FETCH_LAZY
+            // PDO::FETCH_NAMED PDO::FETCH_CLASS PDO::FETCH_OBJ PDO::FETCH_BOUND PDO::FETCH_LAZY PDO::FETCH_KEY_PAIR
         }
 
         // die zu sendenden Daten an ihr Format binden und dem SQL-Befehl hinzufügen

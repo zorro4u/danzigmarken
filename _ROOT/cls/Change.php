@@ -193,7 +193,7 @@ class Change extends Details
                 ':ip' => $remaddr ];
             $stmt1 = "UPDATE dzg_file SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
             $stmt2 = "UPDATE dzg_fileplace SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
-            $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=;ip, chg_by=:by WHERE id=:id";
+            $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
 
             Database::sendSQL($stmt1, $data);
             Database::sendSQL($stmt2, $data);
@@ -450,7 +450,7 @@ class Change extends Details
 
                 // update gruppe
                 if (!empty($s)) {
-                    $s['ip'] = $remaddr;
+                    $s['chg_ip'] = $remaddr;
                     $set = '';
                     $data = [];
 
@@ -471,7 +471,8 @@ class Change extends Details
                 if (!empty($d)) {
                     $d['ip'] = $remaddr;
                     $set1 = '';
-                    $data1 = $data2 = [];
+                    $data1 = [];
+                    $data2 = [];
 
                     foreach ($d AS $spalte => $input_wert) {
                         $set1 .= $spalte."=:".$spalte.", ";
