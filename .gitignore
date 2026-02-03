@@ -1,6 +1,6 @@
 .org
-_info/
-_py/
+_py*/
+data/_*
 data/*.*
 data/*/*/*.jpg
 data/*/*/*.webp
@@ -15,7 +15,7 @@ vendor/
 yiisite/
 laravelsite/
 
-.gitignore_X
+_*.*
 .htaccess*
 *.ffs_db
 *.ffs_lock
@@ -27,7 +27,7 @@ sitemap.xml
 *OLD*
 *.code-workspace
 about.txt
-account_data.php
+account_data.p*
 
 pipfile
 pyrightconfig.json

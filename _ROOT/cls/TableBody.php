@@ -160,7 +160,7 @@ class TableBody
                 $idx = "";
                 // grau formatieren
                 if (($spalte_db == 'print')) {
-                    $idx = "idx' title='in Druckauswahl aufnehmen' style='color:hsl(0,0%,55%); font-style:italic";
+                    $idx = "idx noprint' title='in Druckauswahl aufnehmen' style='color:hsl(0,0%,55%); font-style:italic";
                 }
                 $output .= "<th class='head-cell sortx {$idx}'>{$spalte_web}</th>";
             }
@@ -246,10 +246,10 @@ class TableBody
                         # onclick='return false;' .. disabled='disabled'  onclick='prn_toogle(".$stamp[$id].",".$data_rev.")'
 
                         $output .= "
-                                <td class='data-cell' title='druck ja/nein'
+                                <td class='data-cell noprint' title='druck ja/nein'
                                     style='text-align:center;'>
                                 <input type='checkbox' name='{$spalte_db}'
-                                    id='prn_{$fid}' class='chkbx' {$checked} onclick='prn_toogle({$fid},{$data_rev})' />
+                                    id='prn_{$fid}' class='chkbx noprint' {$checked} onclick='prn_toogle({$fid},{$data_rev})' />
                                 <label for='prn_{$fid}'></label></td>";
 
                     // Ansicht
