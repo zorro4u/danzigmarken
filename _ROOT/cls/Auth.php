@@ -322,8 +322,6 @@ class Auth
      */
     private static function getLoginData(int $userid=0): array
     {
-        $login_data = [];
-
         // mit Autologin
         if (!$userid) {
 
@@ -342,6 +340,9 @@ class Auth
             $data = [':userid', $userid];   # int
             $login_data = Database::sendSQL($stmt, $data, 'fetch');
         }
+
+        # wenn kein Eintrag gefunden wurde
+        if (!$login_data) $login_data = [];
 
         return $login_data;
     }
