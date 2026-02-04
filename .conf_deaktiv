@@ -1,6 +1,0 @@
-# NGINX:
- 
-# keine Bilder indizieren
-location ~* \.(png|je?p|webp|svg|gif)$ {
-add_header X-Robots-Tag "noindex";
-}
