@@ -40,7 +40,7 @@ E-Mail:
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>
 
 
-<?php if (Auth::isCheckedIn()): ?>
+<?php // if (Auth::isCheckedIn()): ?>
 
 <br />
 <p><span style='font-style:italic;text-decoration:underline'>
@@ -61,7 +61,7 @@ Web-Hoster:</span><br />
 www.rainbow-web.com</a>&nbsp;
 <img src='/assets/pic/extlink.png' width='12' height='12'></p>
 
-<?php endif; ?>
+<?php // endif; ?>
 
 </div>
 

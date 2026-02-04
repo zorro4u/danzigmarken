@@ -13,21 +13,21 @@ overflow: hidden;
 font: 0/0 serif;
 z-index: -1;
 font: inherit;
-z-index: auto; 
+z-index: auto;
 */
 
 /*** Seiten-Einrichtung ***
     * erste Seite *
-@page :first { 
-    margin-top: 4cm; 
+@page :first {
+    margin-top: 4cm;
 }
     * linke Seite *
-@page :left  { 
-    margin-right: 2.5cm; 
+@page :left  {
+    margin-right: 2.5cm;
 }
     * rechte Seite *
-@page :right { 
-    margin-left: 2.5cm; 
+@page :right {
+    margin-left: 2.5cm;
 }
     * Leerseite *
 @page :blank {
@@ -41,10 +41,10 @@ z-index: auto;
 
 /**************************************************/
 /* A4 Hochformat, Ränder: oben rechts unten links */
-@page { 
-    size: A4 landscape;
-    size: A4 portrait;
-    margin: 1.5cm 1cm 1cm 1cm; 
+@page {
+    size: A4 landscape;     /* für Übersichtstabelle */
+    size: A4 portrait;      /* für Detailausdruck */
+    margin: 1.5cm 1cm 1cm 1cm;
 }
 
 /* Hintergrund ausblenden, Schrift schwarz */
@@ -112,10 +112,10 @@ div.detail-thumb_akt {
 }
 
 /* Bild-Hover Effekte entfernen */
-div.detail-pic:hover, 
+div.detail-pic:hover,
 div.detail-pic:focus,
 div.detail-pic:active,
-div.detail-thumb:hover, 
+div.detail-thumb:hover,
 div.detail-thumb:focus,
 div.detail-thumb:active {
     background-color: unset;
@@ -158,9 +158,9 @@ div.fuss {
 */
 
 td.fid {
-    color:hsl(0, 0%, 80%); 
+    color:hsl(0, 0%, 80%);
     font-size: 80%;
-    font-style: italic; 
+    font-style: italic;
     padding-top: 15px;
 }
 
@@ -195,7 +195,7 @@ div.navi_suche {
 }
 
 tr.row-body:hover,
-tr.row-body:focus, 
+tr.row-body:focus,
 tr.row-body:active {
     background-color: unset;
     border-left: unset;

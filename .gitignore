@@ -1,37 +1,38 @@
-.org
-_info/
-_py/
-data/*.*
-data/*/*/*.jpg
-data/*/*/*.webp
-data/*/*/*.png
-download/work/
-upload/*.php
-upload/files/*.php
-test/
+!*.gitignore
+*.code-workspace
+
+# passwords
+account_data.p*
+
+# Verzeichnisse
+*/data/_*
+*/download/work/
 fontawesome*/
 bootstrap*/
 vendor/
 yiisite/
 laravelsite/
+_py*/
 
-.gitignore_X
+# Dateien
 .htaccess*
+robots*.txt
+google*.html
+sitemap.xml
+_*.*
 *.ffs_db
 *.ffs_lock
 *.db
 *.pdf
-robots*.txt
-google*.html
-sitemap.xml
 *OLD*
-*.code-workspace
 about.txt
-account_data.php
+*/data/*.*
+*/data/*/*/*.jpg
+*/data/*/*/*.webp
+*/data/*/*/*.png
+*/upload/*.php
+*/upload/files/*.php
 
-pipfile
-pyrightconfig.json
-requirements.txt
 
 
 ##------------------##

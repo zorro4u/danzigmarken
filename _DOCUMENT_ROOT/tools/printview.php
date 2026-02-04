@@ -416,6 +416,7 @@ class PrintView
             <img src='/".htmlspecialchars($stamps[$akt_file_idx]['small']).
             "' width='300' height='' alt='".
             htmlspecialchars($stamps[$akt_file_idx]['name'])."'>";
+            // htmlspecialchars($stamps[$akt_file_idx]['small'])."'>";
 
         $output .= "</div></td></tr></tbody>";
         $output .= "</table>";
@@ -486,7 +487,7 @@ class PrintView
                 // cut = 40 Einträge/Thema --> 20 Seiten (gesamt x5: 100 Seiten, 50 Blätter)
                 $id_cut = 40;
                 ++$i;
-                if ($i == $id_cut) break;
+                // if ($i == $id_cut) break;
             }
         }
     }

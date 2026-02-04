@@ -208,7 +208,7 @@ class Database
                     for ($i=0; $i < count($dataset); ++$i) {
                         if (is_int($dataset[$i])) {
                             $qry->bindParam($i+1, $dataset[$i], PDO::PARAM_INT);
-                        } elseif (is_string($i)) {
+                        } elseif (is_string($dataset[$i])) {
                             $qry->bindParam($i+1, $dataset[$i], PDO::PARAM_STR);
                         }
                     }
@@ -263,9 +263,9 @@ class Database
 
         if (!empty($data)) {
             for ($i=0; $i < count($data); $i++) {
-                if (is_int($i)) {
+                if (is_int($data[$i])) {
                     $qry->bindParam($i+1, $data[$i], PDO::PARAM_INT);
-                } elseif (is_string($i)) {
+                } elseif (is_string($data[$i])) {
                     $qry->bindParam($i+1, $data[$i], PDO::PARAM_STR);
                 }
             }
