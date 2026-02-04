@@ -322,6 +322,8 @@ class Auth
      */
     private static function getLoginData(int $userid=0): array
     {
+        $login_data = [];
+
         // mit Autologin
         if (!$userid) {
 
@@ -360,7 +362,7 @@ class Auth
     }
 
     /***********************
-     * Summary of setLoginSession
+     * Summary of setAutologinSession
      */
     public static function setAutologinSession($login_id, $identifier)
     {
