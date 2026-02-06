@@ -140,7 +140,7 @@ class Download
             FROM dzg_fileplace ort
             LEFT JOIN dzg_file dat ON dat.id=ort.id_datei
             LEFT JOIN dzg_group sta ON sta.id=dat.id_stamp
-            LEFT JOIN dzg_thema the ON the.id=dat.id_thema
+            LEFT JOIN dzg_dirsub2 the ON the.id=dat.id_thema
             LEFT JOIN dzg_dirsub2 sub2 ON sub2.id=ort.id_sub2
             LEFT JOIN dzg_dirliste dir ON dir.id=ort.id_dirliste
             LEFT JOIN dzg_filesuffix suf ON suf.id=ort.id_suffix

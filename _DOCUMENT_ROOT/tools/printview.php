@@ -71,7 +71,7 @@ class PrintView
     }
     protected static function themeListeHolen(): array
     {
-        $sql = "SELECT thema FROM dzg_thema";
+        $sql = "SELECT thema FROM dzg_dirsub2";
 
         $theme_array = Database::sendSQL($sql, [], 'fetchall', 'num');
 
@@ -117,7 +117,7 @@ class PrintView
             FROM dzg_fileplace ort
             LEFT JOIN dzg_file dat ON dat.id=ort.id_datei
             LEFT JOIN dzg_group sta ON sta.id=dat.id_stamp
-            LEFT JOIN dzg_thema the ON the.id=dat.id_thema
+            LEFT JOIN dzg_dirsub2 the ON the.id=dat.id_thema
             LEFT JOIN dzg_dirsub2 sub2 ON sub2.id=ort.id_sub2
             LEFT JOIN dzg_dirliste dir ON dir.id=ort.id_dirliste
             LEFT JOIN dzg_filesuffix suf ON suf.id=ort.id_suffix
@@ -219,11 +219,11 @@ class PrintView
         $stmt = "SELECT
             dat.id fid, sta.id gid, ort.name, the.thema,
             dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
-            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name_orig, suf.suffix, sta.*, dat.*
+            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix, sta.*, dat.*
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
@@ -259,12 +259,12 @@ class PrintView
                 // (Anzeigebilder ändern -> auszudruckende Bildqualität ohne Wasserzeichen)
                 if ($v['sub1'] == 'small') {
                     $ffn['small'] = $v['webroot'].'/export.medium/'.$v['sub2'].
-                                    '/m_'.$v['name_orig'].$v['suffix'];
+                                    '/m_'.$v['name'].$v['suffix'];
                     #$ffn['small'] = $v['webroot'].'/large/'.$v['sub2'].
-                    #   '/l_'.$v['name_orig'].$v['suffix'];
+                    #   '/l_'.$v['name'].$v['suffix'];
                 } else {
                     $ffn[$v['sub1']] = $v['webroot'].'/'.$v['sub1'].'/'.$v['sub2'].'/'.
-                                        $v['prefix'].$v['name_orig'].$v['suffix'];
+                                        $v['prefix'].$v['name'].$v['suffix'];
                 }
 
                 $j++;   // Bildzähler
