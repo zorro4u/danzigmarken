@@ -236,7 +236,7 @@ class Details
                 FROM dzg_file AS dat
                     LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                     LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                    LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                    LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                     LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                     LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                     LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
@@ -458,11 +458,11 @@ class Details
         $stmt = "SELECT
             dat.id fid, sta.id gid, ort.name, the.thema,
             dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
-            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name_orig, suf.suffix, sta.*, dat.*
+            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix, sta.*, dat.*
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
@@ -518,7 +518,7 @@ class Details
 
                 // $ffn['original'=>... , 'large'=> ... , ...]
                 $ffn[$v['sub1']] = $v['webroot'].'/'.$v['sub1'].'/'.$v['sub2'].'/'.
-                                    $v['prefix'].$v['name_orig'].$v['suffix'];
+                                    $v['prefix'].$v['name'].$v['suffix'];
 
                 $j++;   // Bildzähler
 

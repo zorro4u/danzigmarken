@@ -49,7 +49,7 @@ class TableData
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
             WHERE {$filter}
@@ -110,12 +110,12 @@ class TableData
 
         $stmt = "SELECT
                     dat.id AS fid, sta.id AS gid, the.thema AS thema,
-                    list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name_orig, suf.suffix,
+                    list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix,
                     sta.*, dat.*
                 FROM dzg_file AS dat
                     LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                     LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                    LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                    LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                     LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                     LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                     LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
@@ -138,13 +138,13 @@ class TableData
             // erzeugt den Fullfilename der Thumb-Datei aus den einzelnen Komponenten
             $stamps_db[$idx]['thumb'] =
                 $stamp['webroot'].'/'.$stamp['sub1'].'/'.$stamp['sub2'].'/'.
-                $stamp['prefix'].$stamp['name_orig'].$stamp['suffix'];
+                $stamp['prefix'].$stamp['name'].$stamp['suffix'];
 
             unset($stamps_db[$idx]['webroot']);
             unset($stamps_db[$idx]['sub1']);
             unset($stamps_db[$idx]['sub2']);
             unset($stamps_db[$idx]['prefix']);
-            unset($stamps_db[$idx]['name_orig']);
+            unset($stamps_db[$idx]['name']);
             unset($stamps_db[$idx]['suffix']);
 
             // Sprungmarken zur vorherigen und nächsten Datei/Gruppe
@@ -181,11 +181,11 @@ class TableData
 
         $stmt =
             "SELECT dat.id AS fid, list.webroot, sub1.sub1, sub2.sub2, pre.prefix,
-                ort.name_orig, suf.suffix
+                ort.name, suf.suffix
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                 LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
@@ -200,7 +200,7 @@ class TableData
         foreach ($stamps as $k => $v) {
             $thb_ffn[$k]['fid'] = $v['fid'];
             $thb_ffn[$k]['thumb'] = $v['webroot'].'/'.$v['sub1'].'/'.$v['sub2'].'/'.
-                                    $v['prefix'].$v['name_orig'].$v['suffix'];
+                                    $v['prefix'].$v['name'].$v['suffix'];
 
             // alle Einzeldateien der Gruppe erhalten Sprungmarke zur nächsten Gruppe
             #$_SESSION['jump'][$gid][$v['fid']] = $tmp;
@@ -229,7 +229,7 @@ class TableData
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
                 LEFT JOIN thb.thumbs AS thb ON thb.id=ort.id_thumb

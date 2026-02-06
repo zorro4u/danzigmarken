@@ -389,7 +389,7 @@ class TableNavi
         $sess_thema = Table::$_session['thema'];
 
         $theme_db = ['- alle -'];
-        $stmt = "SELECT thema FROM dzg_thema ORDER BY thema DESC";
+        $stmt = "SELECT thema FROM dzg_dirsub2 ORDER BY thema DESC";
         $theme_qry = Database::sendSQL($stmt, [], 'fetchall', 'num');
 
         foreach ($theme_qry AS $entry) {
