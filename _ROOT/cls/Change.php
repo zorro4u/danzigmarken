@@ -94,7 +94,7 @@ class Change extends Details
         //
         // DropDown-Bezeichnungen holen für Thema, Frankatur, Ansicht, Attest
         $stmt = "SELECT * FROM (
-            SELECT sub2 FROM dzg_dirsub2 ORDER BY sub2) AS s1, (
+            SELECT thema FROM dzg_thema ORDER BY thema) AS s1, (
             SELECT kat15 FROM dzg_kat15 ORDER BY kat15) AS s2, (
             SELECT kat20 FROM dzg_kat20 ORDER BY kat20 DESC) AS s3, (
             SELECT kat21 FROM dzg_kat21 ORDER BY kat21) AS s4";
@@ -138,7 +138,7 @@ class Change extends Details
         // kat20              -> kat20(kat20)
         // kat21              -> kat21(kat21)
         // kat15              -> kat15(kat15)
-        // thema              -> dzg_dirsub2(sub2)
+        // thema              -> dzg_thema(thema)
 
         $userid = $_SESSION['userid'];
         $stamps = self::$stamps;
@@ -277,7 +277,7 @@ class Change extends Details
                             :kat16, :kat17, :ip, :by, 1)";
 
                 $data1 = [
-                    ':id_thema' => (int)$stamps[$akt_file_idx]['id_sub2'],  # int
+                    ':id_thema' => (int)$stamps[$akt_file_idx]['id_thema'],  # int
                     ':datum'    => $stamps[$akt_file_idx]['datum'],
                     ':kat10'    => $stamps[$akt_file_idx]['kat10'],
                     ':kat11'    => $stamps[$akt_file_idx]['kat11'],
@@ -398,10 +398,10 @@ class Change extends Details
             if (!empty($input)) {
                 /*
                 Update der Spalten entspr. der Abhängigkeiten!!
-                thema              -> dzg_dirsub2(sub2)
+                thema              -> dzg_thema(thema)
                 kat20              -> kat20(kat20)
-                kat10-kat14, datum -> dzg_group, fk:sub2
-                kat21-24           -> dzg_file, fk:sub2,kat20,stamp,(suff,liste)
+                kat10-kat14, datum -> dzg_group, fk:thema
+                kat21-24           -> dzg_file, fk:thema,kat20,stamp,(suff,liste)
                 */
 
                 if (isset($input['kat10'])) $s['kat10'] = $input['kat10'];
@@ -440,11 +440,11 @@ class Change extends Details
 */
                 if (isset($input['thema'])) {
                     // id holen
-                    $stmt = "SELECT id FROM dzg_dirsub2 WHERE sub2 = :sub2";
-                    $data = [':sub2' => $input['thema']];
-                    $id_sub2 = (int)Database::sendSQL($stmt, $data, 'fetch', 'num')[0];
-                    $s['id_thema'] = $id_sub2;
-                    $d['id_thema'] = $id_sub2;
+                    $stmt = "SELECT id FROM dzg_thema WHERE thema = :thema";
+                    $data = [':thema' => $input['thema']];
+                    $id_theme = (int)Database::sendSQL($stmt, $data, 'fetch', 'num')[0];
+                    $s['id_thema'] = $id_theme;
+                    $d['id_thema'] = $id_theme;
                 }
 
 

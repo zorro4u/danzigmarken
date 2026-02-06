@@ -49,7 +49,7 @@ class TableData
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
             WHERE {$filter}
@@ -109,13 +109,13 @@ class TableData
         # LEFT JOIN thumbs AS thb ON thb.id=ort.id_thumb  ... (MariaDB)
 
         $stmt = "SELECT
-                    dat.id AS fid, sta.id AS gid, the.sub2 AS thema,
+                    dat.id AS fid, sta.id AS gid, the.thema AS thema,
                     list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name_orig, suf.suffix,
                     sta.*, dat.*
                 FROM dzg_file AS dat
                     LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                     LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                    LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+                    LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
                     LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                     LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                     LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
@@ -185,7 +185,7 @@ class TableData
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                 LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
@@ -229,7 +229,7 @@ class TableData
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
                 LEFT JOIN thb.thumbs AS thb ON thb.id=ort.id_thumb

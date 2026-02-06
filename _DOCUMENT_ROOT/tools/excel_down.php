@@ -103,7 +103,7 @@ class Download
      */
     public static function bestandsabfrage()
     {
-        $col = "the.sub2 thema, sta.datum,
+        $col = "the.thema, sta.datum,
             sta.kat10, sta.kat11, sta.kat12, sta.kat13, sta.kat14,
             sta.kat15, sta.kat16, sta.kat17, sta.kat18, sta.kat19,
             dat.kat20, dat.kat21, dat.kat22, dat.kat23, dat.kat24,
@@ -140,7 +140,7 @@ class Download
             FROM dzg_fileplace ort
             LEFT JOIN dzg_file dat ON dat.id=ort.id_datei
             LEFT JOIN dzg_group sta ON sta.id=dat.id_stamp
-            LEFT JOIN dzg_dirsub2 the ON the.id=dat.id_thema
+            LEFT JOIN dzg_thema the ON the.id=dat.id_thema
             LEFT JOIN dzg_dirsub2 sub2 ON sub2.id=ort.id_sub2
             LEFT JOIN dzg_dirliste dir ON dir.id=ort.id_dirliste
             LEFT JOIN dzg_filesuffix suf ON suf.id=ort.id_suffix

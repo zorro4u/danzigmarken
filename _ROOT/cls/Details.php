@@ -194,9 +194,9 @@ class Details
         }
         // Array in String rückwandeln und am Anfang 'id' ersetzen
         $tmp = implode(", ", $tmp);
-        $sort1 = 'theme'.substr($tmp, 2);
+        $sort1 = 'thema'.substr($tmp, 2);
 
-        $select = "dat.id fid, sta.id gid, the.id theme,
+        $select = "dat.id fid, sta.id gid, the.id thema,
             sta.kat10, sta.datum, sta.kat11, sta.kat12, sta.kat13, sta.kat14, sta.kat15,
             sta.kat16, sta.kat17, dat.kat20, dat.kat21, dat.kat22, dat.kat23";
 
@@ -236,7 +236,7 @@ class Details
                 FROM dzg_file AS dat
                     LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                     LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                    LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+                    LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
                     LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                     LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                     LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
@@ -364,11 +364,6 @@ class Details
         }
 
 
-        // Der Name der Datenbank-Tabelle (wird nicht weiter verwendet)
-        $table = [
-            "thumbs", "dzg_file", "dzg_group", "dzg_dirliste", "dzg_dirsub1", "dzg_dirsub2",
-            "dzg_fileprefix", "dzg_filesuffix", "dzg_katbezeichnung",];
-
         // im Formular anzuzeigende DB-Spalten (incl. Reihenfolge); Name muss mit DB übereinstimmen
         $show_db_spalten = [
             'thema',  // 'Thema',
@@ -461,13 +456,13 @@ class Details
             sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23, sta.id, dat.id";
 
         $stmt = "SELECT
-            dat.id fid, sta.id gid, ort.name, the.sub2 thema,
+            dat.id fid, sta.id gid, ort.name, the.thema,
             dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
             list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name_orig, suf.suffix, sta.*, dat.*
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+                LEFT JOIN dzg_thema AS the ON the.id=sta.id_thema
                 LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
                 LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
                 LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
