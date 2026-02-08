@@ -69,13 +69,13 @@ class Table
         'dat.kat27' => 'kat27',
         'dat.kat28' => 'kat28',
         'dat.kat29' => 'kat29',
-        'the.sub2'  => 'thema',
+        'the.thema' => 'thema',
         'sub2.sub2' => 'sub2',
         'ort.name'  => 'name',
         'suf.suffix' => 'suffix',
         'sta.id' => 'gid',
         'dat.id' => 'fid',
-        'print' => 'print',
+        'print'  => 'print',
     ];
 
     private const SPALTEN_EINZEL = [
@@ -272,7 +272,7 @@ class Table
 
             if ($_POST['thema'] !== "- alle -") {
                 // wenn Auswahl nicht 'alle'
-                $filter = "the.sub2 = '{$_POST['thema']}'";
+                $filter = "the.thema = '{$_POST['thema']}'";
                 if (empty($thema) || $_POST['thema'] != $thema) {
                     // wenn Auswahl anders als zuvor, speichern
                     $_POST['start'] = 0;
@@ -291,7 +291,7 @@ class Table
         } elseif (!empty($thema) && ($thema != "- alle -")) {
             // kein Dropdown-Auswahl aber irgendwoher schon Thema gemerkt
             if ($thema != "- alle -") {
-                $filter = "the.sub2='{$thema}'";
+                $filter = "the.thema='{$thema}'";
             }
 
         } else {

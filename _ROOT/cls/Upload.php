@@ -465,14 +465,14 @@ class Upload
             // data / original / Lochungen / 1_Dzg1_LO_1921-01-15.jpg
 
             // $ffn['original'=>... , 'large'=> ... , ...]
-            $ffn[$v['sub1']] = $v['webroot'].'/'.$v['sub1'].'/'.$v['sub2'].'/'.$v['prefix'].$v['name_orig'].$v['suffix'];
+            $ffn[$v['sub1']] = $v['webroot'].'/'.$v['sub1'].'/'.$v['sub2'].'/'.$v['prefix'].$v['name'].$v['suffix'];
 
             // nicht weiter benötigt
             unset($v['webroot']);
             unset($v['sub1']);
             unset($v['sub2']);
             unset($v['prefix']);
-            unset($v['name_orig']);
+            unset($v['name']);
             unset($v['suffix']);
 
             $j++;   // Bildzähler

@@ -22,7 +22,7 @@ class PrintView
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    protected static array $sub2_list;
+    protected static array $theme_list;
     private static int $akt_file_id;
     private static int $akt_file_idx;
     private static array $spaltennamen;
@@ -58,47 +58,47 @@ class PrintView
     }
 
 
-    protected static function sub2List(): array
+    protected static function themeList(): array
     {
-        if (empty(self::$sub2_list)) {
-            self::setSub2List();
+        if (empty(self::$theme_list)) {
+            self::setthemeList();
         }
-        return self::$sub2_list;
+        return self::$theme_list;
     }
-    protected static function setSub2List()
+    protected static function setthemeList()
     {
-        self::$sub2_list = self::sub2ListeHolen();
+        self::$theme_list = self::themeListeHolen();
     }
-    protected static function sub2ListeHolen(): array
+    protected static function themeListeHolen(): array
     {
-        $sql = "SELECT sub2 FROM dzg_dirsub2";
+        $sql = "SELECT thema FROM dzg_dirsub2";
 
-        $sub2_array = Database::sendSQL($sql, [], 'fetchall', 'num');
+        $theme_array = Database::sendSQL($sql, [], 'fetchall', 'num');
 
         // [[x],[y],...] -> [x,y,...]
-        foreach ($sub2_array as $entry_array) {
+        foreach ($theme_array as $entry_array) {
             $list []= $entry_array[0];
         }
-        $sub2_list = array_reverse($list);
+        $theme_list = array_reverse($list);
 
-        self::$sub2_list = $sub2_list;
+        self::$theme_list = $theme_list;
 
-        return $sub2_list;
+        return $theme_list;
     }
 
 
-    protected static function idListeHolen(string $sub2=''): array
+    protected static function idListeHolen(string $theme=''): array
     {
         $col = "ort.id oid, dat.id did, sta.id sid";
         $col = "dat.id";
         $idlist = [];
 
         if (!empty($_SESSION['filter'])) {
-            $filter = (str_contains($_SESSION['filter'], "the.sub2"))
+            $filter = (str_contains($_SESSION['filter'], "the.thema"))
                 ? "{$_SESSION['filter']}"
-                : "{$_SESSION['filter']} AND the.sub2='{$sub2}'";
+                : "{$_SESSION['filter']} AND the.thema='{$theme}'";
         } else {
-            $filter = "the.sub2='{$sub2}' AND ort.deakt=0";
+            $filter = "the.thema='{$theme}' AND ort.deakt=0";
         }
 
         $sort = (!empty($_SESSION['sort']))
@@ -108,7 +108,7 @@ class PrintView
             sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23, sta.id, dat.id";
         $sort .= $sort0;
 
-        #$filter = "the.sub2='{$sub2}' AND ort.deakt=0";
+        #$filter = "the.thema='{$theme}' AND ort.deakt=0";
         #$sort = "the.id, sta.kat10, sta.datum, sta.kat11, sta.kat12, sta.kat13, sta.kat14,
         #sta.kat15, sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23,
         #sta.id, dat.id";
@@ -217,9 +217,9 @@ class PrintView
             sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23, sta.id, dat.id";
 
         $stmt = "SELECT
-            dat.id fid, sta.id gid, ort.name, the.sub2 thema,
+            dat.id fid, sta.id gid, ort.name, the.thema,
             dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
-            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name_orig, suf.suffix, sta.*, dat.*
+            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix, sta.*, dat.*
             FROM dzg_file AS dat
                 LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
                 LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
@@ -259,12 +259,12 @@ class PrintView
                 // (Anzeigebilder ändern -> auszudruckende Bildqualität ohne Wasserzeichen)
                 if ($v['sub1'] == 'small') {
                     $ffn['small'] = $v['webroot'].'/export.medium/'.$v['sub2'].
-                                    '/m_'.$v['name_orig'].$v['suffix'];
+                                    '/m_'.$v['name'].$v['suffix'];
                     #$ffn['small'] = $v['webroot'].'/large/'.$v['sub2'].
-                    #   '/l_'.$v['name_orig'].$v['suffix'];
+                    #   '/l_'.$v['name'].$v['suffix'];
                 } else {
                     $ffn[$v['sub1']] = $v['webroot'].'/'.$v['sub1'].'/'.$v['sub2'].'/'.
-                                        $v['prefix'].$v['name_orig'].$v['suffix'];
+                                        $v['prefix'].$v['name'].$v['suffix'];
                 }
 
                 $j++;   // Bildzähler
@@ -460,17 +460,17 @@ class PrintView
     protected static function seitenausgabe()
     {
         // bei Aufruf per Admin-Seite, Filter zurücksetzen
-        if (isset($_GET['sub2']) && (int)$_GET['sub2'] === 100) {
+        if (isset($_GET['thema']) && (int)$_GET['thema'] === 100) {
             $_SESSION['thema'] = "- alle -";
             unset($_SESSION['filter']);
         }
 
-        $sub2_liste = (empty($_SESSION['thema']) || $_SESSION['thema'] === "- alle -")
-            ? self::sub2List()
-            : $sub2_liste = [$_SESSION['thema']];
+        $theme_liste = (empty($_SESSION['thema']) || $_SESSION['thema'] === "- alle -")
+            ? self::themeList()
+            : $theme_liste = [$_SESSION['thema']];
 
         // kontinuierliche Einzelseitenausgabe
-        foreach ($sub2_liste as $thema) {
+        foreach ($theme_liste as $thema) {
             $id_liste = self::idListeHolen($thema);
             if (!$id_liste) continue;
 

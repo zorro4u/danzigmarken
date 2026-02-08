@@ -103,7 +103,7 @@ class Download
      */
     public static function bestandsabfrage()
     {
-        $col = "the.sub2 thema, sta.datum,
+        $col = "the.thema, sta.datum,
             sta.kat10, sta.kat11, sta.kat12, sta.kat13, sta.kat14,
             sta.kat15, sta.kat16, sta.kat17, sta.kat18, sta.kat19,
             dat.kat20, dat.kat21, dat.kat22, dat.kat23, dat.kat24,

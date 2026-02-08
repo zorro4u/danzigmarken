@@ -386,10 +386,10 @@ class TableNavi
      */
     public static function feldThemenwahl()
     {
-        $thema = Table::$_session['thema'];
+        $sess_thema = Table::$_session['thema'];
 
         $theme_db = ['- alle -'];
-        $stmt = "SELECT sub2 FROM dzg_dirsub2 ORDER BY sub2 DESC";
+        $stmt = "SELECT thema FROM dzg_dirsub2 ORDER BY thema DESC";
         $theme_qry = Database::sendSQL($stmt, [], 'fetchall', 'num');
 
         foreach ($theme_qry AS $entry) {
@@ -400,7 +400,7 @@ class TableNavi
         # &#10005; &#10006; &#10007; &#10008; &#10799 &#215;(&times;)
         $button1 = "<span class='btn_reset deaktiv2' style='font-size:80%'
                     title=''>&#10005;</span>";
-        if (!empty($thema) && $thema !== '- alle -') {
+        if (!empty($sess_thema) && $sess_thema !== '- alle -') {
             $button1 = "<button class='btn_reset' type='submit' name='thema'
                         value='- alle -' title='Auswahl löschen'>&#10006;</button>";
         }
@@ -414,8 +414,8 @@ class TableNavi
 
         foreach ($theme_db as $opt_val) {
             $theme = '- alle -';
-            if (!empty($thema)) {
-                $theme = $thema;
+            if (!empty($sess_thema)) {
+                $theme = $sess_thema;
             }
 
             if ($opt_val === '- alle -') {
