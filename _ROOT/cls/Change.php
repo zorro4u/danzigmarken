@@ -469,7 +469,7 @@ class Change extends Details
 
                 // update datei
                 if (!empty($d)) {
-                    $d['ip'] = $remaddr;
+                    $d['chg_ip'] = $remaddr;
                     $set1 = '';
                     $data1 = [];
                     $data2 = [];
