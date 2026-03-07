@@ -793,6 +793,9 @@ class Admin
         <tr><td>last.unknown:</td><td>".$out_date."</td></tr>
     </table>
 
+    
+    <!-- Zusatz Buttons -->
+
     <br><hr>
     <form action='../tools/show_log' method='POST'>
         <button class='btn btn-primary' type=''>Log-Protokoll</button>&emsp;&emsp;
@@ -800,7 +803,8 @@ class Admin
         <button formaction='../tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
         <button formaction='../tools/pdf_down' class='btn btn-primary' type='' value='' name=''>PDF_Download</button>&emsp;&emsp;
         <button formaction='../tools/printview.php?thema=100' class='btn btn-primary' type='' value='' name=''>PDF anzeigen</button>&emsp;&emsp;
-        <button formaction='https://www.danzigmarken.de/yiisite/web/index.php' class='btn btn-primary' type='' value='' name=''>Yii_Site</button>
+        <button formaction='https://www.danzigmarken.de/yiisite/web/index.php' class='btn btn-primary' type='' value='' name=''>Yii_Site</button>&emsp;&emsp;
+        <button formaction='../tools/deletes.php' class='btn btn-primary' type='' value='' name=''>DB cleaning</button>&emsp;&emsp;
     </form>
 </div>
 ";

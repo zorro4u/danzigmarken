@@ -551,28 +551,29 @@ class Details
 
             // die beiden 'changed'-Einträge (Datei, Gruppe) zusammenfassen,
             // es wird der Neueste angezeigt
+            if (isset($akt_file_idx)) {
+                # beide leer, nix
+                if (empty($stamps[$akt_file_idx]['changed']) &&
+                    empty($stamps[$akt_file_idx]['s_changed']))
+                {
 
-            # beide leer, nix
-            if (empty($stamps[$akt_file_idx]['changed']) &&
-                empty($stamps[$akt_file_idx]['s_changed']))
-            {
+                # datei leer
+                } elseif (empty($stamps[$akt_file_idx]['changed']) &&
+                    !empty($stamps[$akt_file_idx]['s_changed']))
+                {
+                    $stamps[$akt_file_idx]['changed'] = $stamps[$akt_file_idx]['s_changed'];
 
-            # datei leer
-            } elseif (empty($stamps[$akt_file_idx]['changed']) &&
-                !empty($stamps[$akt_file_idx]['s_changed']))
-            {
-                $stamps[$akt_file_idx]['changed'] = $stamps[$akt_file_idx]['s_changed'];
+                # gruppe leer
+                } elseif (empty($stamps[$akt_file_idx]['s_changed']) &&
+                    !empty($stamps[$akt_file_idx]['changed']))
+                {
 
-            # gruppe leer
-            } elseif (empty($stamps[$akt_file_idx]['s_changed']) &&
-                !empty($stamps[$akt_file_idx]['changed']))
-            {
-
-            # datei älter als gruppe, gruppenwert übernehmen
-            } elseif (strtotime($stamps[$akt_file_idx]['changed']) <
-                strtotime($stamps[$akt_file_idx]['s_changed']))
-            {
-                $stamps[$akt_file_idx]['changed'] = $stamps[$akt_file_idx]['s_changed'];
+                # datei älter als gruppe, gruppenwert übernehmen
+                } elseif (strtotime($stamps[$akt_file_idx]['changed']) <
+                    strtotime($stamps[$akt_file_idx]['s_changed']))
+                {
+                    $stamps[$akt_file_idx]['changed'] = $stamps[$akt_file_idx]['s_changed'];
+                }
             }
 
             self::$stamps = $stamps;

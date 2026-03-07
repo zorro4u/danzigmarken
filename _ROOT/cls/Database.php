@@ -74,11 +74,11 @@ class Database
      * @param bool $many .. execute_many, default: false
      */
     public static function sendSQL(
-        string $sql,
-        array $data_array,
+        string      $sql,
+        array       $data_array=[],
         string|true $fetch_mode='no',
-        string $pdo_mode='assoc',
-        bool $many=false )
+        string      $pdo_mode='assoc',
+        bool        $many=false )
     {
         // in 'execute_many' Routine springen
         if ($many) {

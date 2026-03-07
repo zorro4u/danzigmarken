@@ -38,7 +38,7 @@ class TableBody
         array_pop($sort_col);
 
         if (!$is_checked_in) {
-            unset($spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
+            unset($spaltennamen['kat22'], $spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
         }
 
         # Gruppen.ID nur bei admin ausgeben
@@ -185,7 +185,7 @@ class TableBody
         $is_checked_in = Auth::isCheckedIn();
 
         if (!$is_checked_in) {
-            unset($spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
+            unset($spaltennamen['kat22'], $spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
         }
 
         # Gruppen.ID nur bei admin ausgeben

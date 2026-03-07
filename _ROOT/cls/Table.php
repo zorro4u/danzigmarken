@@ -92,8 +92,8 @@ class Table
         'kat23'    => 'Michel',
         'kat15'    => 'Frankatur',
         'kat16'    => 'Zielort',
-        'kat17'    => 'Notiz.1',
-        'kat22'    => 'Notiz.2',
+        'kat17'    => 'Notiz',
+        #'kat22'    => 'Notiz.2',
         #'kat23'    => 'Michel_NEU',
         #'kat24'    => '\'kat24\'',
         'fid'      => 'ID',
@@ -449,33 +449,41 @@ class Table
                 TableNavi::feldSuchen().        # Suche
                 "</div>";
 
+            $stamps_db = TableData::getData();
+
         } else {
             // Nutzer nicht angemeldet --> ohne Navi-Möglichkeit
-
-            // 10 zufällige Elemente anzeigen
+            // und nur zufällige Elemente anzeigen
             if (empty($loggedin)) {
-                $proseite = 10;
-                $start = random_int(0, $maxID - $proseite);
-
-                // Klassenwerte setzen
-                self::$_session['start'] = $start;
-                self::$_session['proseite'] = $proseite;
-
-                // globale $_SESSION Werte mit den Klassenwerten aktualisieren
+                $rand_num  = 10;
+                self::$_session['proseite'] = $maxID;
+                self::$_session['start'] = 0;              // random_int(0, $maxID - $proseite);
                 self::setSession();
+
+                $all_data  = TableData::getData();
+                $rand_idx  = array_rand($all_data, $rand_num);
+                $rand_data = [];
+                foreach ($rand_idx as $idx) {
+                    $rand_data []= $all_data[$idx];
+                }
+                $stamps_db = $rand_data;
+                self::$_session['proseite'] = $rand_num;
+
+                // wird nicht weiter benötigt
+                unset($all_data, $rand_idx, $rand_data);
             }
 
             $navi_tab = '';
             $output .= "<br>";
         }
 
+        // Klassenwert setzen zur weiteren Verwendung
+        Table::$stamps_db = $stamps_db;
+
 
         //-------------------------------------------------
-        // -- zentrale Datenabfrage, die ausgegeben wird --
-        //   (nach Filter- und Seitenwahl!)
+        // Tabelle ausgeben
         //
-        $stamps_db = TableData::getData();
-
 
         // < TABELLE >
         //
@@ -517,14 +525,13 @@ class Table
             // nicht angemeldet --> ohne Navi-Möglichkeit
             $navi_tab = '';
             $txt = number_format($maxID, 0, ',', '.');
-            $txt .= $idx2 ? " Marken" : " Einzelbildern";
+            $txt .= $idx2 ? " Marken" : " Einträgen";
 
-            # Hier nur eine <b>zufällige</b> ".$proseite."er Auswahl aus ".$txt.". <br>
             $output .= "
                 <div class='fuss'>
                 <div class='linksX'>
                     <p><br>
-                    Hier nur eine <b>zufällige</b> ".$proseite."er Auswahl. <br>
+                    Hier nur eine zufällige ".self::$_session['proseite']."er Auswahl aus ".$txt.".<br>
                     Voller Zugang mit Filter- und Suchfunktion nach dem  &gg;&nbsp;
                     <a href='/auth/login' title='Anmelden'><b>Anmelden</b></a>&nbsp;&ll;<br>&nbsp;</p>
                 </div>

@@ -161,17 +161,19 @@ class PrintView
             #'kat19',  // '',
             'kat20',  // 'Ansicht',
             'kat21',  // 'Attest',
-            'kat22',  // 'Notiz.2',
+            #'kat22',  // 'Notiz.2',
             #'kat23',  // 'Bildherkunft',
             #'kat24',  // '',
             ##'created', // 'erfasst',
             ##'changed', // 'geändert',
             ##'gid',     // 'Gruppen.ID',
             'fid',     // 'id',
+            #'name',     // 'Dateiname',
         ];
 
         // anzuzeigende Bezeichnung für Spaltenkategorie; überschreibt DB-Bezeichnung
         $nameof_spalten = [
+            #'name'  => 'Datei',
             'fid'   => 'Bild.ID',
             'gid'   => 'Gruppen.ID',
             'thema' => 'Thema',
@@ -369,11 +371,14 @@ class PrintView
                     : "";
 
             } elseif ($spalte_db === 'fid') {   #style='".$tfoot."padding-top: 8px;'
-                $data = self::$akt_file_id;
+                $data0 = self::$akt_file_id;
+                $data1 = $stamps[$akt_file_idx]['name'].$stamps[$akt_file_idx]['suffix'];
                 $output .= (Auth::isCheckedIn())
-                    ? "<tr><td class='detail-key fid' >{$spalte_web}</td>
-                       <td class='detail-val fid' >{$data}</td></tr></tfoot>"
+                    ? "<tr><td class='detail-key' style='color:hsl(0, 0%, 60%); font-size: 90%; padding-top: 8px;' colspan='2'>[{$data0}]&ensp;{$data1}</td>
+                       <!-- <td class='detail-val fid'>{$data}</td> -->
+                       </tr></tfoot>"
                     : "";
+
 
             // ab hier die Infos für alle
             } elseif ($spalte_web === 'Ansicht') {
@@ -423,6 +428,7 @@ class PrintView
 
 
         // rechte Seite, Thumbnail-Grid
+        /*
         $output .= "<div class='detail-thumb-grid detail-gal'>";
 
         if (self::$max_file > 1) {
@@ -439,6 +445,7 @@ class PrintView
             }
         }
         $output .= "</div>";  # ende thumb-grid
+        */
         $output .= "</div>";  # ende rechte Seite, < /main-detail-right >
         $output .= "</div>";  # ende < /MAIN-DETAIL >
 

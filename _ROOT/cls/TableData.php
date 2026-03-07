@@ -160,7 +160,6 @@ class TableData
         #$_SESSION['jump'] = Table::$_session['jump'] = [];
         unset($_SESSION['jump']);
 
-        Table::$stamps_db = $stamps_db;
         return $stamps_db;
     }
 
