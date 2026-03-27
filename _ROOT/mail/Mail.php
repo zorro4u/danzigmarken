@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\Mail;
 
-require __DIR__.'/MailConfig.php';
+require_once __DIR__.'/MailConfig.php';
 
 
 /***********************

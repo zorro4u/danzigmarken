@@ -24,7 +24,7 @@ class Show_log
 
         // Error-Log IPs in Blackliste eintragen
         #CheckIP::write_errorlog_into_DB();
-        #CheckIP::write_DB_into_htaccess();
+        CheckIP::write_DB_into_htaccess();
 
         // nur einmalig zu Service-Zwecke
         #CheckIP::write_htaccess_into_DB();

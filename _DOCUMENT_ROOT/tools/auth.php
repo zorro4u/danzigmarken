@@ -1,5 +1,6 @@
 <?php
-namespace Test;
+namespace Dzg\Test;
+
 date_default_timezone_set('Europe/Berlin');
 session_start();
 

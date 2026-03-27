@@ -1,12 +1,13 @@
 <?php
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Auth};
-use Dzg\Account\Data;
+use Dzg\Account\MyData;
 
 require_once __DIR__.'/../tools/Header.php';
 require_once __DIR__.'/../tools/Footer.php';
 require_once __DIR__.'/../tools/Auth.php';
 require_once __DIR__.'/../db/account_data.php';
+
 
 class Impressum
 {
@@ -47,14 +48,14 @@ class Impressum
 
 <p><span style='font-style:italic;text-decoration:underline'>
 Herausgeber:</span><br />
-<?= Data::NAME ?><br />
-<?= Data::STREET ?><br />
-<?= Data::TOWN ?><br />
+<?= MyData::NAME ?><br />
+<?= MyData::STREET ?><br />
+<?= MyData::TOWN ?><br />
 Deutschland</p>
 
 <p><span style='font-style:italic;text-decoration:underline'>
 Kontakt:</span><br />
-Telefon: <?= Data::PHONE ?><br />
+Telefon: <?= MyData::PHONE ?><br />
 E-Mail:
     <a href='/kontakt' title='Kontaktformular' style='background-color:transparent'>
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>

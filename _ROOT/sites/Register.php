@@ -1,5 +1,6 @@
 <?php
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->dieseSeite:RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
+
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};

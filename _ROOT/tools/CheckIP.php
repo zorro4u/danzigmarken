@@ -4,7 +4,6 @@ namespace Dzg\Tools;
 require_once __DIR__.'/Database.php';
 
 
-
 /****************************
  * Class CheckIP
  *

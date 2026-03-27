@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
-use PDO, PDOException;
+use \PDO, \PDOException;
 
 require_once __DIR__.'/Details.php';
 require_once __DIR__.'/../tools/Header.php';

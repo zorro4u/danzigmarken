@@ -1,5 +1,6 @@
 <?php
 /* Prozess: dieseSeite:RegInfo-->email(Admin)-->email(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
+
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
@@ -7,8 +8,6 @@ use Dzg\Mail\{MailConfig, Mail};
 session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
-
-#header('Content-type: text/html; charset=utf-8');
 
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
@@ -18,6 +17,8 @@ require_once __DIR__.'/../tools/Database.php';
 require_once __DIR__.'/../tools/Auth.php.php';
 require_once __DIR__.'/../tools/Tools.php';
 
+
+#header('Content-type: text/html; charset=utf-8');
 
 /***********************
  * Summary of Register_info

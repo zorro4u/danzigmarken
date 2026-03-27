@@ -2,6 +2,12 @@
 namespace Dzg\Mail;
 use Dzg\Mail\QuestionBlocker;
 
+require_once __DIR__.'/QuestionBlocker.php';
+#require_once __DIR__.'/../sites/Kontakt.php';
+
+require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
+use Gregwar\Captcha\CaptchaBuilder;
+
 
 #########################################################################
 #	Kontaktformular.com         					                    #
@@ -10,12 +16,6 @@ use Dzg\Mail\QuestionBlocker;
 #-----------------------------------------------------------------------#
 #	I-Net: http://www.knothemedia.de                            		#
 #########################################################################
-
-#require_once __DIR__.'/QuestionBlocker.php';
-#require_once __DIR__.'/../sites/Kontakt.php';
-
-require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
-use Gregwar\Captcha\CaptchaBuilder;
 
 
 /***********************

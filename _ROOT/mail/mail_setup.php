@@ -2,8 +2,8 @@
 date_default_timezone_set('Europe/Berlin');
 
 // Anmeldedaten laden
-use Dzg\Account\Data;
-require __DIR__.'/../db/account_data.php';
+use Dzg\Account\MyData;
+require_once __DIR__.'/../db/account_data.php';
 
 
 // Konfiguration des Mail-Moduls
@@ -19,30 +19,30 @@ $smtp['debug'] = 0;             // Das Debuglevel (0 - 4)
 
 // SET-0 via rainbow
 $smtp['from_name'] = "danzigmarken.de";
-$smtp['from_addr'] = Data::MAILFROM0;
+$smtp['from_addr'] = MyData::MAILFROM0;
 $smtp['mail_host'] = 'danzigmarken.de'; // Der Host, unter welchem der SMTP Server erreichbar ist. (bspw. smtp.gmail.com)
 $smtp['encryption'] = 'ssl';            // Die Art der Verschlüsselung, die bei der Verbindung mit Ihrem SMTP Server verwendet wird: '', 'ssl' oder 'tls'
 $smtp['smtp_port'] = 465;               // Der TCP Port, unter welchem Ihr SMTP Server erreichbar ist. tls-587, ssl-465
-$smtp['login_usr'] = Data::MAILUSR0;         // Der Benutzername, mit welchem Sie sich bei Ihrem SMTP Server authentifizieren. (kann u.U. die oben genannte E-Mail Adresse sein!)
-$smtp['login_pwd'] = Data::MAILPWD0;         // Das Passwort, mit welchem Sie sich bei Ihrem SMTP Server authentifizieren.
+$smtp['login_usr'] = MyData::MAILUSR0;         // Der Benutzername, mit welchem Sie sich bei Ihrem SMTP Server authentifizieren. (kann u.U. die oben genannte E-Mail Adresse sein!)
+$smtp['login_pwd'] = MyData::MAILPWD0;         // Das Passwort, mit welchem Sie sich bei Ihrem SMTP Server authentifizieren.
 
 // SET-1 via steffen.1
-$smtp1['from_name'] = "danzigmarken.de";
-$smtp1['from_addr'] = Data::MAILFROM1;
-$smtp1['mail_host'] = 'smtp.web.de';
+$smtp1['from_name']  = "danzigmarken.de";
+$smtp1['from_addr']  = MyData::MAILFROM1;
+$smtp1['mail_host']  = 'smtp.web.de';
 $smtp1['encryption'] = 'tls';
-$smtp1['smtp_port'] = 587;
-$smtp1['login_usr'] = Data::MAILUSR1;
-$smtp1['login_pwd'] = Data::MAILPWD1;
+$smtp1['smtp_port']  = 587;
+$smtp1['login_usr']  = MyData::MAILUSR1;
+$smtp1['login_pwd']  = MyData::MAILPWD1;
 
 // SET-2 via heinz.2
-$smtp2['from_name'] = "danzigmarken.de";
-$smtp2['from_addr'] = Data::MAILFROM2;
-$smtp2['mail_host'] = 'mail.gmx.net';
+$smtp2['from_name']  = "danzigmarken.de";
+$smtp2['from_addr']  = MyData::MAILFROM2;
+$smtp2['mail_host']  = 'mail.gmx.net';
 $smtp2['encryption'] = 'tls';
-$smtp2['smtp_port'] = 587;
-$smtp2['login_usr'] = Data::MAILUSR2;
-$smtp2['login_pwd'] = Data::MAILPWD2;
+$smtp2['smtp_port']  = 587;
+$smtp2['login_usr']  = MyData::MAILUSR2;
+$smtp2['login_pwd']  = MyData::MAILPWD2;
 
 
 // Weitere Einstellungen //

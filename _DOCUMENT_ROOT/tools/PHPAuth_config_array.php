@@ -1,28 +1,28 @@
 <?php
 // Anmeldedaten laden
-use Dzg\Account\Data;
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/db/account_data.php";
+use Dzg\Account\MyData;
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/db/account_data.php";
 
 $smtp0 = [
     'from_name'  => "danzigmarken.de",
-    'from_addr'  => Data::MAILFROM0,
+    'from_addr'  => MyData::MAILFROM0,
     'mail_host'  => "danzigmarken.de",
     'encryption' => "ssl",
     'smtp_port'  => 465,
-    'login_usr'  => Data::MAILUSR0,
-    'login_pwd'  => Data::MAILPWD0,
+    'login_usr'  => MyData::MAILUSR0,
+    'login_pwd'  => MyData::MAILPWD0,
     'site_url'   => "https://www.danzigmarken.de",
     'site_name'  => "Danzigmarken.de",
 ];
 
 $smtp1 = [
     'from_name'  => "danzigmarken.de",
-    'from_addr'  => Data::MAILFROM1,
+    'from_addr'  => MyData::MAILFROM1,
     'mail_host'  => "smtp.web.de",
     'encryption' => "tls",
     'smtp_port'  => 587,
-    'login_usr'  => Data::MAILUSR1,
-    'login_pwd'  => Data::MAILPWD1,
+    'login_usr'  => MyData::MAILUSR1,
+    'login_pwd'  => MyData::MAILPWD1,
     'site_url'   => "https://www.danzigmarken.de",
     'site_name'  => "Danzigmarken.de",
 ];

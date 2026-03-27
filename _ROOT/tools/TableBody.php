@@ -2,8 +2,8 @@
 namespace Dzg\Tools;
 use Dzg\Sites\Table;
 
-require_once __DIR__.'/../sites/Table.php';
 require_once __DIR__.'/TableData.php';
+require_once __DIR__.'/../sites/Table.php';
 
 
 /***********************

@@ -11,7 +11,6 @@ MailConfig::load();
  */
 class MailConfig
 {
-
     public static $smtp;
     public static $smtp1;
     public static $smtp2;
@@ -31,7 +30,7 @@ class MailConfig
 
     public static function load()
     {
-        require "mail_setup.php";
+        require_once "mail_setup.php";
 /*
         global
         $smtp,

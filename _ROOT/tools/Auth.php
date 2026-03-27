@@ -1,7 +1,6 @@
 <?php
 namespace Dzg\Tools;
 
-
 /****************************
  * Funktionscontainer für den Anmelde- und Verifizierungsprozess
  *
@@ -19,7 +18,7 @@ require_once __DIR__.'/Database.php';
 include_once __DIR__.'/Tools.php';
 include_once __DIR__.'/auth.password.func.php';
 
-require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
+#require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
 # use PHPAuth\Config as PHPAuthConfig;
 # use PHPAuth\Auth as PHPAuth;
 

@@ -1,5 +1,6 @@
 <?php
 /* Prozess: dieseSeite:Forget-->email(Admin)/email(Code)-->ResetSeite-->Login */
+
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};

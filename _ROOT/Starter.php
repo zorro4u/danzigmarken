@@ -10,6 +10,7 @@ class Starter
         $class_site = __DIR__."/sites/".ucfirst($site).".php";
         require_once $class_site;
 
+
         switch (strtolower($site)):
 
             case "admin":

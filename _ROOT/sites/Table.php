@@ -12,7 +12,6 @@ require_once __DIR__.'/../tools/Auth.php';
 require_once __DIR__.'/../tools/Tools.php';
 
 
-
 /***********************
  * Summary of Table
  * Webseite:

@@ -1,9 +1,8 @@
 <?php
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
+
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Tools};
-
-// TODO: alle Autologins beenden
 
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
@@ -14,6 +13,8 @@ require_once __DIR__.'/../tools/Footer.php';
 require_once __DIR__.'/../tools/Database.php';
 require_once __DIR__.'/../tools/Tools.php';
 
+
+// TODO: alle Autologins beenden
 
 /***********************
  * Summary of Pw_reset

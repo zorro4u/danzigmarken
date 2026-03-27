@@ -344,7 +344,7 @@ class Header
         $canonical = $meta['canonical'];
 
         // lädt das <head> Template
-        require $_SERVER['DOCUMENT_ROOT'].self::HEAD_TEMPLATE;
+        require_once $_SERVER['DOCUMENT_ROOT'].self::HEAD_TEMPLATE;
     }
 
 

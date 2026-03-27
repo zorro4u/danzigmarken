@@ -7,7 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Tools.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/CheckIP.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/tools/ip_range/ip_in_range2.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/tools/CIDRmatch.php";
-#require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Logger.php";
+#require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Logger.php";
 #Logger::delete_logs();
 
 

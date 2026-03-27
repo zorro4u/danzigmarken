@@ -1,12 +1,12 @@
 <?php
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Tools};
-use Dzg\Mail\{MailConfig, Mail, AntiSpam};
+use Dzg\Mail\{MailConfig, AntiSpam};
 
 require_once __DIR__.'/../tools/Header.php';
 require_once __DIR__.'/../tools/Footer.php';
 require_once __DIR__.'/../tools/Tools.php';
-require_once __DIR__.'/../mail/Mail.php';
+#require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
 require_once __DIR__.'/../mail/AntiSpam.php';
 #require_once __DIR__.'/../mail/RateLimiting.php';
@@ -97,7 +97,7 @@ class Kontakt
      */
     private static function formEvaluation()
     {
-        #require $_SERVER['DOCUMENT_ROOT'].'/kontakt/mail-setup.php';
+        #require_once $_SERVER['DOCUMENT_ROOT'].'/kontakt/mail-setup.php';
         #global $cfg, $smtp;
 
         #MailConfig::load();

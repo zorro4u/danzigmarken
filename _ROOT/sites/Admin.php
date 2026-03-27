@@ -1,8 +1,6 @@
 <?php
-
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Auth, CheckIP, Tools};
-
 
 require_once __DIR__.'/Settings.php';
 require_once __DIR__.'/../tools/Header.php';
@@ -11,7 +9,6 @@ require_once __DIR__.'/../tools/Database.php';
 require_once __DIR__.'/../tools/Auth.php';
 require_once __DIR__.'/../tools/CheckIP.php';
 require_once __DIR__.'/../tools/Tools.php';
-
 
 
 /****************************

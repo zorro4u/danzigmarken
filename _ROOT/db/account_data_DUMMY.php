@@ -6,9 +6,9 @@ namespace Dzg\Account;
  * Datei liegt außerhalb des Verzeichnisbaums $_SERVER['DOCUMENT_ROOT']
  * damit sie nicht von extern zugreifbar ist (chmod 0600)
  *
- * abrufbar: \Dzg\Account\Data::DBASE;
+ * abrufbar: \Dzg\Account\MyData::DBASE;
  */
-class Data
+class MyData
 {
     // mysql
     public const DBASE  = "XXXX";       # Datenbankname

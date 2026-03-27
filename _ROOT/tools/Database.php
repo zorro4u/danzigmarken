@@ -1,11 +1,12 @@
 <?php
 namespace Dzg\Tools;
+use Dzg\Account\MyData;
 use \PDO, \PDOException, \Exception;
-use Dzg\Account\Data;
 
 date_default_timezone_set('Europe/Berlin');
 
 require_once __DIR__.'/../db/account_data.php';
+
 
 /***********************
  * Summary of Database
@@ -34,10 +35,10 @@ class Database
      */
     protected static function setPDO()
     {
-        $user     = Data::DBUSER;
-        $password = Data::DBPW;
+        $user     = MyData::DBUSER;
+        $password = MyData::DBPW;
         $host     = "localhost:3306";
-        $database = Data::DBASE;
+        $database = MyData::DBASE;
         $charset  = 'utf8mb4';
         $options  = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
