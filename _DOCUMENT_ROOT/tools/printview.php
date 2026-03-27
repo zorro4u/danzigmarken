@@ -2,8 +2,8 @@
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Header.php";
-use Dzg\{Database, Auth, Tools, Header};
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Header.php";
+use Dzg\Tools\{Database, Auth, Tools, Header};
 
 // Seite anzeigen
 PrintView::show();
@@ -218,20 +218,26 @@ class PrintView
         $sort = "sta.kat10, sta.datum, sta.kat11, sta.kat12, sta.kat13, sta.kat14, sta.kat15,
             sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23, sta.id, dat.id";
 
-        $stmt = "SELECT
-            dat.id fid, sta.id gid, ort.name, the.thema,
-            dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
-            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix, sta.*, dat.*
+        $stmt = "WITH
+            dzgfile AS (
+                SELECT id_stamp FROM dzg_file WHERE id=:id)
+
+            SELECT
+                dat.id fid, sta.id gid, ort.name, the.thema,
+                dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
+                list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix,
+                sta.*, dat.*
             FROM dzg_file AS dat
-                LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-                LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-                LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-                LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
-                LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
-                LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
-                LEFT JOIN dzg_fileprefix AS pre ON pre.id_sub1=sub1.id
-            WHERE sta.id=(SELECT id_stamp FROM dzg_file WHERE id=:id) AND dat.deakt=0
+            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
+            LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+            LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
+            LEFT JOIN dzg_fileprefix AS pre ON pre.id_sub1=sub1.id
+            WHERE sta.id IN (SELECT * FROM dzgfile)
+                AND dat.deakt=0
             ORDER BY {$sort}";
 
         $data = [':id' => $akt_file_id];    # int

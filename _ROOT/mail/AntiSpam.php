@@ -1,5 +1,7 @@
 <?php
-namespace Dzg;
+namespace Dzg\Mail;
+use Dzg\Mail\{QuestionBlocker, RateLimiting, Captcha};
+
 require_once __DIR__.'/QuestionBlocker.php';
 require_once __DIR__.'/RateLimiting.php';
 require_once __DIR__.'/Captcha.php';

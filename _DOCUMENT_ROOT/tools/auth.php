@@ -3,8 +3,8 @@ namespace Test;
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Database.php";
-use Dzg\Database as DB;
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
+use \Dzg\Tools\Database as DB;
 
 require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
 

@@ -1,27 +1,28 @@
 <?php
 // Anmeldedaten laden
+use Dzg\Account\Data;
 require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/db/account_data.php";
 
 $smtp0 = [
     'from_name'  => "danzigmarken.de",
-    'from_addr'  => $mailfrom0,
+    'from_addr'  => Data::MAILFROM0,
     'mail_host'  => "danzigmarken.de",
     'encryption' => "ssl",
     'smtp_port'  => 465,
-    'login_usr'  => $mailusr0,
-    'login_pwd'  => $mailpwd0,
+    'login_usr'  => Data::MAILUSR0,
+    'login_pwd'  => Data::MAILPWD0,
     'site_url'   => "https://www.danzigmarken.de",
     'site_name'  => "Danzigmarken.de",
 ];
 
 $smtp1 = [
     'from_name'  => "danzigmarken.de",
-    'from_addr'  => $mailfrom1,
+    'from_addr'  => Data::MAILFROM1,
     'mail_host'  => "smtp.web.de",
     'encryption' => "tls",
     'smtp_port'  => 587,
-    'login_usr'  => $mailusr1,
-    'login_pwd'  => $mailpwd1,
+    'login_usr'  => Data::MAILUSR1,
+    'login_pwd'  => Data::MAILPWD1,
     'site_url'   => "https://www.danzigmarken.de",
     'site_name'  => "Danzigmarken.de",
 ];
@@ -29,7 +30,7 @@ $smtp1 = [
 $smtp = $smtp0;
 $PHPAuth_config_array = array(
 
-    
+
 // primary config for PHPAuth
 // [with (*) marked entries are set to default when unset]
 // -----

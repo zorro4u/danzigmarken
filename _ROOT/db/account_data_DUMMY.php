@@ -1,18 +1,24 @@
 <?php
-/***********************
+namespace Dzg\Account;
+
+/**
  * Anmelde-Informationen.
  * Datei liegt außerhalb des Verzeichnisbaums $_SERVER['DOCUMENT_ROOT']
  * damit sie nicht von extern zugreifbar ist (chmod 0600)
+ *
+ * abrufbar: \Dzg\Account\Data::DBASE;
  */
+class Data
+{
+    // mysql
+    public const DBASE  = "XXXX";       # Datenbankname
+    public const DBUSER = "XXXX";       # DB-Anmeldename
+    public const DBPW   = "XXXX";       # DB-Anmeldepasswort
 
-// mysql
-$dbase = "XXXX";        # Datenbankname
-$dbuser = "XXXX";       # DB-Anmeldename
-$dbpw = "XXXX";         # DB-Anmeldepasswort
 
+    // email
+    public const MAILFROM = "XXXX";     # email-from Info für Empfänger
+    public const MAILUSR  = "XXXX";     # Account-Anmeldename
+    public const MAILPWD  = "XXXX";     # Account-Anmeldepasswort
 
-// email
-$mailfrom = "XXXX";     # email-from Info für Empfänger
-$mailusr  = "XXXX";     # Account-Anmeldename
-$mailpwd  = "XXXX";     # Account-Anmeldepasswort
-
+}

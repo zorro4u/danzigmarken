@@ -3,7 +3,7 @@ date_default_timezone_set('Europe/Berlin');
 session_start();
 
 require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/mail/MailConfig.php";
-use Dzg\MailConfig;
+use Dzg\Mail\MailConfig;
 
 // Überprüfen, ob der Benutzer eingeloggt ist
 if (isset($_SESSION['loggedin'])

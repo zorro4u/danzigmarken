@@ -3,8 +3,8 @@ namespace Dzg;
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Database.php";
-use Dzg\Database;
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
+use Dzg\Tools\Database as DB;
 use Exception;
 
 
@@ -30,15 +30,17 @@ class Delete
     public static function delete_deaktiv_files(): void
     {
         // als 'gelöscht' markierte Einträge aus DB holen
-        $sql = "SELECT sub2.sub2, ort.name, suf.suffix, dat.id
-                FROM dzg_file AS dat
-                LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-                LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-                LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-                LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
-                WHERE ort.deakt=1";
+        $sql =
+            "SELECT sub2.sub2, ort.name, suf.suffix, dat.id
+            FROM dzg_file AS dat
+            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+            WHERE ort.deakt=1";
+
         // [['Lochung', 'xxx', '.jpg', id], [...]]
-        $dblist = Database::sendSQL($sql, [], 'fetchall', 'num');
+        $dblist = DB::sendSQL($sql, [], 'fetchall', 'num');
 
         // Dateien löschen
         if (!empty($dblist)) {
@@ -161,19 +163,23 @@ class Delete
                 $data []= [$v];
             }
             $sql = "DELETE FROM dzg_file WHERE id=?";
-            Database::sendSQL($sql, $data, 'no', 'num', true);
+            DB::sendSQL($sql, $data, 'no', 'num', true);
         }
 
         // verwaiste Einträge aus DB (dzg_group) zählen und löschen,
         // (... wenn keine Dateien mehr verknüpft sind)
-        $sql0 = "SELECT sta.id FROM dzg_group AS sta
-                LEFT JOIN dzg_file AS dat ON sta.id=dat.id_stamp
-                WHERE dat.id IS Null AND sta.deakt=1
-                GROUP BY sta.id";
-        $result['sta_idlist'] = Database::sendSQL($sql0, [], 'fetchall', 'num');
+        $sql0 =
+            "SELECT sta.id
+            FROM dzg_group AS sta
+            LEFT JOIN dzg_file AS dat ON sta.id=dat.id_stamp
+            WHERE dat.id IS Null
+                AND sta.deakt=1
+            GROUP BY sta.id";
+
+        $result['sta_idlist'] = DB::sendSQL($sql0, [], 'fetchall', 'num');
 
         $sql = "DELETE FROM dzg_group WHERE id in ({$sql0})";
-        Database::sendSQL($sql);
+        DB::sendSQL($sql);
 
         return $result;
     }

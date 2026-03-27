@@ -1,5 +1,5 @@
 <?php
-namespace Dzg;
+namespace Dzg\Mail;
 
 date_default_timezone_set('Europe/Berlin');
 
