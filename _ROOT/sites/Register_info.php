@@ -156,13 +156,13 @@ class Register_info
                 $pwcode_endtime = Auth::getPWcodeTimer();
 
                 // Links für Email-Versand erzeugen
-                $reg_url = Tools::getSiteURL().'register.php?code='.$reg_code;
+                $reg_url  = Tools::getSiteURL().'register.php?code='.$reg_code;
                 $reg_link = 'register.php?code='.$reg_code;     // intern
 
-                $input_usr_temp = $input_vor."_dummy_";
+                $input_usr_temp   = $input_vor."_dummy_";
                 $input_email_temp = $input_email."_dummy_";
                 $status = $reg_code;
-                $notiz = $reg_url;
+                $notiz  = $reg_url;
 
                 // Nutzerdaten schon einmal in DB temporär erfassen
                 $stmt =
@@ -181,10 +181,10 @@ class Register_info
 
                 // === EMAIL ===
                 //
-                $cfg = MailConfig::$cfg;
-                $smtp = MailConfig::$smtp;
+                $cfg  = MailConfig::$cfg;
+                $smtp = MailConfig::$smtp[0];
 
-                $ip = $_SERVER['REMOTE_ADDR'];
+                $ip   = $_SERVER['REMOTE_ADDR'];
                 $host = getHostByAddr($ip);
                 $UserAgent = $_SERVER["HTTP_USER_AGENT"];
                 $date = date("d.m.Y | H:i");
@@ -192,7 +192,7 @@ class Register_info
                 // ---- create mail for customer
                 $mailto1  = $input_email;
                 $subject1 = 'Registrierungs-Link für www.danzigmarken.de';
-                $mailcontent1  = "Hallo ".$input_name.",\n\n".
+                $mailcontent1 = "Hallo ".$input_name.",\n\n".
                     "du kannst dich jetzt auf www.danzigmarken.de registrieren. ".
                     "Rufe dazu in den nächsten 4 Wochen (bis zum ".date('d.m.y', $pwcode_endtime).") ".
                     "den folgenden Link auf: \n\n".$reg_url ."\n\n".
@@ -200,9 +200,9 @@ class Register_info
                     "Dein Support-Team von www.danzigmarken.de\n";
 
                 // ---- create mail for admin(steffen)
-                $mailto2      = $smtp['from_addr'];
+                $mailto2  = $smtp['from_addr'];
                 $subject2 = "[Info:] Anfrage zur Registrierung auf www.danzigmarken.de";
-                $mailcontent2  = "Folgendes wurde am ". $date ." Uhr per Formular empfangen:\n".
+                $mailcontent2 = "Folgendes wurde am ". $date ." Uhr per Formular empfangen:\n".
                     "-------------------------------------------------------------------------\n\n".
                     "E-Mail: ".$input_email."\n".
                     "Name: ".$input_name."\n\n".
@@ -262,7 +262,7 @@ class Register_info
 
         // Wert für das Vorausfüllen des Login-Formulars
         $pre_email = "";
-        $pre_usr = "";
+        $pre_usr   = "";
         if (isset($_GET['email']))
             $pre_email = htmlspecialchars(Tools::cleanInput($_GET['email']));
         elseif ($input_email != "")

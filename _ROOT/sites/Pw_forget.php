@@ -125,10 +125,10 @@ class Pw_forget
 
                 // === EMAIL ===
                 //
-                $cfg = MailConfig::$cfg;
-                $smtp = MailConfig::$smtp;
+                $cfg  = MailConfig::$cfg;
+                $smtp = MailConfig::$smtp[0];
 
-                $ip = $_SERVER['REMOTE_ADDR'];
+                $ip   = $_SERVER['REMOTE_ADDR'];
                 $host = getHostByAddr($ip);
                 $UserAgent = $_SERVER["HTTP_USER_AGENT"];
                 $date = date("d.m.Y | H:i");
@@ -136,7 +136,7 @@ class Pw_forget
                 // ---- create mail for customer
                 $mailto1  = $input_email;
                 $subject1 = 'Neues Passwort für www.danzigmarken.de';
-                $mailcontent1  = "Hallo ".$name.",\n\n".
+                $mailcontent1 = "Hallo ".$name.",\n\n".
                     "für deinen Account auf www.danzigmarken.de wurde nach einem neuen Passwort gefragt.\n".
                     "Um ein neues Passwort zu vergeben, rufe innerhalb der nächsten 48 Stunden (bis ".$pwcode_endtime_str.") ".
                     "die folgende Website auf:\n\n".$pwcode_url."\n\n".
@@ -147,7 +147,7 @@ class Pw_forget
                 // ---- create info mail for admin
                 $mailto2  = $smtp['from_addr'];
                 $subject2 = "[Info:] Reset Passwort auf www.danzigmarken.de";
-                $mailcontent2  = "Folgendes wurde am ". $date ." Uhr verschickt:\n".
+                $mailcontent2 = "Folgendes wurde am ". $date ." Uhr verschickt:\n".
                     "-------------------------------------------------------------------------\n\n".
                     "Eine Email an den Anfragenden wurde gesendet.\n\n".
                     "Von: ".$smtp['from_name']." <".$smtp['from_addr'].">\n".

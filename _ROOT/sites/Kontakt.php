@@ -100,10 +100,8 @@ class Kontakt
         #require_once $_SERVER['DOCUMENT_ROOT'].'/kontakt/mail-setup.php';
         #global $cfg, $smtp;
 
-        #MailConfig::load();
-        $cfg = MailConfig::$cfg;
-        $smtp = MailConfig::$smtp;
-        #$smtp = array_merge(MailConfig::$smtp, MailConfig::$smtp1);
+        $cfg  = MailConfig::$cfg;
+        $smtp = MailConfig::$smtp[0];
         $datenschutzerklaerung = MailConfig::$datenschutzerklaerung;
 
         $success = false;
@@ -113,8 +111,8 @@ class Kontakt
         $error_arr = [];
         $error_msg = "";
         $success_msg = "";
-        $show_form = True;
-        $input_name = "";
+        $show_form   = True;
+        $input_name  = "";
         $input_email = "";
         $input_message_first = "";
         $fehler = [];
@@ -347,8 +345,8 @@ class Kontakt
                 // === EMAIL ===
                 //
                 $email_send = true;
-                $remote_ip = getenv("REMOTE_ADDR");
-                $ip = $_SERVER['REMOTE_ADDR'];
+                $remote_ip  = getenv("REMOTE_ADDR");
+                $ip   = $_SERVER['REMOTE_ADDR'];
                 $host = getHostByAddr($ip);
                 $UserAgent = $_SERVER['HTTP_USER_AGENT'];
                 $date = date("d.m.Y | H:i");
@@ -356,7 +354,7 @@ class Kontakt
                 // ---- create mail for admin (from admin to admin with user message)
                 $mailto  = $smtp['from_addr'];
                 $subject = "[EMAIL:] Kontaktformular auf www.danzigmarken.de";
-                $mailcontent  = "Folgendes wurde am ". $date ." Uhr per Formular empfangen:\n".
+                $mailcontent = "Folgendes wurde am ". $date ." Uhr per Formular empfangen:\n".
                     "-------------------------------------------------------------------------\n\n".
                     "E-Mail: ".$input_email."\n".
                     "Name: ".$input_name."\n\n".
@@ -583,7 +581,7 @@ $output .= "
         $output .= "onchange=\"checkField(this)\" ";
     }
     $output .= "type=\"text\" name=\"name\" class=\"field\" placeholder=\"Name *\" value=\"".
-        $_POST['name']."\" maxlength=\"".$zeichenlaenge_name."\" id=\"border-right\"
+        $_POST['name']."\" maxlength=\"".$zeichenlaenge['name']."\" id=\"border-right\"
         onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />";
     if (!empty($fehler['name'])) {
         $output .= $fehler['name'];
@@ -602,7 +600,7 @@ $output .= "
 
     \">
     <label class=\"control-label\" for=\"border-right3\"><i id=\"user-icon\" class=\"fas fa-user\"></i></label>
-    <input aria-label=\"Name\" type=\"text\" name=\"name\" class=\"field\" placeholder=\"Name\" value=\"".$_POST['name']."\" maxlength=\"".$zeichenlaenge_name."\" id=\"border-right\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />
+    <input aria-label=\"Name\" type=\"text\" name=\"name\" class=\"field\" placeholder=\"Name\" value=\"".$_POST['name']."\" maxlength=\"".$zeichenlaenge['name']."\" id=\"border-right\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />
 </div>
 <div class=\"col-sm-4";
 
@@ -631,7 +629,7 @@ if ($cfg['HTML5_FEHLERMELDUNGEN']) {
 } else {
     $output .= "text";
 }
-$output .= "\" name=\"email\" class=\"field\" placeholder=\"E-Mail *\" value=\"".$_POST['email']."\" maxlength=\"".$zeichenlaenge_email."\" id=\"border-right2\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />";
+$output .= "\" name=\"email\" class=\"field\" placeholder=\"E-Mail *\" value=\"".$_POST['email']."\" maxlength=\"".$zeichenlaenge['email']."\" id=\"border-right2\" onclick=\"setActive(this);\" onfocus=\"setActive(this);\" />";
 if (!empty($fehler['email'])) {
     $output .= $fehler['email'];
 }

@@ -269,10 +269,10 @@ class Register
 
                     // === EMAIL ===
                     //
-                    $cfg = MailConfig::$cfg;
-                    $smtp = MailConfig::$smtp;
+                    $cfg  = MailConfig::$cfg;
+                    $smtp = MailConfig::$smtp[0];
 
-                    $ip = $_SERVER['REMOTE_ADDR'];
+                    $ip   = $_SERVER['REMOTE_ADDR'];
                     $host = getHostByAddr($ip);
                     $UserAgent = $_SERVER["HTTP_USER_AGENT"];
                     $date = date("d.m.Y | H:i");
@@ -280,16 +280,16 @@ class Register
                     // ---- create mail for customer
                     $mailto1  = $input_email;
                     $subject1 = "Kontoaktivierung auf www.danzigmarken.de";
-                    $mailcontent1  = "Hallo ".$mailto1.",\n\n".
+                    $mailcontent1 = "Hallo ".$mailto1.",\n\n".
                         "dein Konto auf www.danzigmarken.de muss noch bis zum ".date("d.m.y", $pwcode_endtime)." aktiviert werden. ".
                         "Rufe dazu folgenden Link auf: \n\n".$activate_url."\n\n".
                         "Herzliche Grüße\n".
                         "Dein Support-Team von www.danzigmarken.de\n";
 
                     // ---- create mail for admin
-                    $mailto2      = $smtp['from_addr'];
+                    $mailto2  = $smtp['from_addr'];
                     $subject2 = "[Info:] Anfrage zur Kontoaktivierung auf www.danzigmarken.de";
-                    $mailcontent2  = "Folgendes wurde am ". $date ." Uhr verschickt:\n".
+                    $mailcontent2 = "Folgendes wurde am ". $date ." Uhr verschickt:\n".
                         "-------------------------------------------------------------------------\n\n".
                         "Eine Email an den Anfragenden wurde gesendet.\n\n".
                         "Von: ".$smtp['from_name']." <".$smtp['from_addr'].">\n".

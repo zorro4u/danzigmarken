@@ -1,28 +1,28 @@
 <?php
 // Anmeldedaten laden
-use Dzg\Account\MyData;
+use Dzg\PrivateData as MyData;
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/db/account_data.php";
 
 $smtp0 = [
     'from_name'  => "danzigmarken.de",
-    'from_addr'  => MyData::MAILFROM0,
+    'from_addr'  => MyData\MAILFROM0,
     'mail_host'  => "danzigmarken.de",
     'encryption' => "ssl",
     'smtp_port'  => 465,
-    'login_usr'  => MyData::MAILUSR0,
-    'login_pwd'  => MyData::MAILPWD0,
+    'login_usr'  => MyData\MAILUSR0,
+    'login_pwd'  => MyData\MAILPWD0,
     'site_url'   => "https://www.danzigmarken.de",
     'site_name'  => "Danzigmarken.de",
 ];
 
 $smtp1 = [
     'from_name'  => "danzigmarken.de",
-    'from_addr'  => MyData::MAILFROM1,
+    'from_addr'  => MyData\MAILFROM1,
     'mail_host'  => "smtp.web.de",
     'encryption' => "tls",
     'smtp_port'  => 587,
-    'login_usr'  => MyData::MAILUSR1,
-    'login_pwd'  => MyData::MAILPWD1,
+    'login_usr'  => MyData\MAILUSR1,
+    'login_pwd'  => MyData\MAILPWD1,
     'site_url'   => "https://www.danzigmarken.de",
     'site_name'  => "Danzigmarken.de",
 ];
@@ -125,7 +125,7 @@ $PHPAuth_config_array = array(
 
 // the email address from which to send activation and password reset emails
 #'site_email' => "no-reply@phpauth.cuonic.com",
-'site_email' => $smtp['from_addr'],
+'site_email' => $smtp[0]['from_addr'],
 
 // a random string that you should modify used to validate cookies to ensure
 // they are not tampered with
@@ -138,7 +138,7 @@ $PHPAuth_config_array = array(
 // the name of the website to display in the activation
 // and password reset emails
 #'site_name' => "PHPAuth",
-'site_name' => $smtp['site_name'],
+'site_name' => $smtp[0]['site_name'],
 
 // the password reset page name appended to the site_url
 // in the password reset email
@@ -154,7 +154,7 @@ $PHPAuth_config_array = array(
 // the URL of the Auth root, where you installed the system, without
 // the trailing slash, used for emails.
 #'site_url' => "https://github.com/PHPAuth/PHPAuth",
-'site_url' => $smtp['site_url'],
+'site_url' => $smtp[0]['site_url'],
 
 // 0 to use sendmail for emails, 1 to use SMTP
 'smtp' => "1",
@@ -169,25 +169,25 @@ $PHPAuth_config_array = array(
 
 // hostname of the SMTP server
 #'smtp_host' => "smtp.example.com",
-'smtp_host' => $smtp['mail_host'],
+'smtp_host' => $smtp[0]['mail_host'],
 
 // the password for the SMTP server
 #'smtp_password' => "password",
-'smtp_password' => $smtp['login_pwd'],
+'smtp_password' => $smtp[0]['login_pwd'],
 
 // the port for the SMTP server (25)
 #'smtp_port' => "25",
-'smtp_port' => $smtp['smtp_port'],
+'smtp_port' => $smtp[0]['smtp_port'],
 
 // NULL for no encryption,
 // tls for TLS encryption (587),
 // ssl for SSL encryption (465)
 #'smtp_security' => NULL,
-'smtp_security' => $smtp['encryption'],
+'smtp_security' => $smtp[0]['encryption'],
 
 // the username for the SMTP server
 #'smtp_username' => "email@example.com",
-'smtp_username' => $smtp['login_usr'],
+'smtp_username' => $smtp[0]['login_usr'],
 
 // name of the table with all attempts (default is 'phpauth_attempts')
 'table_attempts' => "phpauth_attempts",

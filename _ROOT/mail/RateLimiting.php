@@ -12,7 +12,6 @@ class RateLimiting
     public static function run()
     {
         $cfg = MailConfig::$cfg;
-        $maximale_aufrufe = MailConfig::$maximale_aufrufe;
 
         // Datei zum Speichern der IP-Adressen
         #$logfile = __DIR__.'/log/ip_log.txt';
@@ -36,7 +35,7 @@ class RateLimiting
         }
 
         // Wenn die IP-Adresse mehr als 100 Mal aufgerufen wurde, zeige eine Warnung
-        if ($ip_count >= $maximale_aufrufe) {
+        if ($ip_count >= $cfg['Maximale_Aufrufe']) {
             $output = '
             <style>
                 .centered-container {

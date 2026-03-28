@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer};
-use Dzg\Account\MyData;
+use Dzg\PrivateData as My;
 
 require_once __DIR__.'/../tools/Header.php';
 require_once __DIR__.'/../tools/Footer.php';
@@ -33,8 +33,8 @@ class About
 
 <p><span style='font-style:italic;text-decoration:underline'>
 verantwortlich:</span><br />
-<?= MyData::NAME ?><br />
-<?= MyData::TOWN ?><br />
+<?= My\NAME ?><br />
+<?= My\TOWN ?><br />
 Deutschland</p>
 
 <p><span style='font-style:italic;text-decoration:underline'>

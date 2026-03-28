@@ -1,6 +1,5 @@
 <?php
 namespace Dzg\Tools;
-use PDO, PDOException, Exception;
 
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Tools.php";
@@ -139,7 +138,7 @@ function write_errorlog_into_DB()
     return $data;
 }
 
-CheckIP::write_errorlog_into_DB();
+#CheckIP::write_errorlog_into_DB();
 
 $test = new \CIDRmatch\CIDRmatch();
 $ip4 = "1.2.3.4";
@@ -156,6 +155,8 @@ $res6 = $test->match($ip6, $range6);
 #$r6 = $res6 ?: 'NIX'; # res6 existiert, aber leer
 #$r7 = $res7 ?? 'NIX'; # res7 existiert nicht
 var_dump($res6);echo'<br>';
+
+
 
 
 
