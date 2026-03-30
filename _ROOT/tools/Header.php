@@ -97,7 +97,7 @@ class Header extends SiteConfig
         Auth::isCheckedIn();
 
         // Site-ID wird in Starter.php gesetzt
-        $site_id = $_SESSION['siteid'];
+        $site_id = $_SESSION['siteid'] ?? 404;
 
         // Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
         // sonst Probleme zB. mit css Aufruf
@@ -275,13 +275,15 @@ class Header extends SiteConfig
         # https://www.danzig.org/
         # https://arge.danzig.org/
 
+        // wenn Funktion direkt von extern aufgerufen wird (printview),
+        // dann allg. dummy-Angaben verwenden
+        self::$site_id ??= 404;
+
         // die META-Anweisungen der Webseite aus dem Site-Array extrahieren
         foreach(self::PAGE as $k=>$v){
             if($v['site_id'] === self::$site_id)
                 $meta = $v['meta'];
         }
-        # falls hier irgendwas mit der ID-Zuweisung schief lief
-        $meta ??= self::PAGE['dummy']['meta'];
 
         // und den Template-Variable zuordnen
         $title   = $meta['title'];
@@ -302,11 +304,11 @@ class Header extends SiteConfig
      */
     private static function showNavigation()
     {
-        $rootdir = self::$rootdir;
-        $main = self::$main;
         $main_pages = self::MAIN_PAGES;
+        $acc_pages  = self::ACC_PAGES;
+        $rootdir = self::$rootdir;
+        $main    = self::$main;
         $stepout = self::$stepout;
-        $acc_pages = self::ACC_PAGES;
         $site_id = self::$site_id;
 
         $output = "

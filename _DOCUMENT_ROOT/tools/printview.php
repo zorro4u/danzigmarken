@@ -1,13 +1,14 @@
 <?php
-namespace Dzg\Test;
+namespace Dzg\Sites;
+use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
 
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Header.php";
-use Dzg\Tools\{Database, Auth, Tools, Header};
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/loader_default.php";
 
-// Seite anzeigen
+
+// die Seite jetzt anzeigen
 PrintView::show();
 
 
@@ -39,8 +40,9 @@ class PrintView
     {
         self::siteEntryCheck();
 
-        Header::loadHtmlMeta();
+        Header::loadHtmlHead();
         self::seitenausgabe();
+        Footer::show("empty");
     }
 
 

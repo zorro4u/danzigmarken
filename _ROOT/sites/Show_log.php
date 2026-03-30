@@ -103,8 +103,10 @@ class Show_log
                     $out .= "<table>";
                     $ip = '';
                     foreach($entry AS $key=>$value) {
-                        if ($key === "id" or $key === "created") continue;
-                        if ($key === "referer" && empty($value)) continue;
+                        if ($key === "id") continue;
+                        if ($key === "created") continue;
+                        if ($key === "referer") continue;
+                        #if ($key === "referer" && empty($value)) continue;
 
                         $style0 = $style1 = "";
 
