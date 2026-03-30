@@ -2,6 +2,6 @@
 namespace Dzg;
 require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/Starter.php";
 
-function start($site='table') {
-    Starter::run($site);
+function show($site=null) {
+    Starter::show($site);
 }

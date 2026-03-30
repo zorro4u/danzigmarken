@@ -11,11 +11,7 @@ session_start();
 
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Database.php';
-require_once __DIR__.'/../tools/Auth.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
 
 
 /***********************

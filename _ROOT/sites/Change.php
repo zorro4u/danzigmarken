@@ -5,11 +5,7 @@ use PDO;
 use PDOException;
 
 require_once __DIR__.'/Details.php';
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Database.php';
-require_once __DIR__.'/../tools/Auth.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
 
 
 /***********************

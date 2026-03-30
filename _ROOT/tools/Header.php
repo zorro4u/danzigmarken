@@ -1,6 +1,7 @@
 <?php
 namespace Dzg\Tools;
 
+require_once __DIR__.'/SiteConfig.php';
 require_once __DIR__.'/Auth.php';
 require_once __DIR__.'/CheckIP.php';
 require_once __DIR__.'/Logger.php';
@@ -14,251 +15,8 @@ require_once __DIR__.'/Tools.php';
  * __public__
  * show()
  */
-class Header
+class Header extends SiteConfig
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
-    private const HEAD_TEMPLATE = "/assets/inc/html-head-meta.php";
-
-    private const
-        PAGE_SETUP = [
-            'cache_no' => "must-revalidate, no-store", #, no-cache, max-age=0, private",
-            'cache_0'  => "no-cache, max-age=0, must-revalidate, private",
-            'cache_1h' => "max-age=3600, stale-if-error=86400, private",    # 1h+1d
-            'cache_1w' => "max-age=604800, stale-if-error=86400, private",  # 7+1Tage
-
-            'expires_0'  => "0",                  # no-cache
-            'expires_1h' => "3600",               # 1 Std Cache
-
-            'robots_index'  => "index, nofollow,",      # indiziert
-            'robots_no'     => "noindex, nofollow,",
-            'robots_follow' => "noindex, follow,",      # Seitenlinks folgen
-
-            'google0' => "",
-            'google1' => "nopagereadaloud",
-
-            'canonical0' => "",
-            'canonical1' => '<link rel="canonical" href="https://www.danzigmarken.de/index">',
-            'canonical2' => '<link rel="canonical" href="https://www.danzigmarken.de/details.php?id=10">',
-        ];
-    public const
-        PAGE = [
-            'index.php' => [
-                'id' => 1,
-                'meta' => [
-                    'title' => "Briefmarken und Paketkarten der Stadt Danzig (1889-1920-1939-1945)",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_index'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical1'],
-                ],
-            ],
-            'index2.php' => [
-                'id' => 2,
-                'meta' => [
-                    'title' => "Briefmarken und Paketkarten der Stadt Danzig (1889-1920-1939-1945)",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_index'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical1'],
-                ],
-            ],
-            'details.php' => [
-                'id' => 3,
-                'meta' => [
-                    'title' => "Detailansicht - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google0'],
-                    'canonical' => self::PAGE_SETUP['canonical2'],
-                ],
-            ],
-            'change.php' => [
-                'id' => 4,
-                'meta' => [
-                    'title' => "Bearbeiten - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1h'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical2'],
-                ],
-            ],
-            'upload.php' => [
-                'id' => 5,
-                'meta' => [
-                    'title' => "Upload - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1w'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'impressum.php' => [
-                'id' => 6,
-                'meta' => [
-                    'title' => "Impressum - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1w'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'login.php' => [
-                'id' => 7,
-                'meta' => [
-                    'title' => "Anmelden - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google0'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'pwforget.php' => [
-                'id' => 8,
-                'meta' => [
-                    'title' => "PW-Vergessen - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'pwreset.php' => [
-                'id' => 9,
-                'meta' => [
-                    'title' => "PW-Reset - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google0'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'register-info.php' => [
-                'id' => 10,
-                'meta' => [
-                    'title' => "Registrieren-Info - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'register.php' => [
-                'id' => 11,
-                'meta' => [
-                    'title' => "Registrieren - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google0'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'activate.php' => [
-                'id' => 12,
-                'meta' => [
-                    'title' => "Aktivieren - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'kontakt.php' => [
-                'id' => 13,
-                'meta' => [
-                    'title' => "Kontakt - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1w'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_follow'],
-                    'google' => self::PAGE_SETUP['google0'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'logout.php' => [
-                'id' => 14,
-                'meta' => [
-                    'title' => "Abmelden - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1w'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_follow'],
-                    'google' => self::PAGE_SETUP['google0'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'download.php' => [
-                'id' => 15,
-                'meta' => [
-                    'title' => "Download - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1h'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'about.php' => [
-                'id' => 16,
-                'meta' => [
-                    'title' => "About - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1w'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'settings.php' => [
-                'id' => 100,
-                'meta' => [
-                    'title' => "Konto - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'admin.php' => [
-                'id' => 101,
-                'meta' => [
-                    'title' => "erweiterte Einstellungen - danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_no'],
-                    'expires' => self::PAGE_SETUP['expires_0'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-            'dummy' => [
-                'id' => 500,
-                'meta' => [
-                    'title' => "danzigmarken.de",
-                    'cache' => self::PAGE_SETUP['cache_1h'],
-                    'expires' => self::PAGE_SETUP['expires_1h'],
-                    'robots' => self::PAGE_SETUP['robots_no'],
-                    'google' => self::PAGE_SETUP['google1'],
-                    'canonical' => self::PAGE_SETUP['canonical0'],
-                ],
-            ],
-        ];
-
-
-    private const ACC_PAGES = ['login.php','logout.php','admin.php','settings.php'];
-    private const MAIN_PAGES = [1 => 'index.php', 2 => 'index2.php'];
-
     private static string $rootdir;
     private static $main;
     private static $stepout;
@@ -269,13 +27,11 @@ class Header
     /***********************
      * den obersten Teil der Webseite inclusive Seiten-Navigation ausgeben
      */
-    public static function show(string $site_name='')
+    public static function show(?string $site_name=null)
     {
-        #self::$site_name = $site_name;
-
         self::antiflood();
         self::dataPreparation();
-        self::loadHtmlMeta();
+        self::loadHtmlHead();
         self::showNavigation();
     }
 
@@ -319,65 +75,8 @@ class Header
     }
 
 
-
-    /***********************
-     * auf der Webseite die oberste, nicht sichtbare
-     * Html <head> Section mit den meta-Anweisungen ausgeben
-     */
-    public static function loadHtmlMeta()
-    {
-        # https://www.danzig.org/
-        # https://arge.danzig.org/
-
-
-        // die speziellen META-Anweisungen der Webseite laden
-        $meta = (!empty(self::$site_name))
-        ? self::PAGE[self::$site_name]['meta']
-        : self::PAGE['dummy']['meta'];
-
-        // und den Template-Variable zuordnen
-        $title   = $meta['title'];
-        $cache   = $meta['cache'];
-        $expires = $meta['expires'];
-        $robots  = $meta['robots'];
-        $google  = $meta['google'];
-        $canonical = $meta['canonical'];
-
-        // lädt das <head> Template
-        require_once $_SERVER['DOCUMENT_ROOT'].self::HEAD_TEMPLATE;
-    }
-
-
-    public static function getSiteID(string $site_name): int
-    {
-        if (empty(self::$site_id))
-            self::setSiteID($site_name);
-        return self::$site_id;
-    }
-    public static function setSiteID(string $site_name)
-    {
-        # TODO
-        #$site_name = basename($_SERVER['PHP_SELF']);
-
-        $page = self::PAGE;
-        $id = (!empty($page[$site_name]))
-            ? $page[$site_name]['id']
-            : $page['dummy']['id'];
-
-        $_SESSION['siteid'] = self::$site_id = $id;
-
-        if (empty($_SESSION['idx2']) && $id === 2) {
-            $_SESSION['idx2'] = True;
-        } elseif (!empty($_SESSION['idx2']) && $id === 1) {
-            $_SESSION['idx2'] = False;
-        };
-    }
-
-
-    /***********************
-     * Summary of active
-     * @param mixed $site_arr
-     * @return string
+    /**
+     * not in use
      */
     public static function active(array $site_arr): string
     {
@@ -397,8 +96,8 @@ class Header
     {
         Auth::isCheckedIn();
 
-        self::$site_name = basename($_SERVER['PHP_SELF']);
-        $site_id = self::getSiteID(self::$site_name);
+        // Site-ID wird in Starter.php gesetzt
+        $site_id = $_SESSION['siteid'];
 
         // Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
         // sonst Probleme zB. mit css Aufruf
@@ -410,14 +109,17 @@ class Header
         $main_pages = self::MAIN_PAGES;
         if (in_array($site_id, array_keys($main_pages))) {
             $main_page = $rootdir.'/'.$main_pages[$site_id];
-        } elseif (isset($_SESSION['main'])) {
+        }
+        elseif (isset($_SESSION['main'])) {
             $main_page = $_SESSION['main'];
-        } else {
+        }
+        else {
             $main_page = $rootdir.'/'.$main_pages[1];
         };
+
         $_SESSION['main'] = $main_page;
 
-        $main = ['site' => $main_page, 'name' => 'Übersicht'];
+        $main    = ['site' => $main_page, 'name' => 'Übersicht'];
         $stepout = ['site' => $main_page, 'name' => '<i class="fas fa-home"></i>Übersicht'];
 
 
@@ -493,9 +195,9 @@ class Header
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
-            // register-info.php
+            // registerinfo.php
             case 10:
-                $main = ['site' => $rootdir.'/auth/register-info.php', 'name' => 'Registrieren'];
+                $main = ['site' => $rootdir.'/auth/registerinfo.php', 'name' => 'Registrieren'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
@@ -560,6 +262,38 @@ class Header
 
         self::$main = $main;
         self::$stepout = $stepout;
+        self::$site_id = $site_id;
+    }
+
+
+    /***********************
+     * auf der Webseite die oberste, nicht sichtbare
+     * Html <head> Section mit den meta-Anweisungen ausgeben
+     */
+    public static function loadHtmlHead()
+    {
+        # https://www.danzig.org/
+        # https://arge.danzig.org/
+
+        // die META-Anweisungen der Webseite aus dem Site-Array extrahieren
+        foreach(self::PAGE as $k=>$v){
+            if($v['site_id'] === self::$site_id)
+                $meta = $v['meta'];
+        }
+        # falls hier irgendwas mit der ID-Zuweisung schief lief
+        $meta ??= self::PAGE['dummy']['meta'];
+
+        // und den Template-Variable zuordnen
+        $title   = $meta['title'];
+        $cache   = $meta['cache'];
+        $expires = $meta['expires'];
+        $robots  = $meta['robots'];
+        $google  = $meta['google'];
+        $canonical = $meta['canonical'];
+
+        // gibt das HTML <head> Template aus,
+        // inkl. den gerade gesetzen META-Werten
+        require_once $_SERVER['DOCUMENT_ROOT'].self::HEAD_TEMPLATE;
     }
 
 

@@ -2,11 +2,7 @@
 namespace Dzg\Sites;
 use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Database.php';
-require_once __DIR__.'/../tools/Auth.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
 
 
 /****************************

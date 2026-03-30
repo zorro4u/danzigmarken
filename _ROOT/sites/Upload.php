@@ -4,10 +4,7 @@ use Dzg\Tools\{Header, Footer, Auth, Tools};
 
 // IN ARBEIT \\
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Auth.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
 
 
 /***********************

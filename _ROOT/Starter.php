@@ -1,17 +1,45 @@
 <?php
 namespace Dzg;
 use Dzg\Sites;
+use Dzg\Tools\SiteConfig as Init;
+
+require_once __DIR__.'/tools/SiteConfig.php';
 
 
 class Starter
 {
-    public static function run($site='table')
+    /**
+     * setzt anhand der Startdatei globale Werte,
+     * die aus der SiteConfig kommen
+     */
+    public static function loadSiteConfig(?string $site=null)
     {
-        $class_site = __DIR__."/sites/".ucfirst($site).".php";
-        require_once $class_site;
+        # ??= steht für: if(!isset(x)) x=y else x=x;             - existiert nicht
+        # ?:  steht für: if(isset(x) && empty(x)) z=y else z=x;  - existiert, aber leer
+        $site ??= basename($_SERVER['PHP_SELF']);
+        $page = Init::PAGE[$site] ?? Init::PAGE['dummy'];
+
+        // globaler Wert für weiteren Seitenaufbau
+        $_SESSION['siteid'] = $id = $page['site_id'];
+
+        // Tabelle: Einzel- oder Gruppenmodus?
+        $_SESSION['idx2'] = ($id === 2) ? true : false;
+
+        return $page['class_file'];
+    }
 
 
-        switch (strtolower($site)):
+    /**
+     * startet die entspr. Seite
+     */
+    public static function show($site=null)
+    {
+        // lädt die entspr. Klassendatei, wenn vorhanden
+        !($classfile = self::loadSiteConfig($site))
+            ?: require_once __DIR__."/sites/".ucfirst($classfile);
+
+        // startet die Seitenklasse
+        switch(strtolower(basename($classfile, '.php'))):
 
             case "admin":
                 Sites\Admin::show();
@@ -49,7 +77,7 @@ class Starter
                 Sites\Pw_reset::show();
                 break;
 
-            case "register_info":
+            case "registerinfo":
                 Sites\Register_info::show();
                 break;
 
@@ -63,10 +91,6 @@ class Starter
 
             case "kontakt":
                 Sites\Kontakt::show();
-                break;
-
-            case "download":
-
                 break;
 
             case "upload":
@@ -85,7 +109,14 @@ class Starter
                 Sites\About::show();
                 break;
 
+
+            case "empty":
+                Sites\Dummy::show("no website found... <br>");
+                break;
+
+            case "download":
             default:
+                exit("exit: no website found... <br>");
 
         endswitch;
     }

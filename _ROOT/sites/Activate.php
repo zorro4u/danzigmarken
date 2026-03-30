@@ -7,10 +7,7 @@ use Dzg\Tools\{Header, Footer, Database, Tools};
 session_start();
 date_default_timezone_set('Europe/Berlin');
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Database.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
 
 
 /***********************

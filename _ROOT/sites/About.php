@@ -5,7 +5,7 @@ use Dzg\PrivateData as My;
 
 require_once __DIR__.'/../tools/Header.php';
 require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../db/account_data.php';
+require_once __DIR__.'/../private/account_data.php';
 
 
 class About

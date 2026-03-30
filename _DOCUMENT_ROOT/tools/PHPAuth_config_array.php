@@ -1,7 +1,7 @@
 <?php
 // Anmeldedaten laden
 use Dzg\PrivateData as MyData;
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/db/account_data.php";
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/private/account_data.php";
 
 $smtp0 = [
     'from_name'  => "danzigmarken.de",

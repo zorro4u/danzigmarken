@@ -26,8 +26,8 @@ class Footer
                 self::account();
                 break;
 
-            case "leer":
-                self::leer();
+            case "empty":
+                self::empty();
                 break;
 
             case "impressum":
@@ -208,7 +208,7 @@ class Footer
     }
 
 
-    protected static function leer()
+    protected static function empty()
     {
         $output = "<footer class='container'></footer>";
         $output .= self::BOOTSTRP;

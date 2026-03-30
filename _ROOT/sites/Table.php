@@ -2,14 +2,8 @@
 namespace Dzg\Sites;
 use Dzg\Tools\{TableBody, TableData, TableNavi, Header, Footer, Database, Auth, Tools};
 
-require_once __DIR__.'/../tools/TableData.php';   // Datenbank-Abfrage
-require_once __DIR__.'/../tools/TableBody.php';   // Tabellen-Erzeugung
-require_once __DIR__.'/../tools/TableNavi.php';   // Tabellen-Navigation
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Database.php';
-require_once __DIR__.'/../tools/Auth.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
+require_once __DIR__.'/../tools/loader_table.php';
 
 
 /***********************
@@ -145,8 +139,6 @@ class Table
 
     public static function getSession()
     {
-        Header::setSiteID(basename($_SERVER['PHP_SELF']));
-
         $keys_str = ['version','sort','dir','col','search', 'suche','thema','filter','rootdir'];
         $keys_int = ['siteid','start','proseite','userid','su','loggedin','idx2'];
         $keys_arr = ['jump'];

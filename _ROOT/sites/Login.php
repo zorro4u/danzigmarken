@@ -4,11 +4,7 @@ use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
 use PDO;
 use PDOException;
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Database.php';
-require_once __DIR__.'/../tools/Auth.php';
-require_once __DIR__.'/../tools/Tools.php';
+require_once __DIR__.'/../tools/loader_default.php';
 
 
 class Login
@@ -435,11 +431,11 @@ class Login
                     #: $_SESSION['rootdir']."/auth/pwforget.php";
 
                 if ($input_email1 != "" && $input_usr === "")
-                    $reg_link = "./register-info.php?email=".$input_email1;
+                    $reg_link = "./registerinfo.php?email=".$input_email1;
                 elseif ($input_usr != "")
-                    $reg_link = "./register-info.php?usr=".$input_usr;
+                    $reg_link = "./registerinfo.php?usr=".$input_usr;
                 else
-                    $reg_link = "./register-info";
+                    $reg_link = "./registerinfo";
 
             $output .= "
                 <table style='display: block; width: 100%; margin-top: 20px;'><tr>

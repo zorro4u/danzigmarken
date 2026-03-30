@@ -152,9 +152,9 @@ $range6 = "1::/32";
 #$res6 = ip_in_range($ip6, $range6);
 $res6 = $test->match($ip6, $range6);
 
-#$r6 = $res6 ?: 'NIX'; # res6 existiert, aber leer
-#$r7 = $res7 ?? 'NIX'; # res7 existiert nicht
-var_dump($res6);echo'<br>';
+$res6 = $res6 ?: 'NIX'; # res6 existiert, aber leer
+$res7 ??= 'NIX';        # res7 existiert nicht
+var_dump($res6, $res7);echo'<br>';
 
 
 

@@ -7,7 +7,7 @@ use Exception;
 
 date_default_timezone_set('Europe/Berlin');
 
-require_once __DIR__.'/../db/account_data.php';
+require_once __DIR__.'/../private/account_data.php';
 
 
 /***********************

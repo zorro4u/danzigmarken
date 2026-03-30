@@ -3,7 +3,7 @@ date_default_timezone_set('Europe/Berlin');
 
 // Anmeldedaten laden
 use Dzg\PrivateData as MyData;
-require_once __DIR__.'/../db/account_data.php';
+require_once __DIR__.'/../private/account_data.php';
 
 
 // Konfiguration des Mail-Moduls
