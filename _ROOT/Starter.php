@@ -101,6 +101,10 @@ class Starter
                 Sites\Show_log::show();
                 break;
 
+            case "printview":
+                Sites\Printview::show();
+                break;
+
             case "impressum":
                 Sites\Impressum::show();
                 break;

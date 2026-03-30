@@ -19,10 +19,13 @@ class SiteConfig
         'cache_no' => "must-revalidate, no-store", #, no-cache, max-age=0, private",
         'cache_0'  => "no-cache, max-age=0, must-revalidate, private",
         'cache_1h' => "max-age=3600, stale-if-error=86400, private",    # 1h+1d
+        'cache_1d' => "max-age=604800, stale-if-error=86400, private",  # 1+1Tage
         'cache_1w' => "max-age=604800, stale-if-error=86400, private",  # 7+1Tage
 
         'expires_0'  => "0",                  # no-cache
         'expires_1h' => "3600",               # 1 Std Cache
+        'expires_1d' => "86400",              # 1 Tag
+        'expires_1w' => "604800",             # 1 Woche
 
         'robots_index'  => "index, nofollow,",      # indiziert
         'robots_no'     => "noindex, nofollow,",
@@ -282,6 +285,19 @@ class SiteConfig
             'title' => "danzigmarken.de",
             'cache' => self::META['cache_no'],
             'expires' => self::META['expires_0'],
+            'robots'  => self::META['robots_no'],
+            'google'  => self::META['google1'],
+            'canonical' => self::META['canonical0'],
+            ],
+        ],
+
+    'printview.php' => [
+        'class_file' => 'Printview.php',
+        'site_id'  => 103,
+        'meta'     => [
+            'title' => "danzigmarken.de",
+            'cache' => self::META['cache_1w'],
+            'expires' => self::META['expires_1d'],
             'robots'  => self::META['robots_no'],
             'google'  => self::META['google1'],
             'canonical' => self::META['canonical0'],
