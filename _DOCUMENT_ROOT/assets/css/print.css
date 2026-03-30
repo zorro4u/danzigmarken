@@ -42,8 +42,8 @@ z-index: auto;
 /**************************************************/
 /* A4 Hochformat, Ränder: oben rechts unten links */
 @page {
-    size: A4 landscape;     /* für Übersichtstabelle */
-    size: A4 portrait;      /* für Detailausdruck */
+    size: A4 landscape;     /* für Übersichtstabelle, breit */
+    size: A4 portrait;      /* für Detailausdruck, hoch */
     margin: 1.5cm 1cm 1cm 1cm;
 }
 

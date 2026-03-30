@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/cls/Database.php";
-use Dzg\Database;
+use Dzg\Tools\Database as DB;
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
 
 // je nachdem über welchen Weg die Daten kommen, json_Array vs POST
 $data = json_decode(file_get_contents('php://input'));
@@ -19,7 +19,7 @@ if (isset($_POST['id']) && isset($_POST['prn'])) {
         ':ip'  => $ip,
         ':by'  => $userid,
         ':id'  => $id ];
-    Database::sendSQL($stmt, $data);
+    DB::sendSQL($stmt, $data);
 }
 
 
@@ -139,7 +139,7 @@ $id = (int)$_GET['id'];
 $prn = (int)$_GET['prn'];
 $ip = $_SERVER['REMOTE_ADDR'];
 $stmt = "UPDATE dzg_file SET print=?, chg_ip=? WHERE id=?";
-Database::fetchDB($stmt, [$prn,$ip,$id]);
+DB::fetchDB($stmt, [$prn,$ip,$id]);
 
 <script>
 function prn_toogle(id, prn) {

@@ -1,11 +1,13 @@
 <?php
+namespace Dzg\Test;
+
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
 $_SESSION['siteid'] = 15;
 
-require_once __DIR__.'/Database.php';
-use Dzg\Database;
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
+use \Dzg\Tools\Database as DB;
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/static/vendor/autoload.php';
 #use avadim\FastExcelReader\Excel as rExcel;
@@ -150,15 +152,15 @@ class Download
             ORDER BY {$sort}";
 # LIMIT :start, :proseite";
 
-        $dblist = Database::sendSQL($stmt1, [], 'fetchall', 'num');
+        $dblist = DB::sendSQL($stmt1, [], 'fetchall', 'num');
 
         // DB-Spaltennamen holen
         $stmt2 = $stmt1." LIMIT 1";
-        $colname = array_keys(Database::sendSQL($stmt2, [], 'fetch'));
+        $colname = array_keys(DB::sendSQL($stmt2, [], 'fetch'));
 
         // Kat-Bezeichnung holen
         $stmt3 = "SELECT spalte, bezeichnung FROM dzg_katbezeichnung ORDER BY spalte";
-        $kat_name = Database::sendSQL($stmt3, [], 'fetchall', 'num');
+        $kat_name = DB::sendSQL($stmt3, [], 'fetchall', 'num');
 
         // und tauschen
         foreach ($kat_name as $v) {

@@ -1,7 +1,7 @@
 <?php
-namespace Dzg;
+namespace Dzg\Mail;
 
-require __DIR__.'/MailConfig.php';
+require_once __DIR__.'/MailConfig.php';
 
 
 /***********************
@@ -14,7 +14,7 @@ class Mail
      * prepare and send email via PHP included mail-function
      *
      * $email_send = self::sendMyMail(
-                        $smtp['from_addr'],
+                        $smtp[0][0]['from_addr'],
                         $smtp['from_name'],
                         $mailto,
                         $subject,
