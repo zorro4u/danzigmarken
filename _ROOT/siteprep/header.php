@@ -99,7 +99,7 @@ class Header extends SiteConfig
     {
         Auth::isCheckedIn();
 
-        // Site-ID wird in Starter.php gesetzt
+        // Site-ID wird in starter.php gesetzt
         $site_id = $_SESSION['siteid'] ?? 404;
 
         // Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
