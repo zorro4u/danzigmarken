@@ -2,8 +2,13 @@
 namespace Dzg\Tools;
 
 require_once __DIR__.'/database.php';
-#require_once __DIR__.'/checkip.php';
-#use Exception;
+
+
+/***********************
+ *
+ * kleine Tool Sammlung zur diversen Nutzung
+ *
+ ***********************/
 
 
 function vardump(mixed ...$params)

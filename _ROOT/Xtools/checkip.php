@@ -93,7 +93,6 @@ class CheckIP
     }
 
 
-
     /*---------------------------*/
     // Public Part
 
@@ -394,6 +393,7 @@ class CheckIP
         $this->setter($userip, $message);
     }
 
+    
     private static function netmask6(string $userip)
     {
         // netmask/CIDR:

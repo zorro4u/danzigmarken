@@ -6,6 +6,9 @@ use Dzg\SitePrep\SiteConfig as Init;
 require_once __DIR__.'/siteprep/siteconfig.php';
 
 
+/**
+ * zentraler Startpunkt für Seitenausgabe
+ */
 class Starter
 {
     /**

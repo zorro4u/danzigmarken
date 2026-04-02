@@ -1,5 +1,6 @@
 <?php
 namespace Dzg\Tools;
+
 use Dzg\PrivateData as MyData;
 use PDO;
 use PDOException;

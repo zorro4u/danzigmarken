@@ -5,6 +5,9 @@ require_once __DIR__."/database.php";
 require_once __DIR__."/checkip.php";
 
 
+/**
+ * Log Daten in DB schreiben
+ */
 class Logger
 {
     /**
