@@ -92,7 +92,7 @@ class Admin
         self::$error_msg = $error_msg;
         self::$show_form = $status;
 
-        CheckIP::write_errorlog_into_DB();
+        self::$new_blocked = CheckIP::write_errorlog_into_DB();
     }
 
 

@@ -70,7 +70,7 @@ class Table
         'dat.kat29' => 'kat29',
         'the.thema' => 'thema',
         'sub2.sub2' => 'sub2',
-        'ort.name'  => 'name',
+        'dat.name'  => 'name',
         'suf.suffix' => 'suffix',
         'sta.id' => 'gid',
         'dat.id' => 'fid',
@@ -296,7 +296,7 @@ class Table
             $filter = "the.id IS NOT NULL";
         };
 
-        $filter .= " AND sta.deakt=0 AND dat.deakt=0 AND ort.deakt=0";
+        $filter .= " AND sta.deakt=0 AND dat.deakt=0";
 
 
         ///////////////////////////////////////////////////

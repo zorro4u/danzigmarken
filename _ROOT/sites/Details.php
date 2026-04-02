@@ -228,12 +228,11 @@ class Details
         -- Haupttabelle-Abfrage + filter (+ sortierung)
         SELECT {$select}
         FROM dzg_file AS dat
-            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
             LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-            LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
-            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
+            LEFT JOIN dzg_dirliste AS list ON list.id=dat.id_dirliste
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
         WHERE {$filter}
         -- Gruppen-Liste
         {$sql_filler1} GROUP BY sta.id
@@ -457,19 +456,18 @@ class Details
 
         $stmt = "WITH
         dzgfile AS (
-            SELECT id_stamp FROM dzg_file WHERE id=:id)
+            SELECT id_group FROM dzg_file WHERE id=:id)
 
         SELECT
-            dat.id fid, sta.id gid, ort.name, the.thema,
+            dat.id fid, sta.id gid, dat.name, the.thema,
             dat.changed changed, dat.created created, sta.changed s_changed, sta.created s_created,
-            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix, sta.*, dat.*
+            list.webroot, sub1.sub1, sub2.sub2, pre.prefix, dat.name, suf.suffix, sta.*, dat.*
         FROM dzg_file AS dat
-        LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-        LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+        LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
         LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-        LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-        LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
-        LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+        LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
+        LEFT JOIN dzg_dirliste AS list ON list.id=dat.id_dirliste
+        LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
         LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
         LEFT JOIN dzg_fileprefix AS pre ON pre.id_sub1=sub1.id
         WHERE sta.id IN (SELECT * FROM dzgfile)

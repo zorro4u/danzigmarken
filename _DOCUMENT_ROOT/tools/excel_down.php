@@ -110,13 +110,13 @@ class Download
             sta.kat15, sta.kat16, sta.kat17, sta.kat18, sta.kat19,
             dat.kat20, dat.kat21, dat.kat22, dat.kat23, dat.kat24,
             dat.kat25, dat.kat26, dat.kat27, dat.kat28, dat.kat29,
-            dir.webroot, sub1.sub1, sub2.sub2, ort.name, suf.suffix,
-            ort.dat_create, ort.dat_change, ort.dat_access,
-            ort.id oid, dat.id did, sta.id sid";
+            dir.webroot, sub1.sub1, sub2.sub2, dat.name, suf.suffix,
+            dat.dat_create, dat.dat_change, dat.dat_access,
+            dat.id oid, dat.id did, sta.id sid";
 
         $filter = (!empty($_SESSION['filter']))
             ? $_SESSION['filter']
-            : 'ort.deakt=0';
+            : 'dat.deakt=0';
 
         $sort = (!empty($_SESSION['sort']))
             ? "{$_SESSION['sort']},"
@@ -139,13 +139,12 @@ class Download
         }
 
         $stmt1 = "SELECT {$col}
-            FROM dzg_fileplace ort
-            LEFT JOIN dzg_file dat ON dat.id=ort.id_datei
-            LEFT JOIN dzg_group sta ON sta.id=dat.id_stamp
+            FROM dzg_file dat
+            LEFT JOIN dzg_group sta ON sta.id=dat.id_group
             LEFT JOIN dzg_dirsub2 the ON the.id=dat.id_thema
-            LEFT JOIN dzg_dirsub2 sub2 ON sub2.id=ort.id_sub2
-            LEFT JOIN dzg_dirliste dir ON dir.id=ort.id_dirliste
-            LEFT JOIN dzg_filesuffix suf ON suf.id=ort.id_suffix
+            LEFT JOIN dzg_dirsub2 sub2 ON sub2.id=dat.id_sub2
+            LEFT JOIN dzg_dirliste dir ON dir.id=dat.id_dirliste
+            LEFT JOIN dzg_filesuffix suf ON suf.id=dat.id_suffix
             LEFT JOIN dzg_dirsub1 sub1 ON sub1.id
             LEFT JOIN dzg_fileprefix pre ON pre.id_sub1=sub1.id
             WHERE {$filter} AND pre.prefix='t_'

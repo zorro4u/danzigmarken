@@ -169,11 +169,9 @@ class Change extends Details
             ':id' => $akt_file_id,  # int
             ':ip' => $remaddr ];
         $stmt1 = "UPDATE dzg_file SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
-        $stmt2 = "UPDATE dzg_fileplace SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id_datei=:id";
         $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
 
         Database::sendSQL($stmt1, $data);
-        Database::sendSQL($stmt2, $data);
 
         // wenn nur 1 Datei, dann auch Gruppeneintrag löschen
         if ($max_file < 2) {
@@ -229,11 +227,9 @@ class Change extends Details
             ':id' => $akt_file_id,  # int
             ':ip' => $remaddr ];
         $stmt1 = "UPDATE dzg_file SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
-        $stmt2 = "UPDATE dzg_fileplace SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id_datei=:id";
         $stmt3 = "UPDATE dzg_group SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
 
         Database::sendSQL($stmt1, $data);
-        Database::sendSQL($stmt2, $data);
 
         // wenn nur 1 Datei, dann auch Gruppe wieder aktivieren
         if ($max_file < 2) {
@@ -312,7 +308,7 @@ class Change extends Details
             }
 
             // Datei mit neuer Marke verknüpfen
-            $stmt2 = "UPDATE dzg_file SET id_stamp=:new_gid, chg_ip=:ip, chg_by=:by
+            $stmt2 = "UPDATE dzg_file SET id_group=:new_gid, chg_ip=:ip, chg_by=:by
                         WHERE id=:akt_file_id";
             $data2 = [
                 ':akt_file_id'  => $akt_file_id,    # int
@@ -441,7 +437,7 @@ class Change extends Details
             if (isset($input['kat24'])) $d['kat24'] = $input['kat24'];
             if (isset($input['deakt'])) $d['deakt'] = $input['deakt'];
             if (isset($input['datum'])) $s['datum'] = $input['datum'];
-            if (isset($input['gid'])) $d['id_stamp'] = (int)$input['gid'];
+            if (isset($input['gid'])) $d['id_group'] = (int)$input['gid'];
             if (isset($input['print'])) $d['print'] = (int)$input['print'];
 /*
             if (isset($input['kat20'])) {

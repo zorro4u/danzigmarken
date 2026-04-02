@@ -51,11 +51,10 @@ class TableData
         summary AS (
             SELECT sta.id
             FROM dzg_file AS dat
-            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
             LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
             WHERE {$filter}
             {$sql_comment1} GROUP BY sta.id
             )
@@ -117,15 +116,14 @@ class TableData
         $stmt =
             "SELECT
                 dat.id AS fid, sta.id AS gid, the.thema AS thema,
-                list.webroot, sub1.sub1, sub2.sub2, pre.prefix, ort.name, suf.suffix,
+                list.webroot, sub1.sub1, sub2.sub2, pre.prefix, dat.name, suf.suffix,
                 sta.*, dat.*
             FROM dzg_file AS dat
-            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
             LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-            LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
-            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
+            LEFT JOIN dzg_dirliste AS list ON list.id=dat.id_dirliste
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
             LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
             LEFT JOIN dzg_fileprefix AS pre ON pre.id_sub1=sub1.id
             WHERE {$filter}
@@ -188,16 +186,15 @@ class TableData
 
         $stmt =
             "SELECT dat.id AS fid, list.webroot, sub1.sub1, sub2.sub2, pre.prefix,
-                ort.name, suf.suffix
+                dat.name, suf.suffix
             FROM dzg_file AS dat
-            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
             LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-            LEFT JOIN dzg_dirliste AS list ON list.id=ort.id_dirliste
+            LEFT JOIN dzg_dirliste AS list ON list.id=dat.id_dirliste
             LEFT JOIN dzg_dirsub1 AS sub1 ON sub1.id
-            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
             LEFT JOIN dzg_fileprefix AS pre ON pre.id_sub1=sub1.id
-            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
             WHERE sta.id=:id
                 AND pre.prefix='t_'
                 AND dat.deakt=0
@@ -236,12 +233,11 @@ class TableData
         $stmt =
             "SELECT dat.id AS fid, thb.thumb AS thumb
             FROM dzg_file AS dat
-            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
             LEFT JOIN dzg_dirsub2 AS the ON the.id=sta.id_thema
-            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
-            LEFT JOIN thb.thumbs AS thb ON thb.id=ort.id_thumb
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
+            LEFT JOIN thb.thumbs AS thb ON thb.id=dat.id_thumb
             WHERE sta.id=:gid
                 AND {$filter}
                 AND dat.deakt=0

@@ -292,7 +292,7 @@ class Tools
             ORDER BY id";
         $result = Database::sendSQL($stmt, [], 'fetchall');
 
-        $stmt = "UPDATE dzg_file SET kat23=:kat14 WHERE id_stamp=:id";
+        $stmt = "UPDATE dzg_file SET kat23=:kat14 WHERE id_group=:id";
         foreach ($result as $data) {
             Database::sendSQL($stmt, $data);
         }

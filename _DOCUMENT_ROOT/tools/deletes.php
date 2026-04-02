@@ -13,7 +13,7 @@ Delete::delete_deaktiv_files();
 
 
 /**
- * Löscht Einträge ort.deaktiv=1 aus DB & als Datei
+ * Löscht Einträge dat.deaktiv=1 aus DB & als Datei
  */
 class Delete
 {
@@ -32,13 +32,12 @@ class Delete
     {
         // als 'gelöscht' markierte Einträge aus DB holen
         $sql =
-            "SELECT sub2.sub2, ort.name, suf.suffix, dat.id
+            "SELECT sub2.sub2, dat.name, suf.suffix, dat.id
             FROM dzg_file AS dat
-            LEFT JOIN dzg_fileplace AS ort ON ort.id_datei=dat.id
-            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=ort.id_sub2
-            LEFT JOIN dzg_filesuffix AS suf ON suf.id=ort.id_suffix
-            WHERE ort.deakt=1";
+            LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
+            LEFT JOIN dzg_dirsub2 AS sub2 ON sub2.id=dat.id_sub2
+            LEFT JOIN dzg_filesuffix AS suf ON suf.id=dat.id_suffix
+            WHERE dat.deakt=1";
 
         // [['Lochung', 'xxx', '.jpg', id], [...]]
         $dblist = DB::sendSQL($sql, [], 'fetchall', 'num');
@@ -155,7 +154,6 @@ class Delete
     private static function deleting_db_files($result)
     {
         // Dateien aus DB (dzg_file) löschen
-        // (dzg_fileplace-Einträge durch FK autom. gelöscht)
 
         if (!empty($result['deleted_id'])) {
             // für executemany vorbereiten, Liste in Liste
@@ -172,7 +170,7 @@ class Delete
         $sql0 =
             "SELECT sta.id
             FROM dzg_group AS sta
-            LEFT JOIN dzg_file AS dat ON sta.id=dat.id_stamp
+            LEFT JOIN dzg_file AS dat ON sta.id=dat.id_group
             WHERE dat.id IS Null
                 AND sta.deakt=1
             GROUP BY sta.id";

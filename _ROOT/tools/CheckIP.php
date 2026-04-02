@@ -737,16 +737,16 @@ class CheckIP
             // Insert oder Update?
             foreach($qry as $ip){
                 !$ip['found']
-                ? $insert []= $ip['address']
-                : ($ip['upd']>0 ? $update []= $ip['address'] : 0);
+                ? $insert []= [$ip['address']]
+                : ($ip['upd']>0 ? $update []= [$ip['address']] : 0);
             }
 
             // IP blocken
             if($insert){
                 $stmt = "INSERT INTO site_blacklist
                     (ip, net, `block`, notiz)
-                    VALUES (?, 1, 1, 'from error_log')
-                    ON DUPLICATE KEY UPDATE id=id ";
+                    VALUES (?, 1, 1, 'from error_log')";
+                #    ON DUPLICATE KEY UPDATE id=id ";
                 $data = $insert;
             }
             elseif($update){
@@ -755,7 +755,7 @@ class CheckIP
                     WHERE ip=? ";
                 $data = $update;
             }
-            Database::sendSQL($stmt, $data, false, '', true);
+            Database::sendSQL($stmt, $data, false, 'num', true);
             #$stmt = "ALTER TABLE `site_blacklist` AUTO_INCREMENT=0";
             #Database::sendSQL($stmt, []);
 
@@ -822,8 +822,8 @@ class CheckIP
 
         $stmt = "INSERT INTO site_blacklist
             (ip, net, `block`, notiz)
-            VALUES (?, ?, 1, 'from htaccess')
-            ON DUPLICATE KEY UPDATE id=id";
+            VALUES (?, ?, 1, 'from htaccess')";
+        #    ON DUPLICATE KEY UPDATE id=id";
         Database::sendSQL($stmt, $block, false, 'num', true);
 
         return $block;

@@ -391,7 +391,7 @@ class Database
         ? self::getPDO()
         : self::connectMyDB();
 
-        # neuestes Datum aus created/changed: dzg_fileplace, dzg_file, dzg_group
+        # neuestes Datum aus created/changed: dzg_file, dzg_group
         # MAX-Werte der einzelnen Spalten holen,
         # die Ergebnis-Zeile in Spalte transponieren
         # und den MAX-Wert ermitteln
@@ -400,22 +400,19 @@ class Database
         -- eine Zeile mit den max-Werten der versch. Tabellenspalten
         -- 1Z/6S
         SELECT
-            MAX(ort.changed) m11, MAX(dat.changed) m12, MAX(sta.changed) m13,
-            MAX(ort.created) m21, MAX(dat.created) m22, MAX(sta.created) m23
-        FROM dzg_fileplace AS ort
-        LEFT JOIN dzg_file AS dat ON dat.id=ort.id_datei
-        LEFT JOIN dzg_group AS sta ON sta.id=dat.id_stamp
-        WHERE ort.deakt=0 ),
+            MAX(dat.changed) m12, MAX(sta.changed) m13,
+            MAX(dat.created) m22, MAX(sta.created) m23
+        FROM dzg_file AS dat
+        LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
+        WHERE dat.deakt=0 ),
 
         cte2 AS (
         -- Zeilenwerte ('m..') (nebeneinander) als Spaltenwerte ('werte') (untereinander)
         -- mit 'union all' die einzelnen select Abfragen anhängen
         -- pro Zeile: [wert]: (max.Wert)
         -- 6Z/1S
-        SELECT m11 wert FROM cte1 UNION ALL
         SELECT m12 wert FROM cte1 UNION ALL
         SELECT m13 wert FROM cte1 UNION ALL
-        SELECT m21 wert FROM cte1 UNION ALL
         SELECT m22 wert FROM cte1 UNION ALL
         SELECT m23 wert FROM cte1 )
 
