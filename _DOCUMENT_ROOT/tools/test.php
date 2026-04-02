@@ -1,12 +1,12 @@
 <?php
 namespace Dzg\Tools;
 
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Tools.php";
-require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/CheckIP.php";
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/database.php";
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/tools.php";
+require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/checkip.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/tools/ip_range/ip_in_range2.php";
 require_once $_SERVER['DOCUMENT_ROOT']."/tools/CIDRmatch.php";
-#require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Logger.php";
+#require_once $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/logger.php";
 #Logger::delete_logs();
 
 

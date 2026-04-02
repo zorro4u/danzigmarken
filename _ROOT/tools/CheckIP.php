@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\Tools;
 
-require_once __DIR__.'/Database.php';
+require_once __DIR__.'/database.php';
 
 
 /****************************
@@ -105,9 +105,9 @@ class CheckIP
      * aber bisschen vor permanenter DB-Abfragerei
      * Was ist bei ständig wechselnder IP?
      *
-     * wird in Header.php aufgerufen
+     * wird in header.php aufgerufen
      */
-    public static function antiflood(int $loads=5, int $time_gap=3, ?string $ip=null) :string
+    public static function antiflood(int $loads=5, int $time_gap=3, ?string $ip=null) :bool
     {
         // IP mit Blockliste abgleichen,
         // wenn mehrfach dann (Bereich) blocken
@@ -158,7 +158,11 @@ class CheckIP
             header("location: {$redirection}");
             exit;
         };
-        return $ip_address->status();
+
+        // wenn mal Zugriff auf Detailseite, dann ausnutzen und das errorlog auslesen
+        if(3 == $_SESSION['siteid'] ?? 0){self::write_errorlog_into_DB();}
+
+        return $ip_address->denied();
     }
 
 
@@ -856,7 +860,7 @@ class CheckIP
             }
 
             elseif(strpos($line, '</RequireAll>') !== false){
-                $ip_section_end = $line_num;
+                $ip_section_end = $line_num-1;
             };
         };
 
@@ -923,12 +927,11 @@ class CheckIP
 
                 // vor Ende IP-Section neue IPs einfügen
                 else{
-                    $date = date("d.m.Y H:i:s");
-                    $new_file_arr []= "# added at {$date}\n";
+                    #$date = date("d.m.Y H:i:s");
+                    #$new_file_arr []= "# added at {$date}\n";
                     foreach($write as $ip_str){
                         $new_file_arr []= 'Require not ip '.$ip_str."\n";
                     }
-                    $new_file_arr []= "\n";
                     $new_file_arr []= $line;
                 };
             };
@@ -943,7 +946,7 @@ class CheckIP
             #$out = htmlentities($file_input[$ip_section_end]);
             #var_dump(htmlspecialchars($file_input[2]));echo'<br>';
 
-            echo "= htaccess: +".count($new_file_arr)-2-count($file_input)." =<br><br>";
+            echo "= htaccess: +".count($new_file_arr)-count($file_input)." =<br><br>";
         };
 
     }

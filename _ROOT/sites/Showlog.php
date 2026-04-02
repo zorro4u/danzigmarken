@@ -2,17 +2,17 @@
 namespace Dzg\Sites;
 use Dzg\Tools\{Database, CheckIP, Logger};
 
-require_once __DIR__."/../tools/Database.php";
-require_once __DIR__."/../tools/CheckIP.php";
-require_once __DIR__."/../tools/Logger.php";
+require_once __DIR__."/../tools/database.php";
+require_once __DIR__."/../tools/checkip.php";
+require_once __DIR__."/../tools/logger.php";
 
 
-class Show_log
+class ShowLog
 {
     /**
      * das Log-Protokoll anzeigen, ggf kürzen
      * wird als Button in admin.php aufgerufen
-     * wurde in Footer.php angelegt
+     * wurde in footer.php angelegt
      */
     public static function show()
     {

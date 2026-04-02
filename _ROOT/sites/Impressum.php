@@ -1,11 +1,11 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\Tools\{Header, Footer, Auth};
+use Dzg\SitePrep\{Header, Footer};
+use Dzg\Tools\Auth;
 use Dzg\PrivateData as My;
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
-require_once __DIR__.'/../tools/Auth.php';
+require_once __DIR__.'/../siteprep/loader_default.php';
+require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../private/account_data.php';
 
 
@@ -17,6 +17,7 @@ class Impressum
     public static function show()
     {
         self::siteEntryCheck();
+
         Header::show();
         self::siteOutput();
         Footer::show("impressum");
@@ -26,7 +27,7 @@ class Impressum
     /**
      * Summary of siteEntryCheck
      */
-    public static function siteEntryCheck()
+    private static function siteEntryCheck()
     {
         // Nutzer nicht angemeldet? Dann weg hier ...
         if (!Auth::isCheckedIn()) {
@@ -57,7 +58,7 @@ Deutschland</p>
 Kontakt:</span><br />
 Telefon: <?= My\PHONE ?><br />
 E-Mail:
-    <a href='/kontakt' title='Kontaktformular' style='background-color:transparent'>
+    <a href='/contact' title='Kontaktformular' style='background-color:transparent'>
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>
 
 <br />

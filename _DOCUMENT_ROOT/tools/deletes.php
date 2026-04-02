@@ -4,7 +4,7 @@ namespace Dzg\Test;
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/database.php";
 use Dzg\Tools\Database as DB;
 use Exception;
 

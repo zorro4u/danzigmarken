@@ -1,11 +1,12 @@
 <?php
-namespace Dzg\Tools;
+namespace Dzg\SitePrep;
+use Dzg\Tools\{Auth, Tools, CheckIP, Logger};
 
-require_once __DIR__.'/SiteConfig.php';
-require_once __DIR__.'/Auth.php';
-require_once __DIR__.'/CheckIP.php';
-require_once __DIR__.'/Logger.php';
-require_once __DIR__.'/Tools.php';
+require_once __DIR__.'/siteconfig.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
+require_once __DIR__.'/../tools/checkip.php';
+require_once __DIR__.'/../tools/logger.php';
 
 
 /***********************
@@ -22,6 +23,11 @@ class Header extends SiteConfig
     private static $stepout;
     private static string $site_name;
     private static int $site_id;
+    private static bool $ip_denied=false;
+
+    // getter
+    public static function site_id() {return self::$site_id;}
+    public static function ip_denied() {return self::$ip_denied;}
 
 
     /***********************
@@ -57,9 +63,7 @@ class Header extends SiteConfig
         // -2-
         // manipulierten URL-Aufruf blockieren
         $ip  = CheckIP::getIP();
-        $url = isset($_SERVER["REQUEST_URI"])
-        ? $_SERVER["REQUEST_URI"]
-        : '';
+        $url = $_SERVER["REQUEST_URI"] ?? '';
         if (str_contains($url, "%")) {
             $ipc = new CheckIP("clear");
             $ipc->under_suspicion($ip, true);
@@ -70,8 +74,7 @@ class Header extends SiteConfig
         // IP mit Blockliste abgleichen,
         // wenn mehrfach dann (Bereich) blocken
         // und wegleiten.
-        CheckIP::antiflood();
-
+        self::$ip_denied = CheckIP::antiflood();
     }
 
 
@@ -213,10 +216,10 @@ class Header extends SiteConfig
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
-            // kontakt.php
+            // contact.php
             case 13:
                 Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
-                $main = ['site' => $rootdir.'/kontakt/kontakt', 'name' => 'Kontakt'];
+                $main = ['site' => $rootdir.'/contact/contact', 'name' => 'Kontakt'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 

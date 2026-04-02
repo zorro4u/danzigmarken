@@ -6,7 +6,7 @@ session_start();
 
 $_SESSION['siteid'] = 15;
 
-require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/Database.php";
+require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/database.php";
 use \Dzg\Tools\Database as DB;
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/static/vendor/autoload.php';

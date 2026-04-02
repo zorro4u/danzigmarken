@@ -1,10 +1,9 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\Tools\{Header, Footer};
+use Dzg\SitePrep\{Header, Footer};
 use Dzg\PrivateData as My;
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
+require_once __DIR__.'/../siteprep/loader_default.php';
 require_once __DIR__.'/../private/account_data.php';
 
 
@@ -40,7 +39,7 @@ Deutschland</p>
 <p><span style='font-style:italic;text-decoration:underline'>
 Kontakt:</span><br />
 E-Mail:
-    <a href='/kontakt' title='Kontaktformular' style='background-color:transparent'>
+    <a href='/contact' title='Kontaktformular' style='background-color:transparent'>
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>
 
 

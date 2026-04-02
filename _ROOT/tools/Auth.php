@@ -14,8 +14,8 @@ namespace Dzg\Tools;
 
 date_default_timezone_set('Europe/Berlin');
 
-require_once __DIR__.'/Database.php';
-include_once __DIR__.'/Tools.php';
+require_once __DIR__.'/database.php';
+include_once __DIR__.'/tools.php';
 include_once __DIR__.'/auth.password.func.php';
 
 #require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";

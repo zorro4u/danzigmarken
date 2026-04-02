@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Tools;
+namespace Dzg\SitePrep;
 
 
 class SiteConfig
@@ -199,8 +199,8 @@ class SiteConfig
             ],
         ],
 
-    'kontakt.php' => [
-        'class_file' => 'Kontakt.php',
+    'contact.php' => [
+        'class_file' => 'Contact.php',
         'site_id' => 13,
         'meta'    => [
             'title' => "Kontakt - danzigmarken.de",
@@ -278,8 +278,8 @@ class SiteConfig
             ],
         ],
 
-    'show_log.php' => [
-        'class_file' => 'Show_log.php',
+    'showlog.php' => [
+        'class_file' => 'Showlog.php',
         'site_id'  => 102,
         'meta'     => [
             'title' => "danzigmarken.de",

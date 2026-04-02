@@ -1,9 +1,10 @@
 <?php
-namespace Dzg\Tools;
-use Dzg\Sites\Table;
+namespace Dzg\SitePrep;
+use Dzg\Tools\Auth;
 
-require_once __DIR__.'/TableData.php';
-require_once __DIR__.'/../sites/Table.php';
+require_once __DIR__.'/table.php';
+require_once __DIR__.'/tabledata.php';
+require_once __DIR__.'/../tools/auth.php';
 
 
 /***********************
@@ -24,10 +25,10 @@ class TableBody
      */
     public static function htmlTabkopf(): string
     {
-        $DBspalten = Table::DBspalten;
-        $spaltennamen = Table::spaltennamen();
-        $dir = Table::$_session['dir'];
-        $col = Table::$_session['col'];
+        $DBspalten = TablePrep::DBspalten;
+        $spaltennamen = TablePrep::spaltennamen();
+        $dir = TablePrep::$_session['dir'];
+        $col = TablePrep::$_session['col'];
         $is_checked_in = Auth::isCheckedIn();
         #$is_checked_in = $_SESSION['su'];
 
@@ -181,9 +182,9 @@ class TableBody
      */
     public static function htmlTabelle(): string
     {
-        $stamps_db = Table::$stamps_db;
-        $spaltennamen = Table::spaltennamen();
-        $idx2 = Table::$_session['idx2'];
+        $stamps_db = TablePrep::$stamps_db;
+        $spaltennamen = TablePrep::spaltennamen();
+        $idx2 = TablePrep::$_session['idx2'];
         $is_checked_in = Auth::isCheckedIn();
 
         if (!$is_checked_in) {

@@ -1,8 +1,9 @@
 <?php
-namespace Dzg\Tools;
+namespace Dzg\SitePrep;
+use Dzg\Tools\Database;
 
-require_once __DIR__.'/Database.php';
-require_once __DIR__.'/Logger.php';
+require_once __DIR__.'/../tools/database.php';
+#require_once __DIR__.'/..tools/logger.php';
 
 
 /***********************
@@ -14,8 +15,8 @@ class Footer
     {
         switch ($stile)
         {
-            case "kontakt":
-                self::kontakt();
+            case "contact":
+                self::contact();
                 break;
 
             case "auth":
@@ -53,7 +54,7 @@ class Footer
     // allg    (cop0,com,pic,ico)
     // auth    (cop0,com,ico)
     // account (cop0,com,ico)
-    // kontakt (cop1,com,ico)
+    // contact (cop1,com,ico)
 
 
 
@@ -74,7 +75,7 @@ class Footer
         title='www.danzigmarken.de'>danzigmarken.de</a>
     ";
     private const CC_COPY2 =
-        "&copy; 2023 <a class='foot-link' href='/kontakt.php'
+        "&copy; 2023 <a class='foot-link' href='/contact.php'
         title='Nachricht an danzigmarken.de'>danzigmarken.de</a>
     ";
     private const CC_COM = "
@@ -193,7 +194,7 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
+            <a class='foot-link' href='/contact' title='Nachricht an danzigmarken.de'>
             <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a>";
 
         // die neueste/letzte Änderungszeit einer Kontakt-Projektdatei
@@ -219,7 +220,7 @@ class Footer
     }
 
 
-    protected static function kontakt()
+    protected static function contact()
     {
         // Mitteltext
         $txt['mitte'] = self::CC_COPY . self::CC_COM . self::ABOUT . self::CC_ICO;
@@ -248,7 +249,7 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
+            <a class='foot-link' href='/contact' title='Nachricht an danzigmarken.de'>
             <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a>";
 
         // die neueste/letzte Änderungszeit einer Auth-Projektdatei
@@ -270,7 +271,7 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/kontakt' title='Nachricht an danzigmarken.de'>
+            <a class='foot-link' href='/contact' title='Nachricht an danzigmarken.de'>
             <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a>";
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei

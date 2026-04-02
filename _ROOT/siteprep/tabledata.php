@@ -1,9 +1,9 @@
 <?php
-namespace Dzg\Tools;
-use Dzg\Sites\Table;
+namespace Dzg\SitePrep;
+use Dzg\Tools\Database;
 
-require_once __DIR__.'/Database.php';
-require_once __DIR__.'/../sites/Table.php';
+require_once __DIR__.'/table.php';
+require_once __DIR__.'/../tools/database.php';
 
 
 /***********************
@@ -38,7 +38,7 @@ class TableData
      */
     public static function getMaxID(string $filter): int
     {
-        $idx2 = Table::$_session['idx2'];
+        $idx2 = TablePrep::$_session['idx2'];
 
         //-------------------------------------------------
         // Einzel- oder Gruppen-Liste
@@ -79,11 +79,11 @@ class TableData
      */
     public static function getData(): array
     {
-        $start = Table::$_session['start'];
-        $proseite = Table::$_session['proseite'];
-        $sort = Table::$_session['sort'];
-        $filter = Table::$_session['filter'];
-        $idx2 = Table::$_session['idx2'];
+        $start = TablePrep::$_session['start'];
+        $proseite = TablePrep::$_session['proseite'];
+        $sort = TablePrep::$_session['sort'];
+        $filter = TablePrep::$_session['filter'];
+        $idx2 = TablePrep::$_session['idx2'];
 
         $start = (!empty($start)) ? $start : 0;
         $proseite = (!empty($proseite)) ? $proseite : 5;
@@ -162,8 +162,8 @@ class TableData
         }
 
         // Sprungmarken-Liste global speichern (-> für Detail-Seite)
-        #$_SESSION['jump'] = Table::$_session['jump'] = $jumplist;
-        #$_SESSION['jump'] = Table::$_session['jump'] = [];
+        #$_SESSION['jump'] = TablePrep::$_session['jump'] = $jumplist;
+        #$_SESSION['jump'] = TablePrep::$_session['jump'] = [];
         unset($_SESSION['jump']);
 
         return $stamps_db;
@@ -228,7 +228,7 @@ class TableData
      */
     public static function getThumbBlob(int $gid): array
     {
-        $filter = Table::$_session['filter'];
+        $filter = TablePrep::$_session['filter'];
 
         $stmt =
             "SELECT dat.id AS fid, thb.thumb AS thumb

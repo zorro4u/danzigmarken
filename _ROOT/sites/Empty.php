@@ -1,9 +1,8 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\Tools\{Header, Footer};
+use Dzg\SitePrep\{Header, Footer};
 
-require_once __DIR__.'/../tools/Header.php';
-require_once __DIR__.'/../tools/Footer.php';
+require_once __DIR__.'/../siteprep/loader_default.php';
 
 
 class Dummy

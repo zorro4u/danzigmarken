@@ -1,15 +1,15 @@
 <?php
 namespace Dzg\Tools;
 
-require_once __DIR__."/Database.php";
-require_once __DIR__."/CheckIP.php";
+require_once __DIR__."/database.php";
+require_once __DIR__."/checkip.php";
 
 
 class Logger
 {
     /**
      * in Log schreiben
-     * wird in Footer.php aufgerufen
+     * wird in footer.php aufgerufen
      */
     public static function log()
     {

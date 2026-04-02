@@ -6,22 +6,24 @@
 
 
 namespace Dzg\Sites;
-use Dzg\Tools\{Header, Footer, Database, Auth, Tools};
+use Dzg\SitePrep\{Header, Footer};
+use Dzg\Tools\{Database, Auth, Tools};
 
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 session_start();
 
-require_once __DIR__.'/../tools/loader_default.php';
+require_once __DIR__.'/../siteprep/loader_default.php';
+require_once __DIR__.'/../tools/loader_tools.php';
 
 
-Register_pre::show();
+RegisterPre::show();
 
 
 /***********************
  * Summary of Register_pre
  */
-class Register_pre
+class RegisterPre
 {
     /***********************
      * Klassenvariablen / Eigenschaften

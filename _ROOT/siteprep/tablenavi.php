@@ -1,8 +1,9 @@
 <?php
-namespace Dzg\Tools;
-use Dzg\Sites\Table;
+namespace Dzg\SitePrep;
+use Dzg\Tools\Database;
 
-require_once __DIR__.'/../sites/Table.php';
+require_once __DIR__.'/table.php';
+require_once __DIR__.'/../tools/database.php';
 
 
 /***********************
@@ -28,8 +29,8 @@ class TableNavi
      */
     private static function datenbereich(): int
     {
-        $start = Table::$_session['start'];
-        $proseite = Table::$_session['proseite'];
+        $start = TablePrep::$_session['start'];
+        $proseite = TablePrep::$_session['proseite'];
 
         // Start setzen
         if (empty($start)) $start = 0;
@@ -66,11 +67,11 @@ class TableNavi
 
 
         // Klassenwerte setzen
-        Table::$_session['start'] = $start;
-        Table::$_session['proseite'] = $proseite;
+        TablePrep::$_session['start'] = $start;
+        TablePrep::$_session['proseite'] = $proseite;
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-        Table::setSession();
+        TablePrep::setSession();
 
         return $proseite;
     }
@@ -91,8 +92,8 @@ class TableNavi
      */
     public static function feldSeitenwahl(): string
     {
-        $maxID = Table::$maxID;
-        $start = Table::$_session['start'];
+        $maxID = TablePrep::$maxID;
+        $start = TablePrep::$_session['start'];
 
         // TODO: Seitensprung ändern, logischer
         // start:0 --> site:1
@@ -319,10 +320,10 @@ class TableNavi
 
 
         // Klassenwerte setzen
-        Table::$_session['start'] = $start;
+        TablePrep::$_session['start'] = $start;
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-        Table::setSession();
+        TablePrep::setSession();
 
         return $output;
     }
@@ -338,7 +339,7 @@ class TableNavi
      */
     public static function feldAnzeigewahl(): string
     {
-        $maxID = Table::$maxID;
+        $maxID = TablePrep::$maxID;
 
         // Datenanzeigebereich bestimmen
         $proseite = self::datenbereich();
@@ -388,7 +389,7 @@ class TableNavi
      */
     public static function feldThemenwahl()
     {
-        $sess_thema = Table::$_session['thema'];
+        $sess_thema = TablePrep::$_session['thema'];
 
         $theme_db = ['- alle -'];
         $stmt = "SELECT thema FROM dzg_dirsub2 ORDER BY thema DESC";
@@ -448,7 +449,7 @@ class TableNavi
      */
     public static function feldSuchen()
     {
-        $search = Table::$_session['search'];
+        $search = TablePrep::$_session['search'];
 
         $value = '';
         $placeholder = "suchen &hellip;";

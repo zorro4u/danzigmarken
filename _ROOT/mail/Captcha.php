@@ -3,7 +3,7 @@ namespace Dzg\Mail;
 use Dzg\Mail\QuestionBlocker;
 
 require_once __DIR__.'/QuestionBlocker.php';
-#require_once __DIR__.'/../sites/Kontakt.php';
+#require_once __DIR__.'/../sites/Contact.php';
 
 require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
 use Gregwar\Captcha\CaptchaBuilder;
@@ -22,7 +22,7 @@ use Gregwar\Captcha\CaptchaBuilder;
  * Summary of Captcha
  *
  * wird für Bilderzeugung in assets/inc/captcha.php benötigt
- * und in der Kontakt-Klasse
+ * und in der Contact-Klasse
  */
 class Captcha
 {
@@ -131,7 +131,7 @@ class Captcha
 	}
 
 	// mit CAPTCHA Bibliothek (sicherer, teilsweise aber schwer zu lesen)
-	// muss in Kontakt.php auch aktiviert sein
+	// muss in Contact.php auch aktiviert sein
 	public static function getPic0()
 	{
 		$captcha = new CaptchaBuilder;

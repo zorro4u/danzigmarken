@@ -1,9 +1,9 @@
 <?php
 namespace Dzg;
 use Dzg\Sites;
-use Dzg\Tools\SiteConfig as Init;
+use Dzg\SitePrep\SiteConfig as Init;
 
-require_once __DIR__.'/tools/SiteConfig.php';
+require_once __DIR__.'/siteprep/siteconfig.php';
 
 
 class Starter
@@ -38,7 +38,7 @@ class Starter
         !($classfile = self::loadSiteConfig($site))
             ?: require_once __DIR__."/sites/".ucfirst($classfile);
 
-        // startet die Seitenklasse
+        // startet die Seitenklasse über den zugehörigen Dateinamen
         switch(strtolower(basename($classfile, '.php'))):
 
             case "admin":
@@ -70,15 +70,15 @@ class Starter
                 break;
 
             case "pwforget":
-                Sites\Pw_forget::show();
+                Sites\PWforget::show();
                 break;
 
             case "pwreset":
-                Sites\Pw_reset::show();
+                Sites\PWreset::show();
                 break;
 
             case "registerinfo":
-                Sites\Register_info::show();
+                Sites\RegisterInfo::show();
                 break;
 
             case "register":
@@ -89,16 +89,16 @@ class Starter
                 Sites\Activate::show();
                 break;
 
-            case "kontakt":
-                Sites\Kontakt::show();
+            case "contact":
+                Sites\Contact::show();
                 break;
 
             case "upload":
                 Sites\Upload::show();
                 break;
 
-            case "show_log":
-                Sites\Show_log::show();
+            case "showlog":
+                Sites\ShowLog::show();
                 break;
 
             case "printview":
