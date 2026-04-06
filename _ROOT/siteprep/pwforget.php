@@ -17,7 +17,7 @@ require_once __DIR__.'/../tools/loader_tools.php';
 /***********************
  * Summary of Pw_forget
  */
-class PWforgetPrep
+class PWforget
 {
     /***********************
      * Klassenvariablen / Eigenschaften

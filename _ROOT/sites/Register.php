@@ -2,21 +2,21 @@
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->dieseSeite:RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
 
 namespace Dzg\Sites;
-use Dzg\SitePrep\RegisterPrep;
+use Dzg\SiteForm\Register as Init;
 use Dzg\SitePrep\{Header, Footer};
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
-require_once __DIR__.'/../siteprep/register.php';
+require_once __DIR__.'/../siteform/register.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
 /***********************
  * Summary of Register
  */
-class Register extends RegisterPrep
+class Register extends Init
 {
     /****************************
      * Summary of show

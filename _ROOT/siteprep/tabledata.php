@@ -1,8 +1,9 @@
 <?php
 namespace Dzg\SitePrep;
+use Dzg\SitePrep\TablePrep;
 use Dzg\Tools\Database;
 
-require_once __DIR__.'/table.php';
+require_once __DIR__.'/tableprep.php';
 require_once __DIR__.'/../tools/database.php';
 
 
@@ -38,7 +39,7 @@ class TableData
      */
     public static function getMaxID(string $filter): int
     {
-        $idx2 = TablePrep::$_session['idx2'];
+        $idx2 = $_SESSION['idx2'];
 
         //-------------------------------------------------
         // Einzel- oder Gruppen-Liste
@@ -61,9 +62,20 @@ class TableData
 
         SELECT COUNT(*) FROM summary ";
 
-        $maxID = Database::sendSQL($stmt, [], 'fetch', 'num')[0];
+        return (int)Database::sendSQL($stmt, [], 'fetch', 'num')[0];
+    }
 
-        return (int)$maxID;
+
+    public static function getThemes(): array
+    {
+        $stmt = "SELECT thema FROM dzg_dirsub2 ORDER BY thema DESC";
+        return Database::sendSQL($stmt, [], 'fetchall', 'num');
+    }
+
+
+     public static function getVersion(): string
+    {
+        return Database::version();
     }
 
 
@@ -255,7 +267,7 @@ class TableData
      *
      * @return array
      */
-    public static function kategorieBezeichnungen()
+    public static function kategorieBezeichnungen(): array
     {
         $stmt = "SELECT * FROM dzg_katbezeichnung";
         $result = Database::sendSQL($stmt, [], 'fetchall', 'num');

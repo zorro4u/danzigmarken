@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\UploadPrep;
+use Dzg\SitePrep\Upload as Init;
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\Tools;
 
@@ -18,7 +18,7 @@ require_once __DIR__.'/../tools/tools.php';
  * __public__
  * show()
  */
-class Upload extends UploadPrep
+class Upload extends Init
 {
     public static function show()
     {

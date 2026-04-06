@@ -1,9 +1,9 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\ChangePrep;
+use Dzg\SiteForm\Change as Init;
 use Dzg\SitePrep\{Header, Footer};
 
-require_once __DIR__.'/../siteprep/change.php';
+require_once __DIR__.'/../siteform/change.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
@@ -14,7 +14,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
  * __public__
  * show()
  */
-class Change extends ChangePrep
+class Change extends Init
 {
     /***********************
      * Anzeige der Webseite

@@ -12,7 +12,7 @@ require_once __DIR__.'/../tools/loader_tools.php';
  * die gesamte Datenbank als Druckversion anzeigen
  * dadurch die Möglichkeit, die Ausgaben als PDF-drucken zu speichern
  */
-class PrintViewPrep
+class PrintView
 {
     protected static array $theme_list;
     protected static int $akt_file_id;

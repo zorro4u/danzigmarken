@@ -1,9 +1,11 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SitePrep\TableData;
+use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/tabledata.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 /***********************
@@ -121,7 +123,7 @@ class TablePrep
      }
 
 
-    protected static function getSession()
+    protected static function getSession(): void
     {
         $keys_str = ['version','sort','dir','col','search', 'suche','thema','filter','rootdir'];
         $keys_int = ['siteid','start','proseite','userid','su','loggedin','idx2'];
@@ -138,7 +140,7 @@ class TablePrep
         };
     }
 
-    public static function setSession()
+    public static function setSession(): void
     {
         $key = ['idx2', 'sort', 'dir', 'col', 'search', 'suche',
                 'thema', 'filter', 'start', 'proseite'];
@@ -152,29 +154,21 @@ class TablePrep
                 $_SESSION[$k] = self::$_session[$k];
             };
         };
-        $_SESSION['version'] = Database::version();
+        $_SESSION['version'] = TableData::getVersion();
     }
 
 
     function __construct() {}
     function __destruct() {}
-
-
-    /***********************
-     * Summary of siteEntryCheck
-     * @return void
-     */
     protected static function siteEntryCheck()
-    {
-
-    }
+    {}
 
 
     /***********************
      * Summary of dataPreparation
      * @return void
      */
-    protected static function dataPreparation()
+    protected static function dataPreparation(): void
     {
         // TODO ggf Nutzerdaten holen ???
         if (!Auth::isCheckedIn()) {
@@ -184,14 +178,30 @@ class TablePrep
         // globale $_SESSION Werte in Klassenvariblen importieren
         self::getSession();
 
-        // Klassenvariblen laden
-        $session = self::$_session;
-        $DBspalten = self::DBspalten;
 
-
-        ///////////////////////////////////////////////////
         // Reset-Button
-        //
+        self::resetting();
+
+        // Sortierung bestimmen
+        self::setSort();
+
+        // Thema/Filter bestimmen
+        $filter = self::setTheme();
+
+        // Suche bestimmen, filter wird geändert/ergänzt
+        self::setSearch($filter);
+
+        // mit neuem Filter Elemente zählen
+        self::$maxID = TableData::getMaxID($filter);
+
+
+        // globale $_SESSION Werte mit den Klassenwerten aktualisieren
+        self::setSession();
+    }
+
+
+    private static function resetting(): void
+    {
         if (isset($_POST['reset'])) {
             unset($_POST['reset']);
             unset($_POST['col']);
@@ -203,12 +213,14 @@ class TablePrep
             #$_SESSION['search'] = $_SESSION['sort'] = "";
             self::setSession();
         };
+    }
 
 
-        ///////////////////////////////////////////////////
-        // Sortierung
-        //
-        $sort = "";
+    private static function setSort(): void
+    {
+        $DBspalten = self::DBspalten;
+        $sort = $col = $dir = "";
+
         if (isset($_POST['col'])) {
             // zuerste nach 'Thema' absteigend gruppieren
             $sort = "the.id DESC, ";
@@ -238,41 +250,46 @@ class TablePrep
         // wenn keine Sortierangabe, dann Standardwerte setzen
         if (strlen($sort) < 1) {
             $sort = " the.id DESC, sta.kat10, sta.datum";
-            $col = " sta.kat10";
-            $dir = " ASC";
+            $col  = " sta.kat10";
+            $dir  = " ASC";
         };
+        self::$_session['sort'] = $sort;
+        self::$_session['col']  = $col;
+        self::$_session['dir']  = $dir;
+    }
 
 
-        ///////////////////////////////////////////////////
-        // Thema-Filter bestimmen
-        //
+    private static function setTheme(): string
+    {
         # TODO: $_POST['thema'] nicht direkt übernehmen!
-        $thema = self::$_session['thema'];
+        $theme = self::$_session['thema'];
+        $filter = "";
+
         if (!empty($_POST['thema'])) {
             // wenn Dropdown-Auswahl
 
             if ($_POST['thema'] !== "- alle -") {
                 // wenn Auswahl nicht 'alle'
                 $filter = "the.thema = '{$_POST['thema']}'";
-                if (empty($thema) || $_POST['thema'] != $thema) {
+                if (empty($theme) || $_POST['thema'] != $theme) {
                     // wenn Auswahl anders als zuvor, speichern
                     $_POST['start'] = 0;
-                    $thema = $_POST['thema'];
+                    $theme = $_POST['thema'];
                 };
 
             } elseif ($_POST['thema'] === "- alle -") {
                 // 'alle'
                 $filter = "the.id IS NOT NULL";
                 $_POST['start'] = 0;
-                $thema = $_POST['thema'];
+                $theme = $_POST['thema'];
 
             } else {
             };
 
-        } elseif (!empty($thema) && ($thema != "- alle -")) {
+        } elseif (!empty($theme) && ($theme != "- alle -")) {
             // kein Dropdown-Auswahl aber irgendwoher schon Thema gemerkt
-            if ($thema != "- alle -") {
-                $filter = "the.thema='{$thema}'";
+            if ($theme != "- alle -") {
+                $filter = "the.thema='{$theme}'";
             };
 
         } else {
@@ -282,14 +299,19 @@ class TablePrep
 
         $filter .= " AND sta.deakt=0 AND dat.deakt=0";
 
+        self::$_session['thema'] = $theme;
+        return $filter;
+    }
 
-        ///////////////////////////////////////////////////
-        // Suche bestimmen
-        //
-        $search = self::$_session['search'];
 
-        if (!empty($_POST['search']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST") {
+    private static function setSearch(&$filter): void
+    {
+        $search    = self::$_session['search'];
+        $DBspalten = self::DBspalten;
+        $suchwort  = "";
 
+        if (!empty($_POST['search']) && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST")
+        {
             // Plausi-Check ...
             // erlaubte Zeichen definieren, SQL-kritische: [%;´`\'\"\-\{\}\[\]\*\/\\\\ (AND)(OR)]
             $error_msg = [];
@@ -326,22 +348,23 @@ class TablePrep
                     $_POST['start'] = 0;
                 };
 
-                $search = $input_search;
+                $search   = $input_search;
                 $suchwort = $input_search;
             } else {
                 $error_strg = implode("<br>", $error_msg);
             };
-
+        }
 
         // keine Suchanfrage, aber vorangehende Suche gemerkt
-        } elseif (!empty($search)) {
+        elseif (!empty($search)) {
             $suchwort = trim($search);
         };
+
 
         $suche = "";
         if (!empty($suchwort)) {
             $suchwort = explode(" ", $suchwort);
-            $spalte = array_keys($DBspalten);
+            $spalte   = array_keys($DBspalten);
 
             for ($i = 0; $i < sizeof($suchwort); $i++) {
                 for ($ii = 0; $ii < sizeof($spalte); $ii++) {
@@ -362,21 +385,11 @@ class TablePrep
             };
             $filter .= " AND ".$suche;
         };
-
-
-        // Klassenwerte setzen
-        self::$maxID = TableData::getMaxID($filter);
-        self::$_session['sort'] = $sort;
-        self::$_session['dir'] = $dir;
-        self::$_session['col'] = $col;
-        self::$_session['thema'] = $thema;
-        self::$_session['search'] = $search;
-        self::$_session['suche'] = $suche;
         self::$_session['filter'] = $filter;
-
-        // globale $_SESSION Werte mit den Klassenwerten aktualisieren
-        self::setSession();
+        self::$_session['search'] = $search;
+        self::$_session['suche']  = $suche;
     }
+
 }
 
 

@@ -2,14 +2,14 @@
 /* Prozess: dieseSeite:RegInfo-->email(Admin)-->email(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
 
 namespace Dzg\Sites;
-use Dzg\SitePrep\RegisterInfoPrep;
+use Dzg\SiteForm\RegisterInfo as Init;
 use Dzg\SitePrep\{Header, Footer};
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
-require_once __DIR__.'/../siteprep/registerinfo.php';
+require_once __DIR__.'/../siteform/registerinfo.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
@@ -18,7 +18,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /***********************
  * Summary of Register_info
  */
-class RegisterInfo extends RegisterInfoPrep
+class RegisterInfo extends Init
 {
     /****************************
      * Summary of show
@@ -26,6 +26,7 @@ class RegisterInfo extends RegisterInfoPrep
     public static function show()
     {
         self::dataPreparation();
+        self::formEvaluation();
 
         Header::show();
         self::siteOutput();

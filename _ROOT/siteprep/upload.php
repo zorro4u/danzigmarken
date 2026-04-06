@@ -10,7 +10,7 @@ require_once __DIR__.'/../tools/auth.php';
 /***********************
  * Summary of Upload
  */
-class UploadPrep
+class Upload
 {
     protected static $show_form;
     protected static $error_msg;

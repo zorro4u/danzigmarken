@@ -14,12 +14,8 @@ Controller,     Steuerung: Data <--> Ansicht
 
 /***********************
  * Summary of Details
- * Webseite:
- *
- * __public__
- * show()
  */
-class DetailsPrep
+class Details
 {
     /***********************
      * Klassenvariablen / Eigenschaften

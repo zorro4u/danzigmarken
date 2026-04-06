@@ -1,8 +1,9 @@
 <?php
 namespace Dzg\SitePrep;
+use Dzg\SitePrep\{TablePrep, TableData};
 use Dzg\Tools\Auth;
 
-require_once __DIR__.'/table.php';
+require_once __DIR__.'/tableprep.php';
 require_once __DIR__.'/tabledata.php';
 require_once __DIR__.'/../tools/auth.php';
 
@@ -184,7 +185,7 @@ class TableBody
     {
         $stamps_db = TablePrep::$stamps_db;
         $spaltennamen = TablePrep::spaltennamen();
-        $idx2 = TablePrep::$_session['idx2'];
+        $idx2 = $_SESSION['idx2'];
         $is_checked_in = Auth::isCheckedIn();
 
         if (!$is_checked_in) {

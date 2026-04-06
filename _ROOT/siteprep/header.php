@@ -1,5 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
+use Dzg\SitePrep\SiteConfig;
 use Dzg\Tools\{Auth, Tools, CheckIP, Logger};
 
 require_once __DIR__.'/siteconfig.php';

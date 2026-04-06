@@ -17,7 +17,7 @@ require_once __DIR__.'/../tools/tools.php';
 /***********************
  * Summary of Pw_reset
  */
-class PWresetPrep
+class PWreset
 {
     /***********************
      * Klassenvariablen / Eigenschaften

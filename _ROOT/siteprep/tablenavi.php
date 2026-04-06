@@ -1,9 +1,8 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\Database;
+use Dzg\SitePrep\TablePrep;
 
-require_once __DIR__.'/table.php';
-require_once __DIR__.'/../tools/database.php';
+require_once __DIR__.'/tableprep.php';
 
 
 /***********************
@@ -387,13 +386,11 @@ class TableNavi
      *
      * @return string
      */
-    public static function feldThemenwahl()
+    public static function feldThemenwahl(): string
     {
         $sess_thema = TablePrep::$_session['thema'];
-
-        $theme_db = ['- alle -'];
-        $stmt = "SELECT thema FROM dzg_dirsub2 ORDER BY thema DESC";
-        $theme_qry = Database::sendSQL($stmt, [], 'fetchall', 'num');
+        $theme_qry  = TableData::getThemes();
+        $theme_db   = ['- alle -'];
 
         foreach ($theme_qry AS $entry) {
             foreach ($entry AS $theme) {
@@ -447,7 +444,7 @@ class TableNavi
      * "Suche"
      * @return string
      */
-    public static function feldSuchen()
+    public static function feldSuchen(): string
     {
         $search = TablePrep::$_session['search'];
 

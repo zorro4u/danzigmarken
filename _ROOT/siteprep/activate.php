@@ -12,7 +12,7 @@ require_once __DIR__.'/../tools/tools.php';
 /***********************
  * Summary of Activate
  */
-class ActivatePrep
+class Activate
 {
     /***********************
      * Klassenvariablen / Eigenschaften

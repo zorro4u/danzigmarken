@@ -5,7 +5,7 @@ use Dzg\Tools\{Database, Auth, Tools};
 require_once __DIR__.'/../tools/loader_tools.php';
 
 
-class LogoutPrep
+class Logout
 {
     /***********************
      * Klassenvariablen / Eigenschaften

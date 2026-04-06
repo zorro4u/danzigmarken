@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\PrintViewPrep;
+use Dzg\SitePrep\PrintView as Init;
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\Auth;
 
@@ -16,7 +16,7 @@ require_once __DIR__.'/../tools/auth.php';
  * die gesamte Datenbank als Druckversion anzeigen
  * dadurch die Möglichkeit, die Ausgaben als PDF-drucken zu speichern
  */
-class PrintView extends PrintViewPrep
+class PrintView extends Init
 {
     public static function show()
     {

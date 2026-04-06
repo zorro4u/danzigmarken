@@ -1,9 +1,9 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\ContactPrep;
+use Dzg\SiteForm\Contact as Init;
 use Dzg\SitePrep\{Header, Footer};
 
-require_once __DIR__.'/../siteprep/contact.php';
+require_once __DIR__.'/../siteform/contact.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 #require $_SERVER['DOCUMENT_ROOT']."/assets/vendor/autoload.php";
@@ -13,7 +13,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /***********************
  * Webseite: Kontaktformular
  */
-class Contact extends ContactPrep
+class Contact extends Init
 {
     /***********************
      * Anzeige der Webseite
