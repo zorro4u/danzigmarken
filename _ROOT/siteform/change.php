@@ -1,12 +1,11 @@
 <?php
 namespace Dzg\SiteForm;
 use Dzg\SitePrep\Change as Prep;
-use Dzg\Tools\{Database, Tools};
-use PDO;
-use PDOException;
+use Dzg\SiteData\ChangeData as Data;
+use Dzg\Tools\Tools;
 
 require_once __DIR__.'/../siteprep/change.php';
-require_once __DIR__.'/../tools/database.php';
+require_once __DIR__.'/../sitedata/change.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
@@ -49,18 +48,18 @@ class Change extends Prep
         $_POST = [];
 
         $data = [
-            ':by' => $userid,       # int
-            ':id' => $akt_file_id,  # int
-            ':ip' => $remaddr ];
-        $stmt1 = "UPDATE dzg_file SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
-        $stmt3 = "UPDATE dzg_group SET deakt=1, chg_ip=:ip, chg_by=:by WHERE id=:id";
-
-        Database::sendSQL($stmt1, $data);
+            'id' => $akt_file_id,  # int
+            'ip' => $remaddr,
+            'by' => $userid ];     # int
+        Data::deleteFile($data);
 
         // wenn nur 1 Datei, dann auch Gruppeneintrag löschen
         if ($max_file < 2) {
-            $data[':id'] = $gid;
-            Database::sendSQL($stmt3, $data);
+            $data = [
+                'id' => $gid,
+                'ip' => $remaddr,
+                'by' => $userid ];
+            Data::deleteGroup($data);
         }
 
         // zum vorherigen Element wechseln
@@ -107,18 +106,15 @@ class Change extends Prep
         $_POST = [];
 
         $data = [
-            ':by' => $userid,       # int
-            ':id' => $akt_file_id,  # int
-            ':ip' => $remaddr ];
-        $stmt1 = "UPDATE dzg_file SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
-        $stmt3 = "UPDATE dzg_group SET deakt=0, chg_ip=:ip, chg_by=:by WHERE id=:id";
-
-        Database::sendSQL($stmt1, $data);
+            'id' => $akt_file_id,  # int
+            'ip' => $remaddr,
+            'by' => $userid ];     # int
+        Data::undeleteFile($data);
 
         // wenn nur 1 Datei, dann auch Gruppe wieder aktivieren
         if ($max_file < 2) {
-            $data[':id'] = $gid;
-            Database::sendSQL($stmt3, $data);
+            $data['id'] = $gid;
+            Data::undeleteGroup($data);
         }
 
         self::$stamps[$akt_file_idx]['deakt'] = '0';
@@ -131,7 +127,6 @@ class Change extends Prep
      */
     protected static function executeSplitButton()
     {
-        $pdo_db = self::$pdo;
         $stamps = self::$stamps;
         $akt_file_idx = self::$akt_file_idx;
         $akt_file_id  = self::$akt_file_id;
@@ -151,13 +146,6 @@ class Change extends Prep
             $stamps[$akt_file_idx]['kat17'] .= "_ALT: {$gid}_";
 
             // neuen Datensatz 'Marke' anlegen
-            $stmt1 =
-                "INSERT INTO dzg_group
-                    (id_thema, datum, kat10, kat11, kat12, kat13,
-                        kat14, kat15, kat16, kat17, chg_ip, chg_by, mirror)
-                VALUES (:id_thema, :datum, :kat10, :kat11, :kat12, :kat13, :kat14, :kat15,
-                        :kat16, :kat17, :ip, :by, 1) ";
-
             $data1 = [
                 ':id_thema' => (int)$stamps[$akt_file_idx]['id_thema'],  # int
                 ':datum'    => $stamps[$akt_file_idx]['datum'],
@@ -171,38 +159,28 @@ class Change extends Prep
                 ':kat17'    => $stamps[$akt_file_idx]['kat17'],
                 ':ip'       => $remaddr,
                 ':by'       => $userid ];
+            $result = Data::newGroup($data1);
 
-            // TODO: Funktioniert dann lastinsertId() ?
-            #Database::sendSQL($stmt1, $data1);
-            try {
-                $qry = $pdo_db->prepare($stmt1);
-                foreach ($data1 AS $k => &$v) {
-                    if (is_int($v)) {
-                        $qry->bindParam($k, $v, PDO::PARAM_INT);
-                    } else {
-                        $qry->bindParam($k, $v);
-                    }
-                }
-                $qry->execute();
+            if(is_int($result)){
+                $new_gid = $result;
 
-                $new_gid = (int)$pdo_db->lastInsertId();
+                // Datei mit neuer Marke verknüpfen
+                $data = [
+                    'id'      => $akt_file_id,    # int
+                    'new_gid' => $new_gid,        # int
+                    'ip'      => $remaddr,
+                    'by'      => $userid ];
+                $set = "id_group=:new_gid, chg_ip=:ip, chg_by=:by ";
+                Data::updateFile($set, $data);
 
-            } catch(PDOException $e) {
-                $error_arr []= '--- nix geschrieben ---'.$e->getMessage();
+                $success_msg = 'aus Gruppe gelöst';
+                header ("Location: /change.php?id={$akt_file_id}");
             }
 
-            // Datei mit neuer Marke verknüpfen
-            $stmt2 = "UPDATE dzg_file SET id_group=:new_gid, chg_ip=:ip, chg_by=:by
-                        WHERE id=:akt_file_id";
-            $data2 = [
-                ':akt_file_id'  => $akt_file_id,    # int
-                ':new_gid'      => $new_gid,        # int
-                ':ip'           => $remaddr,
-                ':by'           => $userid ];
-            Database::sendSQL($stmt2, $data2);
+            else {
+                $error_arr []= $result;
+            }
 
-            $success_msg = 'aus Gruppe gelöst';
-            header ("Location: /change.php?id={$akt_file_id}");
 
             // Rückgabewerte
             self::$stamps    = $stamps;
@@ -227,6 +205,7 @@ class Change extends Prep
         $success_msg  = "";
         $gid     = self::$gid;
         $remaddr = $_SERVER['REMOTE_ADDR'];     # abfragende Adresse
+        $userid  = $_SESSION['userid'];
         $input   = [];
         $s       = [];
         $d       = [];
@@ -340,10 +319,7 @@ class Change extends Prep
             }
 */
             if (isset($input['thema'])) {
-                // id holen
-                $stmt = "SELECT id FROM dzg_dirsub2 WHERE thema = :thema";
-                $data = [':thema' => $input['thema']];
-                $id_theme = (int)Database::sendSQL($stmt, $data, 'fetch', 'num')[0];
+                $id_theme = Data::getID($input['thema']);
                 $s['id_thema'] = $id_theme;
                 $d['id_thema'] = $id_theme;
             }
@@ -362,51 +338,35 @@ class Change extends Prep
 
                 // letzten 2 Zeichen (Komma) löschen, Leerz. anhängen
                 $set = substr($set, 0, -2)." ";
-                $data += [':id' => $gid];    # int
-                $stmt = "UPDATE dzg_group SET {$set} WHERE id=:id";
-                Database::sendSQL($stmt, $data);
+                $data += ['id' => $gid];    # int
+                Data::updateGroup($set, $data);
                 $success_msg = 'Änderung ausgeführt.';
             }
 
             // update datei
             if (!empty($d)) {
                 $d['chg_ip'] = $remaddr;
-                $set1 = '';
-                $data1 = [];
-                $data2 = [];
+                $set  = '';
+                $data = [];
 
                 foreach ($d AS $spalte => $input_wert) {
-                    $set1 .= $spalte."=:".$spalte.", ";
-                    $data1[$spalte] = $input_wert;
+                    $set .= $spalte."=:".$spalte.", ";
+                    $data[$spalte] = $input_wert;
                 }
 
                 // letzten 2 Zeichen (Komma) löschen, Leerz. anhängen
-                $set1 = substr($set1, 0, -2)." ";
-                $data1 += [':id' => $akt_file_id];
-                $stmt1 = "UPDATE dzg_file SET {$set1} WHERE id=:id";
-
-                # trouble mit UNIQUE key
-                $stmt2 = "UPDATE dzg_group SET deakt=1, mirror=1 WHERE id=:id";
-                #$stmt2 = "DELETE FROM dzg_group WHERE id = :id";
-                #$stmt2 = "DELETE FROM dzg_group WHERE id = :id AND kat17 LIKE '%_ALT:%';";
-                $data2 = [':id' => $gid];
-
-                $stmt3 =
-                    "UPDATE sqlite_sequence
-                    SET seq=(SELECT MAX(id) max_id FROM dzg_group)
-                    WHERE name='dzg_group'";      # -> lastNR
-                #$stmt3 = "DELETE FROM sqlite_sequence WHERE name = 'dzg_group'";
-                # "UPDATE sqlite_sequence SET seq=0 WHERE name='dzg_group'";    # -> 0
-                # "DELETE FROM sqlite_sequence WHERE name = 'dzg_group'";
-                # "SELECT * FROM sqlite_sequence ORDER BY name";    # -> view autoincrement
-
-                Database::sendSQL($stmt1, $data1);
+                $set = substr($set, 0, -2)." ";
+                $data += ['id' => $akt_file_id];
+                Data::updateFile($set, $data);
 
                 // wenn MarkenID geändert wird, und ($max_file < 2) dann auch Marke löschen
                 if (isset($input['gid']) && ($max_file < 2)) {
-                    Database::sendSQL($stmt2, $data2);
+                    $data = [
+                        'id' => $gid,
+                        'ip' => $remaddr,
+                        'by' => $userid ];
+                    Data::deleteGroup($data);
                 }
-
                 $success_msg = 'Änderung ausgeführt.';
             }
         }
@@ -486,8 +446,5 @@ class Change extends Prep
         // globale Variablen setzen
         self::$show_form = $show_form;
         self::$status_message = $status_message;
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 }

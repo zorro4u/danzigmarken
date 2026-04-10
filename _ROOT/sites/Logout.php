@@ -1,13 +1,13 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\Logout as Init;
+use Dzg\SitePrep\Logout as Prep;
 use Dzg\SitePrep\{Header, Footer};
 
 require_once __DIR__.'/../siteprep/logout.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-class Logout extends Init
+class Logout extends Prep
 {
     /***********************
      * Anzeige der Webseite

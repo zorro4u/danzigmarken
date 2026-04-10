@@ -2,7 +2,8 @@
 /* Prozess: dieseSeite:Forget-->email(Admin)/email(Code)-->ResetSeite-->Login */
 
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\PWforgetData as Data;
+use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
 
 date_default_timezone_set('Europe/Berlin');
@@ -11,6 +12,7 @@ session_start();
 
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
+require_once __DIR__.'/../sitedata/pwforget.php';
 require_once __DIR__.'/../tools/loader_tools.php';
 
 
@@ -72,9 +74,7 @@ class PWforget
             if(empty($error_msg)):
 
                 // Email in DB suchen
-                $stmt = "SELECT userid, email, username, vorname, nachname FROM site_users WHERE email = :email";
-                $data = [':email' => $input_email];
-                $usr_data = Database::sendSQL($stmt, $data, 'fetch');
+                $usr_data = Data::searchEmail($input_email);
 
                 if(!$usr_data) {
                     $error_msg = "Keine solche E-Mail-Adresse im System hinterlegt.";
@@ -87,15 +87,12 @@ class PWforget
                     $pwcode_endtime_str = date("d.m.y H:i", $pwcode_endtime);
                     $pwcode_url = Tools::getSiteURL().'pwreset.php?pwcode='.$pwcode;
 
-                    $stmt = "UPDATE site_users
-                        SET pwcode_hash = :pwcode_hash, pwcode_endtime = :pwcode_endtime, notiz = :notiz
-                        WHERE userid = :userid";
                     $data = [
                         ':userid'         => $usr_data['userid'],   # int
                         ':notiz'          => $pwcode_url,
                         ':pwcode_hash'    => $pwcode_hash,
                         ':pwcode_endtime' => $pwcode_endtime ];
-                    Database::sendSQL($stmt, $data);
+                    Data::setPassCode($data);
 
                     // Anrede
                     if (!empty($usr_data['vorname']))

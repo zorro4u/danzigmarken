@@ -290,23 +290,24 @@ class CheckIP
         for ($net=0; $net<4; $net++) {
 
             // gespeicherte IP-Adressen entspr. Netzbereich aus DB lesen
-            $ip_arr[$net] += self::DB_get_data($ip_arr[$net]);
+            $ip_arr[$net] += self::DB_get_data($ip_arr[$net]['cut']);
             $count  = $ip_arr[$net]['count'];
             $denied = $ip_arr[$net]['denied'];
             $mask   = $ip_arr[$net]['mask'];
 
             // im Bereich gefunden...
-            if (($ip_arr[$net]['count'] > 0) && ($net<=$mask)) {
+            if (($count > 0) && ($net<=$mask)) {
 
                 // mehrfach im Bereich gefunden/gesperrt -> auffällig, IP/Bereich sperren
-                $max = 10**($net+1);
+                #$max = 10**($net+1);    # 10/100/1.000/10.000
+                $max = 10*($net+1);     # 10/20/30/40
                 if (($count > $max) || ($denied > intdiv($max, 4))) {
                     self::DB_block_ip4($ip_arr[$net], $net);
                     $message = "Bereich ({$ip_arr[$net]['cut']}) jetzt geblockt...<br>";
                 }
 
                 // IP/Bereich gesperrt? EXIT
-                elseif ($count == $denied+15) {
+                elseif ($count == $denied+10) {
                     $message = "IP/Bereich ({$ip_arr[$net]['cut']}) gesperrt....";
                 }
 
@@ -355,14 +356,14 @@ class CheckIP
             #$addr = inet_ntop(inet_pton($ip_arr[$net]['cut']));
 
             // gespeicherte IP-Adressen entspr. Netzbereich aus DB lesen
-            $ip_arr[$net] += self::DB_get_data($ip_arr[$net]);
+            $ip_arr[$net] += self::DB_get_data($ip_arr[$net]['cut']);
             $count  = $ip_arr[$net]['count'];
             $denied = $ip_arr[$net]['denied'];
 
             // im Bereich gefunden...
-            if (($ip_arr[$net]['count'] > 0) && ($ct<2)) {
+            if (($count > 0) && ($ct<2)) {
                 // mehrfach im Bereich gefunden/gesperrt -> auffällig, IP/Bereich sperren
-                $max = 10**($net+1);
+                $max = 10*($net+1);
                 if (($count > $max) || ($denied > intdiv($max, 4))) {
                     self::DB_block_ip4($ip_arr[$net], $net);
                     $message = "Bereich ({$ip_arr[$net]['cut']}) jetzt geblockt...<br>";
@@ -393,7 +394,7 @@ class CheckIP
         $this->setter($userip, $message);
     }
 
-    
+
     private static function netmask6(string $userip)
     {
         // netmask/CIDR:
@@ -446,9 +447,13 @@ class CheckIP
     }
 
 
-    private static function DB_get_data(array $ip_arr) :array
+    /**
+     * Summary of DB_get_data
+     * @param string $ip
+     * @return array['result','count','denied','mask']
+     */
+    private static function DB_get_data(string $ip) :array
     {
-        $ip = $ip_arr['cut'];
         if (substr($ip, -2, 2) === "::")
             $ip = substr($ip, 0, -1);
 

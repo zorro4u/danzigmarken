@@ -1,7 +1,8 @@
 <?php
 namespace Dzg\SiteForm;
 use Dzg\SitePrep\RegisterInfo as Prep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\RegisterInfoData as Data;
+use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
 
 session_start();
@@ -9,7 +10,9 @@ date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
 require_once __DIR__.'/../siteprep/registerinfo.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/registerinfo.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
 
@@ -130,10 +133,6 @@ class RegisterInfo extends Prep
                 $notiz  = $reg_url;
 
                 // Nutzerdaten schon einmal in DB temporär erfassen
-                $stmt =
-                    "INSERT INTO site_users
-                        (username, email, `status`, pwcode_endtime, notiz, vorname, nachname)
-                    VALUES (:username, :email, :status, :pwcode_endtime, :notiz, :vorname, :nachname)";
                 $data = [
                     ':username'       => $input_usr_temp,
                     ':email'          => $input_email_temp,
@@ -142,7 +141,7 @@ class RegisterInfo extends Prep
                     ':notiz'          => $notiz,
                     ':vorname'        => $input_vor,
                     ':nachname'       => $input_nach ];
-                Database::sendSQL($stmt, $data);
+                Data::storeUser($data);
 
                 // === EMAIL ===
                 //

@@ -1,9 +1,9 @@
 <?php
-namespace Dzg\SitePrep;
+namespace Dzg\SiteData;
 use Dzg\SitePrep\TablePrep;
 use Dzg\Tools\Database;
 
-require_once __DIR__.'/tableprep.php';
+require_once __DIR__.'/../siteprep/tableprep.php';
 require_once __DIR__.'/../tools/database.php';
 
 
@@ -89,15 +89,15 @@ class TableData
      *
      * @return array
      */
-    public static function getData(): array
+    public static function getMainData(): array
     {
-        $start = TablePrep::$_session['start'];
+        $start    = TablePrep::$_session['start'];
         $proseite = TablePrep::$_session['proseite'];
-        $sort = TablePrep::$_session['sort'];
+        $sort   = TablePrep::$_session['sort'];
         $filter = TablePrep::$_session['filter'];
-        $idx2 = TablePrep::$_session['idx2'];
+        $idx2   = TablePrep::$_session['idx2'];
 
-        $start = (!empty($start)) ? $start : 0;
+        $start    = (!empty($start)) ? $start : 0;
         $proseite = (!empty($proseite)) ? $proseite : 5;
 
         $sort = (!empty($sort))

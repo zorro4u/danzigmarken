@@ -1,10 +1,13 @@
 <?php
 namespace Dzg\SiteForm;
 use Dzg\SitePrep\Admin as Prep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\AdminData as Data;
+use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../siteprep/admin.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/admin.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 /****************************
@@ -46,78 +49,50 @@ class Admin extends Prep
                     case "autologin":
 
                         switch ((int)$_POST['logout']) {
-                            case 11:        // alle meine anderen aktiven Anmeldungen
-                                $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                        WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
-                                #$stmt = "DELETE FROM site_login WHERE userid = :userid AND (login IS NOT NULL && autologin IS NOT NULL) AND identifier != :ident";
-                                $data = [':userid' => $userid, ':ident' => $identifier];
-                                Database::sendSQL($stmt, $data);
+                            case 11:     // alle meine anderen aktiven Anmeldungen
+                                Data::deleteMyActive($userid, $identifier);
                                 $success_msg = "Alle meine anderen aktiven Autologins beendet.";
                                 break;
 
-                            case 10:        // alle meine ausgeloggten Anmeldungen
-                                $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                        WHERE userid = :userid AND (login IS NULL && autologin IS NOT NULL) AND identifier != :ident";
-                                $data = [':userid' => $userid, ':ident' => $identifier];
-                                Database::sendSQL($stmt, $data);
+                            case 10:     // alle meine ausgeloggten Anmeldungen
+                                Data::deleteMyNoActive($userid, $identifier);
                                 $success_msg = "Alle meine ausgeloggten Logins beendet.";
                                 break;
 
-                            case 12:     // alle meine beendeten Anmeldungen (tot)  #AND identifier IS NOT NULL
-                                $stmt = "DELETE FROM site_login
-                        WHERE userid = :userid AND (login IS NULL && autologin IS NULL)";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 12:     // alle meine beendeten Anmeldungen (tot)
+                                Data::deleteMyClosed($userid);
                                 $success_msg = "Alle meine beendeten Logins gelöscht.";
                                 break;
 
-                            case 13:        // alle meine abgelaufenen Anmeldungen (tot)
-                                $stmt = "DELETE FROM site_login
-                        WHERE userid = :userid AND token_endtime < NOW()";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 13:     // alle meine abgelaufenen Anmeldungen (tot)
+                                Data::deleteMyOld($userid);
                                 $success_msg = "Alle meine abgelaufenen Logins gelöscht.";
                                 break;
 
 
-                            case 21:        // alle anderen aktiven
-                                $stmt = "UPDATE site_login SET login = NULL
-                        WHERE userid != :userid AND (login IS NOT NULL && autologin IS NOT NULL)";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 21:     // alle anderen aktiven
+                                Data::deleteActive($userid);
                                 $success_msg = "Alle aktiven Autologins der anderen Nutzer beendet.";
                                 break;
 
-                            case 20:        // alle anderen ausgeloggten Anmeldung
-                                $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                        WHERE userid != :userid AND (login IS NULL && autologin IS NOT NULL)";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 20:     // alle anderen ausgeloggten Anmeldung
+                                Data::deleteNoActive($userid);
                                 $success_msg = "Alle ausgeloggten Autologins der anderen Nutzer beendet.";
                                 break;
 
-                            case 22:        // alle anderen beendeten Anmeldung (tot)  #AND identifier IS NOT NULL
-                                $stmt = "DELETE FROM site_login
-                        WHERE userid != :userid AND (login IS NULL && autologin IS NULL)";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 22:     // alle anderen beendeten Anmeldung (tot)
+                                Data::deleteClosed($userid);
                                 $success_msg = "Alle anderen toten Logins gelöscht.";
                                 break;
 
-                            case 23:        // alle anderen abgelaufenen (tot)
-                                $stmt = "DELETE FROM site_login
-                        WHERE userid != :userid AND token_endtime < NOW()";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 23:     // alle anderen abgelaufenen (tot)
+                                Data::deleteOld($userid);
                                 $success_msg = "Alle anderen abgelaufenen Logins gelöscht.";
                                 break;
 
-                            case 24:        // alle Anmeldungen der anderen Nutzer ('break' weggelassen)
-                            case 25:        // alle anderen Nutzer
-                                $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                        WHERE userid != :userid AND identifier IS NOT NULL";
-                                $data = [':userid' => $userid];     # int
-                                Database::sendSQL($stmt, $data);
+                            case 24:     // alle Anmeldungen der anderen Nutzer ('break' weggelassen)
+                            case 25:     // alle anderen Nutzer
+                                Data::deleteOtherAutologin($userid);
                                 $success_msg = "Alle Autologins der anderen Nutzer beendet.";
                                 break;
                         }  // $_POST['logout']
@@ -140,18 +115,13 @@ class Admin extends Prep
                         $status = $reg_code;
                         $notiz  = $reg_url;
 
-                        $stmt =
-                            "INSERT INTO site_users
-                    (username, email, `status`, pwcode_endtime, notiz)
-                VALUES (:username, :email, :status, :pwcode_endtime, :notiz) ";
                         $data = [
                             ':username' => $input_usr,
                             ':email'    => $input_email,
                             ':status'   => $status,
                             ':pwcode_endtime' => $pwcode_endtime,
-                            ':notiz'    => $notiz
-                        ];
-                        Database::sendSQL($stmt, $data);
+                            ':notiz'    => $notiz ];
+                        Data::storeRegCode($data);
                         $success_msg = "Registrierungs-Link erzeugt.";
                         break;
 
@@ -177,20 +147,14 @@ class Admin extends Prep
                     case "delete_reg":
                         if (isset($_POST['regchoise'])) {
                             $i = (int)$_POST['regchoise'] - 1;
-                            $stmt = "DELETE FROM site_users WHERE userid = :userid";
-                            $data = [':userid' => $reglinks[$i]['userid']];     # int
-                            Database::sendSQL($stmt, $data);
+                            Data::deleteRegLink($reglinks[$i]['userid']);
                             $success_msg = "Registrierungslink gelöscht.";
                         }
                         break;
 
                     case "delete_allregs":
                         if (count($reglinks)) {
-                            // DB aufräumen, VACUUM;
-                            // DB Integritätsprüfung: PRAGMA integrity_check;
-                            // Zähler zurücksetzen: "DELETE FROM sqlite_sequence WHERE name = '{tab_name}'"  # autoincrement zurücksetzen
-                            $stmt = "DELETE FROM site_users WHERE email LIKE '%dummy%'";
-                            Database::sendSQL($stmt, []);
+                            Data::deleteAllRegLink();
                             $success_msg = "alle Registrierungslinks gelöscht.";
                         }
                         break;
@@ -202,19 +166,13 @@ class Admin extends Prep
                         if (isset($_POST['usrchoise'])) {
                             $i = (int)$_POST['usrchoise'] - 1;
                             if ($user_list[$i]['userid'] !== $_SESSION['userid']) {
-                                $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
-                                #$stmt = "DELETE FROM site_users WHERE userid = :userid";
-                                $data = [':userid' => $user_list[$i]['userid']];        # int
-                                Database::sendSQL($stmt, $data);
+                                Data::deleteUser($user_list[$i]['userid']);
                                 $success_msg = "Nutzer gelöscht.";
-
-                                // wenn Variante 'deaktiv setzen', dann auch alle Anmeldungen löschen,
-                                // (sonst bei DELETE automatisch per Verknüpfung gelöscht).
-                                $stmt = "DELETE FROM site_login WHERE userid = :userid";
-                                $data = [':userid' => $user_list[$i]['userid']];        # int
-                                Database::sendSQL($stmt, $data);
-                            } else $error_msg = "Kann mich nicht selbst löschen.";
-                        }
+                            }
+                            else {
+                                $error_msg = "Kann mich nicht selbst löschen.";
+                            };
+                        };
                         break;
 
 

@@ -1,13 +1,13 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SiteForm\Login as Init;
+use Dzg\SiteForm\Login as Prep;
 use Dzg\SitePrep\{Header, Footer};
 
 require_once __DIR__.'/../siteform/login.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-class Login extends Init
+class Login extends Prep
 {
     /***********************
      * Anzeige der Webseite

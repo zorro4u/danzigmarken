@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SiteForm\Settings as Init;
+use Dzg\SiteForm\Settings as Prep;
 use Dzg\SitePrep\{Header, Footer};
 
 require_once __DIR__.'/../siteform/settings.php';
@@ -10,7 +10,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /****************************
  * Summary of Settings
  */
-class Settings extends Init
+class Settings extends Prep
 {
      /****************************
      * Summary of show

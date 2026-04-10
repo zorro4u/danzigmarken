@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\Details as Init;
+use Dzg\SitePrep\Details as Prep;
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\Auth;
 
@@ -23,7 +23,7 @@ Controller,     Steuerung: Data <--> Ansicht
  * __public__
  * show()
  */
-class Details extends Init
+class Details extends Prep
 {
     /***********************
      * Anzeige der Webseite

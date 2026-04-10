@@ -1,27 +1,16 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Auth};
+use Dzg\Tools\Auth;
 
-require_once __DIR__.'/../tools/database.php';
 require_once __DIR__.'/../tools/auth.php';
 
 
 class Login
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
-    protected static $pdo;
     protected static string $success_msg;
-
 
     protected static function siteEntryCheck()
     {
-        // Datenbank öffnen
-        if (!is_object(self::$pdo)) {
-            self::$pdo = Database::connectMyDB();
-        }
-
         // Nutzer schon angemeldet? Dann weg hier ...
         self::$success_msg = (Auth::isCheckedIn())
             ? "Du bist schon angemeldet. Was machst du dann hier? ..."
@@ -59,3 +48,4 @@ class Login
     { }
 
 }
+

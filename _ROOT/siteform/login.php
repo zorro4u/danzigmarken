@@ -1,12 +1,13 @@
 <?php
 namespace Dzg\SiteForm;
 use Dzg\SitePrep\Login as Prep;
-use Dzg\Tools\{Database, Auth, Tools};
-use PDO;
-use PDOException;
+use Dzg\SiteData\LoginData as Data;
+use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../siteprep/login.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/login.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 class Login extends Prep
@@ -25,8 +26,6 @@ class Login extends Prep
      */
     protected static function formEvaluation()
     {
-        $pdo = self::$pdo;
-
         $error_arr = [];
         $success_msg = self::$success_msg;
         $input_usr = "";
@@ -69,9 +68,8 @@ class Login extends Prep
             } else {
 
                 // Nutzerdaten in DB finden & holen
-                $stmt = "SELECT * FROM site_users WHERE email = :email OR username = :username";
                 $data = [':email' => $input_email1, ':username' => $input_usr];
-                $usr_data = Database::sendSQL($stmt, $data, 'fetch');
+                $usr_data = Data::searchUser($data);
 
                 // Nutzer gefunden und Passwort korrekt
                 if($usr_data !== False) {
@@ -90,12 +88,11 @@ class Login extends Prep
                                 $pw_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
                                 #$pw_hash = password_hash($input_pw, PASSWORD_BCRYPT, ['cost' => 12]);
 
-                                $stmt = "UPDATE site_users SET pw_hash=:pw_hash, chg_ip=:ip, chg_by=:userid WHERE userid=:userid";
                                 $data = [
                                     ':userid'   => $userid,
                                     ':ip'       => $ip,
                                     ':pw_hash'  => $pw_hash ];
-                                Database::sendSQL($stmt, $data);
+                                Data::storePWhash($data);
                             }
 
                             // Nutzer möchte angemeldet bleiben (1 Jahr)
@@ -106,36 +103,17 @@ class Login extends Prep
                                 $token_endtime = date('Y-m-d H:i:s', $token_timer);
 
                                 // Autologin: Identifier/Token eintragen
-                                $stmt =
-                                    "INSERT INTO site_login
-                                    (userid, identifier, token_hash, token_endtime, `login`, autologin, ip)
-                                    VALUES
-                                    (:userid, :identifier, :token_hash, :token_endtime, 1, 1, :ip)";
-
                                 $data = [
                                     ':userid'        => $userid,   # int
                                     ':identifier'    => $identifier,
                                     ':token_hash'    => $token_hash,
                                     ':token_endtime' => $token_endtime,
                                     ':ip'            => $ip ];
+                                $result = Data::storeToken($data);
 
-                                // TODO: Funktioniert dann lastinsertId() ?
-                                #Database::sendSQL($stmt, $data);
-
-                                try {
-                                    $qry = $pdo->prepare($stmt);
-                                    foreach ($data AS $k => &$v) {
-                                        if (is_int($v)) {
-                                            $qry->bindParam($k, $v, PDO::PARAM_INT);
-                                        } else {
-                                            $qry->bindParam($k, $v);
-                                        }
-                                    }
-                                    $qry->execute();
-
-                                    $login_id = (int)$pdo->lastInsertId();
-
-                                } catch(PDOException $e) {die($e->getMessage().': login.inc_storetoken');}
+                                is_int($result)
+                                ? $login_id = $result
+                                : exit($result);
 
                                 // Cookies setzen --- (name, value, expire, path, domain, ...) siehe neu: cookies vs. localStorage
                                 #session_regenerate_id();
@@ -178,10 +156,8 @@ class Login extends Prep
                                 */
 
                                 // Login speichern
-                                $stmt = "INSERT INTO site_login (userid, `login`, ip)
-                                        VALUES (:userid, 1, :ip)";
                                 $data = [':userid' => $userid, ':ip' => $ip];
-                                Database::sendSQL($stmt, $data);
+                                Data::storeLogin($data);
                             }
                             $success_msg = "Du bist angemeldet";
 
@@ -229,9 +205,6 @@ class Login extends Prep
         self::$user_value = $user_value;
         self::$input_email1 = $input_email1;
         self::$input_usr = $input_usr;
-
-
-        // Datenbank schließen
-        self::$pdo = Null;
     }
 }
+

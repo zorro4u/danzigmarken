@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SiteForm\Admin as Init;
+use Dzg\SiteForm\Admin as Prep;
 use Dzg\SitePrep\{Header, Footer};
 
 require_once __DIR__.'/../siteform/admin.php';
@@ -11,7 +11,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
  * Summary of Admin
  * class A extends B implements C
  */
-class Admin extends Init
+class Admin extends Prep
 {
      /****************************
      * Summary of show

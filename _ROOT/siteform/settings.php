@@ -1,10 +1,13 @@
 <?php
 namespace Dzg\SiteForm;
 use Dzg\SitePrep\Settings as Prep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\SettingsData as Data;
+use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../siteprep/settings.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/settings.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 /****************************
@@ -71,30 +74,17 @@ class Settings extends Prep
         // globale Variablen holen
         $userid = self::$userid;
         $identifier = self::$identifier;
-        $show_form = self::$show_form;
-        $usr_data = [];
-        $userliste = [];
+        $show_form  = self::$show_form;
+        $usr_data   = [];
+        $userliste  = [];
 
         // Seiten-Check okay, Seite starten
         if ($show_form):
 
         // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
         // alle aktiven Anmeldungen
-        $stmt = "WITH
-        cte1 AS (
-            SELECT userid, COUNT(*) AS count3
-            FROM site_login
-            WHERE userid = :userid
-                AND (`login`=1 && autologin=1)
-                AND identifier != :ident)
-
-        SELECT site_users.userid, username, email, vorname, nachname, pw_hash, count3
-        FROM site_users
-        LEFT JOIN cte1 ON cte1.userid=site_users.userid
-        ";
-
         $data = [':userid' => $userid, ':ident' => $identifier];
-        $results = Database::sendSQL($stmt, $data, 'fetchall');
+        $results = Data::getUserCounts($data);
 
         // Daten separieren
         foreach ($results as $user) {
@@ -106,14 +96,14 @@ class Settings extends Prep
             else {
                 $userliste []= [
                     'username' => $user['username'],
-                    'email' => $user['email']
+                    'email'    => $user['email']
                 ];
             }
         }
         endif;      # Seiten-Check okay
 
         // globale Variablen setzen
-        self::$usr_data = $usr_data;
+        self::$usr_data  = $usr_data;
         self::$userliste = $userliste;
     }
 
@@ -125,8 +115,8 @@ class Settings extends Prep
     protected static function formEvaluation()
     {
         $identifier = self::$identifier;
-        $usr_data = self::$usr_data;
-        $userliste = self::$userliste;
+        $usr_data   = self::$usr_data;
+        $userliste  = self::$userliste;
         $userid = self::$userid;
         $show_form = self::$show_form;
         $error_msg = self::$error_msg;
@@ -154,7 +144,7 @@ class Settings extends Prep
             $update_email = False;
 
             $input_usr = htmlspecialchars(Tools::cleanInput($_POST['username']));    # strtolower()
-            $input_email = htmlspecialchars(Tools::cleanInput($_POST['email']));
+            $input_email  = htmlspecialchars(Tools::cleanInput($_POST['email']));
             $input_email2 = htmlspecialchars(Tools::cleanInput($_POST['email2']));
             $input_pw = $_POST['passwort'];
 
@@ -223,27 +213,24 @@ class Settings extends Prep
             // Daten in DB ändern
             if ($error_msg === "" && $success_msg === "") {
                 if ($update_email && $update_username) {
-                    $stmt = "UPDATE site_users SET email = :email, username = :username  WHERE userid = :userid";
                     $data = [
                         ':userid'   => $userid,
                         ':username' => $input_usr,
                         ':email'    => $input_email ];
-                    Database::sendSQL($stmt, $data);
+                    Data::changeUser($data);
                     $usr_data['username'] = $input_usr;
                     $usr_data['email'] = $input_email;
                     $success_msg = "Benutzername und E-Mail-Adresse erfolgreich gespeichert.";
 
                 } elseif ($update_email) {
-                    $stmt = "UPDATE site_users SET email = :email WHERE userid = :userid";
                     $data = [':userid' => $userid, ':email' => $input_email];
-                    Database::sendSQL($stmt, $data);
+                    Data::changeUserMail($data);
                     $usr_data['email'] = $input_email;
                     $success_msg = "E-Mail-Adresse erfolgreich gespeichert.";
 
                 } elseif ($update_username) {
-                    $stmt = "UPDATE site_users SET username = :username WHERE userid = :userid";
                     $data = [':userid' => $userid, ':username' => $input_usr];
-                    Database::sendSQL($stmt, $data);
+                    Data::changeUserName($data);
                     $usr_data['username'] = $input_usr;
                     $success_msg = "Benutzername erfolgreich geändert.";
                 }
@@ -254,7 +241,7 @@ class Settings extends Prep
 
         // Änderung Passwort
         case 'passwort':
-            $input_pwALT = $_POST['passwortAlt'];
+            $input_pwALT  = $_POST['passwortAlt'];
             $input_pwNEU1 = $_POST['passwortNeu'];
             $input_pwNEU2 = $_POST['passwortNeu2'];
 
@@ -273,9 +260,8 @@ class Settings extends Prep
 
             else {
                 $passwort_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
-                $stmt = "UPDATE site_users SET pw_hash = :pw_hash WHERE userid = :userid";
                 $data = [':userid' => $userid, ':pw_hash' => $passwort_hash];
-                Database::sendSQL($stmt, $data);
+                Data::storePW($data);
                 $usr_data['pw_hash'] = $passwort_hash;
                 $success_msg = "Passwort erfolgreich gespeichert.";
             }
@@ -298,12 +284,11 @@ class Settings extends Prep
             // Eingabe okay
             if (empty($error_msg)){
                 if ($input_vor != $usr_data['vorname'] || $input_nach != $usr_data['nachname']) {
-                    $stmt = "UPDATE site_users SET vorname = :vorname, nachname = :nachname WHERE userid = :userid";
                     $data = [
                         ':userid'   => $userid,
                         ':vorname'  => $input_vor,
                         ':nachname' => $input_nach ];
-                    Database::sendSQL($stmt, $data);
+                    Data::changeUserData($data);
                     $usr_data['vorname'] = $input_vor;
                     $usr_data['nachname'] = $input_nach;
                     $success_msg = "Persönliche Daten geändert.";
@@ -315,11 +300,8 @@ class Settings extends Prep
 
         // Autologins abmelden, log=0
         case 'autologin':
-            $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                WHERE userid = :userid AND (login = 1 && autologin = 1) AND identifier != :ident";
-            #$stmt = "DELETE FROM site_login WHERE userid=:userid AND autologin=1";
             $data = [':userid' => $userid, ':ident' => $identifier];
-            Database::sendSQL($stmt, $data);
+            Data::deleteMyAutologin($data);
             $usr_data['count3'] = "";
             $success_msg = "alle meine anderen Autologins beendet.";
         break;
@@ -337,17 +319,7 @@ class Settings extends Prep
                 $error_msg = "Ein Admin kann sich hier nicht löschen.";
 
             if ($error_msg === "") {
-                $stmt = "UPDATE site_users SET status = 'deaktiv' WHERE userid = :userid";
-                #$stmt = "DELETE FROM site_users WHERE userid=:userid";
-                $data = [':userid' => $userid];     # int
-                Database::sendSQL($stmt, $data);
-
-                // wenn auf 'deaktiv' gesetzt, dann auch alle Anmeldungen löschen/beenden, (sonst bei DELETE automatisch per Verknüpfung gelöscht).
-                #$stmt = "DELETE FROM site_login WHERE userid = :userid";
-                $stmt = "UPDATE site_login SET login = NULL, autologin = NULL
-                    WHERE userid = :userid AND (login = 1 || autologin = 1)";
-                $data = [':userid' => $userid];     # int
-                Database::sendSQL($stmt, $data);
+                Data::deleteUser($userid);
                 $usr_data = [];
                 $success_msg = "Nutzer gelöscht.";
 
@@ -389,7 +361,7 @@ class Settings extends Prep
 
         // globale Variablen setzen
         self::$usr_data = $usr_data;
-        self::$active = $active;
+        self::$active   = $active;
         self::$error_msg = $error_msg;
         self::$status_message = $status_message;
 

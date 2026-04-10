@@ -1,6 +1,7 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SitePrep\{TablePrep, TableBody, TableData, TableNavi};
+use Dzg\SiteData\TableData as Data;
+use Dzg\SitePrep\{TablePrep, TableBody, TableNavi};
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\Auth;
 
@@ -90,7 +91,7 @@ class Table extends TablePrep
                 TableNavi::feldSuchen().        # Suche
                 "</div>";
 
-            $stamps_db = TableData::getData();
+            $stamps_db = Data::getMainData();
 
         } else {
             // Nutzer nicht angemeldet --> ohne Navi-Möglichkeit
@@ -101,7 +102,7 @@ class Table extends TablePrep
                 self::$_session['start'] = 0;              // random_int(0, $maxID - $proseite);
                 self::setSession();
 
-                $all_data  = TableData::getData();
+                $all_data  = Data::getMainData();
                 $rand_idx  = array_rand($all_data, $rand_num);
                 $rand_data = [];
                 foreach ($rand_idx as $idx) {

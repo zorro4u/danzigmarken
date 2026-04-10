@@ -1,8 +1,11 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\SettingsData as Data;
+use Dzg\Tools\{Auth, Tools};
 
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/settings.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 /****************************
@@ -82,21 +85,7 @@ class Settings
 
         // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
         // alle aktiven Anmeldungen
-        $stmt = "WITH
-        cte1 AS (
-            SELECT userid, COUNT(*) AS count3
-            FROM site_login
-            WHERE userid = :userid
-                AND (`login`=1 && autologin=1)
-                AND identifier != :ident)
-
-        SELECT site_users.userid, username, email, vorname, nachname, pw_hash, count3
-        FROM site_users
-        LEFT JOIN cte1 ON cte1.userid=site_users.userid
-        ";
-
-        $data = [':userid' => $userid, ':ident' => $identifier];
-        $results = Database::sendSQL($stmt, $data, 'fetchall');
+        $results = Data::getCounter($userid, $identifier);
 
         // Daten separieren
         foreach ($results as $user) {
@@ -118,7 +107,6 @@ class Settings
         self::$usr_data = $usr_data;
         self::$userliste = $userliste;
     }
-
 }
 
 

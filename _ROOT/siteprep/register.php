@@ -1,12 +1,13 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Tools};
+use Dzg\SiteData\RegisterData as Data;
+use Dzg\Tools\Tools;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
-require_once __DIR__.'/../tools/database.php';
+require_once __DIR__.'/../sitedata/register.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
@@ -72,21 +73,14 @@ class Register
         if ($error_msg === "") {
 
             // Registrierungs-Link auf Gültigkeit prüfen
-            $stmt = "SELECT userid, email, pwcode_endtime
-                    FROM site_users
-                    WHERE `status` = :status";
-            $data = [':status' => $input_code];
-            $usr_data = Database::sendSQL($stmt, $data, 'fetch');
+            $usr_data = Data::getUser($input_code);
 
             if (!$usr_data) {
                 $error_msg = "Registrierungs-Link wurde verändert oder ist nicht gültig.";
 
             } elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {  // +1 Std. Karenz
                 // veralteten Eintrag löschen
-                $stmt0 = "UPDATE site_users SET status=NULL, pwcode_endtime=NULL, notiz=NULL, pwc=NULL WHERE userid=:userid";
-                $stmt = "DELETE FROM site_users WHERE userid=:userid";
-                $data = [':userid' => $usr_data['userid']];     # int
-                Database::sendSQL($stmt, $data);
+                Data::deleteOldEntry($usr_data['userid']);
 
                 $error_msg = "Registrierungs-Link ist nach 4 Wochen am ".date('d.m.Y', $usr_data['pwcode_endtime'])." abgelaufen.";
 

@@ -1,8 +1,11 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\LogoutData as Data;
+use Dzg\Tools\{Auth, Tools};
 
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/logout.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 class Logout
@@ -59,32 +62,7 @@ class Logout
 
             // alle Logins beenden
             if(isset($_POST['logout_all'])) {
-
-                // alle anderen Autologins beenden, wenn mit Autologin auch angemeldet
-                $stmt0 = "UPDATE site_login
-                    SET login = NULL, autologin = NULL
-                    WHERE userid = :userid AND (login = 1 && autologin = 1)
-                    AND identifier != :ident";
-
-                // alle anderen Logins beenden, wenn mit Autologin angemeldet
-                $stmt = "UPDATE site_login
-                    SET login = NULL, autologin = NULL
-                    WHERE userid = :userid AND (login = 1)
-                    AND identifier != :ident";
-
-                // alle Autologins beenden
-                $stmt1 = "UPDATE site_login
-                    SET login = NULL, autologin = NULL
-                    WHERE userid = :userid AND (login = 1 && autologin = 1)";
-
-                // alle Logins beenden
-                $stmt2 = "UPDATE site_login
-                    SET login = NULL, autologin = NULL
-                    WHERE userid = :userid AND (login = 1)";
-
-                $data = [':userid' => $userid, ':ident' => $identifier];
-                Database::sendSQL($stmt, $data);
-
+                Data::setLogout($userid, $identifier);
                 $success_msg = "Alle meine anderen Autologins beendet.";
             }
 
@@ -109,3 +87,4 @@ class Logout
         self::$status_message = Tools::statusOut($success_msg, $error_msg);
     }
 }
+

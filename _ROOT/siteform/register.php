@@ -1,7 +1,8 @@
 <?php
 namespace Dzg\SiteForm;
 use Dzg\SitePrep\Register as Prep;
-use Dzg\Tools\{Database, Auth, Tools};
+use Dzg\SiteData\RegisterData as Data;
+use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
 
 session_start();
@@ -9,7 +10,9 @@ date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 
 require_once __DIR__.'/../siteprep/register.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../sitedata/register.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
 
@@ -81,12 +84,8 @@ class Register extends Prep
                 if ($error_msg === "") {
 
                     // usernamen/email im Bestand suchen
-                    $stmt = "SELECT username, email
-                            FROM site_users
-                            WHERE `status`='activated'
-                                AND (username = :username OR email = :email)";
                     $data = [':username' => $input_usr, ':email' => $input_email];
-                    $userliste = Database::sendSQL($stmt, $data, 'fetchall');
+                    $userliste = Data::searchActivatedUser($data);
 
                     // Benutzername vergeben
                     if ($input_usr !== "") {
@@ -167,10 +166,6 @@ class Register extends Prep
                 $passwort_hash = password_hash($input_pw1, PASSWORD_DEFAULT);
 
                 // Nutzerdaten in DB eintragen
-                $stmt = "UPDATE site_users
-                    SET username = :username, email = :email, pw_hash = :pw_hash,
-                        status = :status, pwcode_endtime = :pwcode_endtime, notiz = :notiz
-                    WHERE userid = :userid";
                 $data = [
                     ':userid'         => $usr_data['userid'],   # int
                     ':username'       => $input_usr,
@@ -179,7 +174,7 @@ class Register extends Prep
                     ':pwcode_endtime' => $pwcode_endtime,
                     ':status'         => $status,
                     ':notiz'          => $notiz ];
-                Database::sendSQL($stmt, $data);
+                Data::storeUser($data);
 
                 // wenn Konto-Email anders als Anfrage-Email,
                 // dann noch Verifizierung per Aktivierungs-Mail

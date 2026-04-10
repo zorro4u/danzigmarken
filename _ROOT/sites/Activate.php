@@ -2,7 +2,7 @@
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->RegSeite-->email(AktLink)-->dieseSeite:ActivateSeite-->Login */
 
 namespace Dzg\Sites;
-use Dzg\SitePrep\Activate as Init;
+use Dzg\SitePrep\Activate as Prep;
 use Dzg\SitePrep\{Header, Footer};
 
 session_start();
@@ -15,7 +15,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /***********************
  * Summary of Activate
  */
-class Activate extends Init
+class Activate extends Prep
 {
 
     /****************************

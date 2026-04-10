@@ -1,10 +1,11 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SitePrep\{TablePrep, TableData};
+use Dzg\SitePrep\TablePrep;
+use Dzg\SiteData\TableData as Data;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/tableprep.php';
-require_once __DIR__.'/tabledata.php';
+require_once __DIR__.'/../sitedata/tabledata.php';
 require_once __DIR__.'/../tools/auth.php';
 
 
@@ -289,7 +290,7 @@ class TableBody
 
                 // Thumbs der Einzeldateien holen
                 # $thumb_liste = getThumbBlob($stamp['gid']);
-                $thumb_liste = TableData::getThumbPath($stamp['gid']);
+                $thumb_liste = Data::getThumbPath($stamp['gid']);
 
                 // Anzahl Dateien (Bilder) pro Gruppe
                 $maxfile = count($thumb_liste);

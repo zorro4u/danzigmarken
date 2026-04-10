@@ -1,9 +1,9 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SitePrep\TableData;
+use Dzg\SiteData\TableData as Data;
 use Dzg\Tools\{Auth, Tools};
 
-require_once __DIR__.'/tabledata.php';
+require_once __DIR__.'/../sitedata/tabledata.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
@@ -154,7 +154,7 @@ class TablePrep
                 $_SESSION[$k] = self::$_session[$k];
             };
         };
-        $_SESSION['version'] = TableData::getVersion();
+        $_SESSION['version'] = Data::getVersion();
     }
 
 
@@ -192,7 +192,7 @@ class TablePrep
         self::setSearch($filter);
 
         // mit neuem Filter Elemente zählen
-        self::$maxID = TableData::getMaxID($filter);
+        self::$maxID = Data::getMaxID($filter);
 
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren

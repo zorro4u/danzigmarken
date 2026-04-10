@@ -1,8 +1,10 @@
 <?php
 namespace Dzg\SitePrep;
 use Dzg\SitePrep\TablePrep;
+use Dzg\SiteData\TableData as Data;
 
 require_once __DIR__.'/tableprep.php';
+require_once __DIR__.'/../sitedata/tabledata.php';
 
 
 /***********************
@@ -389,7 +391,7 @@ class TableNavi
     public static function feldThemenwahl(): string
     {
         $sess_thema = TablePrep::$_session['thema'];
-        $theme_qry  = TableData::getThemes();
+        $theme_qry  = Data::getThemes();
         $theme_db   = ['- alle -'];
 
         foreach ($theme_qry AS $entry) {

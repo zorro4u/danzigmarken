@@ -102,5 +102,5 @@ class Activate
         self::$status_message = $status_message;
         self::$usr_data = $usr_data;
     }
-
 }
+

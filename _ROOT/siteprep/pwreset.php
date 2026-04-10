@@ -2,13 +2,14 @@
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
 
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Tools};
+use Dzg\SiteData\PWresetData as Data;
+use Dzg\Tools\Tools;
 
 date_default_timezone_set('Europe/Berlin');
 error_reporting(E_ERROR | E_PARSE);
 session_start();
 
-require_once __DIR__.'/../tools/database.php';
+require_once __DIR__.'/../sitedata/pwreset.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
@@ -81,11 +82,7 @@ class PWreset
 
             // Passcode auf Gültigkeit prüfen
             $pwcode_hash = sha1($input_code);
-            $stmt = "SELECT userid, username, email, vorname, nachname, pwcode_endtime
-                FROM site_users
-                WHERE pwcode_hash = :pwcode_hash";
-            $data = [':pwcode_hash' => $pwcode_hash];
-            $usr_data = Database::sendSQL($stmt, $data, 'fetch');
+            $usr_data = Data::getPassCode($pwcode_hash);
 
             if (!$usr_data)
                 $error_msg = "Der Benutzer wurde nicht gefunden oder hat kein neues Passwort angefordert bzw. der übergebene Code war ungültig. ".
@@ -94,9 +91,7 @@ class PWreset
 
             elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {  // +1 Std. Karenz
                 // Passcode abgelaufen, veralteten Eintrag löschen
-                $stmt = "UPDATE site_users SET pwcode_hash = NULL, pwcode_endtime = NULL, pwc = NULL, notiz = NULL WHERE userid = :userid";
-                $data = [':userid' => $usr_data['userid']];     # int
-                Database::sendSQL($stmt, $data);
+                Data::deletePassCode($usr_data['userid']);
 
                 $error_msg = "Dein Code ist leider am ".date('d.m.y H:i', $usr_data['pwcode_endtime']).
                     " abgelaufen. Benutze die <a href='pwforget'>Passwortvergessen-Funktion</a> erneut.";
@@ -143,12 +138,7 @@ class PWreset
                 // TODO: alle Autologins beenden
                 if ($error_msg === "") {
                     $passwort_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
-
-                    $stmt = "UPDATE site_users
-                        SET pw_hash = :pw_hash, status = 'activated', pwcode_hash = NULL, pwcode_endtime = NULL, pwc = NULL, notiz = NULL
-                        WHERE userid = :userid";
-                    $data = [':userid' => $usr_data['userid'], ':pw_hash' => $passwort_hash];
-                    Database::sendSQL($stmt, $data);
+                    Data::storeNewPassword($usr_data['userid'], $passwort_hash);
 
                     $success_msg = "Dein Passwort wurde geändert";
                     $show_form = False;
@@ -171,3 +161,4 @@ class PWreset
         self::$usr_data = $usr_data;
     }
 }
+

@@ -2,7 +2,7 @@
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
 
 namespace Dzg\Sites;
-use Dzg\SitePrep\PWreset as Init;
+use Dzg\SitePrep\PWreset as Prep;
 use Dzg\SitePrep\{Header, Footer};
 
 date_default_timezone_set('Europe/Berlin');
@@ -18,7 +18,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /***********************
  * Summary of Pw_reset
  */
-class PWreset extends Init
+class PWreset extends Prep
 {
     /****************************
      * Summary of show
