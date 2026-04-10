@@ -13,7 +13,8 @@ session_start();
 require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
 require_once __DIR__.'/../sitedata/pwforget.php';
-require_once __DIR__.'/../tools/loader_tools.php';
+require_once __DIR__.'/../tools/auth.php';
+require_once __DIR__.'/../tools/tools.php';
 
 
 /***********************

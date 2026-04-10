@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SiteForm;
-use Dzg\SitePrep\Contact as Prep;
+use Dzg\SitePrep\Contact as Pre;
 use Dzg\Tools\Tools;
 use Dzg\Mail\{MailConfig, AntiSpam};
 
@@ -19,7 +19,7 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 /***********************
  * Webseite: Kontaktformular
  */
-class Contact extends Prep
+class Contact extends Pre
 {
     protected static $show_form;
     protected static string $status_message;

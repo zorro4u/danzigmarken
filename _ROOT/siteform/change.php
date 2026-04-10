@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SiteForm;
-use Dzg\SitePrep\Change as Prep;
+use Dzg\SitePrep\Change as Pre;
 use Dzg\SiteData\ChangeData as Data;
 use Dzg\Tools\Tools;
 
@@ -12,7 +12,7 @@ require_once __DIR__.'/../tools/tools.php';
 /***********************
  * Auswertung der Formulareingabe
  */
-class Change extends Prep
+class Change extends Pre
 {
     /***********************
      * ABBRUCH - Button

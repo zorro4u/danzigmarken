@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SiteForm\Change as Prep;
+use Dzg\SiteForm\Change as Pre;
 use Dzg\SitePrep\{Header, Footer};
 
 require_once __DIR__.'/../siteform/change.php';
@@ -14,7 +14,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
  * __public__
  * show()
  */
-class Change extends Prep
+class Change extends Pre
 {
     /***********************
      * Anzeige der Webseite

@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SiteForm;
-use Dzg\SitePrep\RegisterInfo as Prep;
+use Dzg\SitePrep\RegisterInfo as Pre;
 use Dzg\SiteData\RegisterInfoData as Data;
 use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
@@ -22,7 +22,7 @@ require_once __DIR__.'/../mail/MailConfig.php';
 /***********************
  * Summary of Register_info
  */
-class RegisterInfo extends Prep
+class RegisterInfo extends Pre
 {
     protected static $show_form;
     protected static string $status_message;

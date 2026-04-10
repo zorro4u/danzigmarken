@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SiteForm;
-use Dzg\SitePrep\Login as Prep;
+use Dzg\SitePrep\Login as Pre;
 use Dzg\SiteData\LoginData as Data;
 use Dzg\Tools\{Auth, Tools};
 
@@ -10,7 +10,7 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-class Login extends Prep
+class Login extends Pre
 {
     protected static $show_form;
     protected static $cookie;

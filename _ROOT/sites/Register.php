@@ -2,7 +2,7 @@
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->dieseSeite:RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
 
 namespace Dzg\Sites;
-use Dzg\SiteForm\Register as Prep;
+use Dzg\SiteForm\Register as Pre;
 use Dzg\SitePrep\{Header, Footer};
 
 session_start();
@@ -16,7 +16,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /***********************
  * Summary of Register
  */
-class Register extends Prep
+class Register extends Pre
 {
     /****************************
      * Summary of show

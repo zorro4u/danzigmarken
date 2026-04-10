@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SiteForm\Contact as Prep;
+use Dzg\SiteForm\Contact as Pre;
 use Dzg\SitePrep\{Header, Footer};
 
 require_once __DIR__.'/../siteform/contact.php';
@@ -13,7 +13,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /***********************
  * Webseite: Kontaktformular
  */
-class Contact extends Prep
+class Contact extends Pre
 {
     /***********************
      * Anzeige der Webseite

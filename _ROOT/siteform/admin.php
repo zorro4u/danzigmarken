@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SiteForm;
-use Dzg\SitePrep\Admin as Prep;
+use Dzg\SitePrep\Admin as Pre;
 use Dzg\SiteData\AdminData as Data;
 use Dzg\Tools\{Auth, Tools};
 
@@ -14,7 +14,7 @@ require_once __DIR__.'/../tools/tools.php';
  * Summary of Admin
  * class A extends B implements C
  */
-class Admin extends Prep
+class Admin extends Pre
 {
     protected static $status_message;
     protected static $active;

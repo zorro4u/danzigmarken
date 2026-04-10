@@ -1,11 +1,12 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\Tools\{Database, Tools};
+use Dzg\SiteData\ActivateData as Data;
+use Dzg\Tools\Tools;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
 
-require_once __DIR__.'/../tools/database.php';
+require_once __DIR__.'/../sitedata/activate.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
@@ -62,9 +63,7 @@ class Activate
         if(isset($error_msg) && $error_msg === "") {
 
             // Nutzer mit Aktivierungscode suchen
-            $stmt = 'SELECT userid, username, pwcode_endtime FROM site_users WHERE status = :code';
-            $data = [':code' => $input_code];
-            $usr_data = Database::sendSQL($stmt, $data, 'fetch');
+            $usr_data = Data::getUser($input_code);
 
             // Nutzer (code) gefunden
             if ($usr_data) {
@@ -73,18 +72,13 @@ class Activate
                 if ($usr_data['pwcode_endtime'] < (string)time()) {
 
                     // Status auf 'activated' setzen -> zur späteren Auswertung
-                    $stmt = "UPDATE site_users SET status = 'activated', pwcode_endtime = Null, notiz = Null WHERE userid = :userid";
-                    $data = [':userid' => $usr_data['userid']];     # int
-                    Database::sendSQL($stmt, $data);
+                    Data::setActivated($usr_data['userid']);
 
                     $success_msg = 'Dein Konto ist aktiviert. Du kannst dich jetzt <a href="login.php?usr='.$usr_data['username'].'">anmelden</a>!';
 
                 } else {
                     // veralteten Eintrag löschen
-                    #$stmt0 = "UPDATE site_users SET status=NULL, pwcode_endtime=NULL, notiz=NULL, pwc=NULL WHERE userid=:userid";
-                    $stmt = "DELETE FROM site_users WHERE userid = :userid";
-                    $data = [':userid' => $usr_data['userid']];     # int
-                    Database::sendSQL($stmt, $data);
+                    Data::deleteOld($usr_data['userid']);
 
                     $error_msg = 'Die Aktivierungsfrist von 4 Wochen ist am '.date("d.m.y", $usr_data['pwcode_endtime']).' abgelaufen.';
                 }
