@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\SettingsData as Data;
+use Dzg\SiteData\Settings as Data;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/settings.php';

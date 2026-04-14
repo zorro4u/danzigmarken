@@ -5,7 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-class LogoutData
+class Logout
 {
     public static function setLogout($userid, $identifier): void
     {

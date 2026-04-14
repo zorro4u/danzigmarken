@@ -19,7 +19,7 @@ class Impressum
         self::siteEntryCheck();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("impressum");
     }
 
@@ -38,9 +38,9 @@ class Impressum
 
 
     /**
-     * Summary of siteOutput
+     * Summary of view
      */
-    private static function siteOutput()
+    private static function view()
     {
 ?>
 

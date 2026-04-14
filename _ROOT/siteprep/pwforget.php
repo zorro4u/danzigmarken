@@ -2,7 +2,7 @@
 /* Prozess: dieseSeite:Forget-->email(Admin)/email(Code)-->ResetSeite-->Login */
 
 namespace Dzg\SitePrep;
-use Dzg\SiteData\PWforgetData as Data;
+use Dzg\SiteData\PWforget as Data;
 use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
 

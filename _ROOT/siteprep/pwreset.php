@@ -2,7 +2,7 @@
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
 
 namespace Dzg\SitePrep;
-use Dzg\SiteData\PWresetData as Data;
+use Dzg\SiteData\PWreset as Data;
 use Dzg\Tools\Tools;
 
 date_default_timezone_set('Europe/Berlin');

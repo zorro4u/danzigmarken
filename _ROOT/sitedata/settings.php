@@ -5,7 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-class SettingsData
+class Settings
 {
     public static function getCounter($userid, $identifier)
     {

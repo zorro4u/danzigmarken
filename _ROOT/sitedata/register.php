@@ -5,7 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-class RegisterData
+class Register
 {
     public static function getUser($input_code): array
     {

@@ -7,7 +7,7 @@ use PDOException;
 require_once __DIR__.'/../tools/database.php';
 
 
-class LoginData
+class Login
 {
     public static function searchUser($data): array
     {

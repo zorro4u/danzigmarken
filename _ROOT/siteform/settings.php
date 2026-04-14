@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\SiteForm;
-use Dzg\SitePrep\Settings as Pre;
-use Dzg\SiteData\SettingsData as Data;
+use Dzg\SitePrep\Settings as Prep;
+use Dzg\SiteData\Settings as Data;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../siteprep/settings.php';
@@ -13,7 +13,7 @@ require_once __DIR__.'/../tools/tools.php';
 /****************************
  * Summary of Settings
  */
-class Settings extends Pre
+class Settings extends Prep
 {
     protected static $active;
     protected static $status_message;

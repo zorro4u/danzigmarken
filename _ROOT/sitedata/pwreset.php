@@ -5,7 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-class PWresetData
+class PWreset
 {
     /**
      * PassCode holen

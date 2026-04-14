@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\SitePrep;
 use Dzg\SitePrep\Details;
-use Dzg\SiteData\ChangeData as Data;
+use Dzg\SiteData\Change as Data;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/details.php';

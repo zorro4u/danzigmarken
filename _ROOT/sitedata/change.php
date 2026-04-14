@@ -7,7 +7,7 @@ use PDOException;
 require_once __DIR__.'/../tools/database.php';
 
 
-class ChangeData
+class Change
 {
     // DropDown-Bezeichnungen holen für Thema, Frankatur, Ansicht, Attest
     public static function getDropEntry(): array

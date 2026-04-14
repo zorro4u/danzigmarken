@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\LogoutData as Data;
+use Dzg\SiteData\Logout as Data;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/logout.php';

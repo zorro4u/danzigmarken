@@ -5,7 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-class PrintViewData
+class PrintView
 {
     public static function getTheme(): array
     {

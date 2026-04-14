@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\RegisterData as Data;
+use Dzg\SiteData\Register as Data;
 use Dzg\Tools\Tools;
 
 session_start();

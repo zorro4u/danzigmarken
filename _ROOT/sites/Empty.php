@@ -10,12 +10,12 @@ class Dummy
     public static function show(?string $msg=null)
     {
         Header::show();
-        self::siteOutput($msg);
+        self::view($msg);
         Footer::show("empty");
     }
 
 
-    private static function siteOutput($msg)
+    private static function view($msg)
     {
         echo "
             <div class='container main-container registration-form'>

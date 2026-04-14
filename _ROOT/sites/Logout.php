@@ -17,12 +17,12 @@ class Logout extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("auth");
     }
 
 
-    private static function siteOutput()
+    private static function view()
     {
         $show_form = self::$show_form;
         $root_site = self::$root_site;

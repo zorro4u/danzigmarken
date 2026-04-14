@@ -34,17 +34,17 @@ class Details extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show();
     }
 
 
     /***********************
-     * Summary of siteOutput
+     * Summary of view
      *
      * als HTML ausgeben
      */
-    protected static function siteOutput()
+    protected static function view()
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;

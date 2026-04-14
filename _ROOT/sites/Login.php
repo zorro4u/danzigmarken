@@ -19,12 +19,12 @@ class Login extends Pre
         self::formEvaluation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("auth");
     }
 
 
-    private static function siteOutput()
+    private static function view()
     {
         /**
          * Passwort-Eingabe sichtbar machen,

@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\AdminData as Data;
+use Dzg\SiteData\Admin as Data;
 use Dzg\Tools\{Auth, Tools, CheckIP};
 
 require_once __DIR__.'/../sitedata/admin.php';

@@ -5,7 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-class AdminData
+class Admin
 {
     /****************************
      * Summary of getDBregistryLink
@@ -448,7 +448,7 @@ class AdminData
             SET `status`='deaktiv'
             WHERE userid=:userid";
         Database::sendSQL($stmt, $data);
-        
+
         // wenn Variante 'deaktiv setzen', dann auch alle Anmeldungen löschen,
         // (sonst bei DELETE automatisch per Verknüpfung gelöscht).
         self::deleteUserLogin($userid);

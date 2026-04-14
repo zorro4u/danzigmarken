@@ -5,10 +5,7 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
-/***********************
- * Summary of Details
- */
-class DetailsData
+class Details
 {
     /***********************
      * ermittelt Vorgänger und Nachfolger der akt. Seite

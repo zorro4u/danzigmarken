@@ -26,15 +26,15 @@ class PWforget extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("auth");
     }
 
 
     /****************************
-     * Summary of siteOutput
+     * Summary of view
      */
-    private static function siteOutput()
+    private static function view()
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;

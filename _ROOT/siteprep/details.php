@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\DetailsData as Data;
+use Dzg\SiteData\Details as Data;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/details.php';

@@ -24,7 +24,7 @@ class Contact extends Pre
         self::formEvaluation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("contact");
 
         self::siteClose();
@@ -32,10 +32,10 @@ class Contact extends Pre
 
 
     /***********************
-     * Summary of siteOutput
+     * Summary of view
      * [https://www.kontaktformular.com/]
      */
-    private static function siteOutput()
+    private static function view()
     {
         /*
         $act_pth = explode('/', __DIR__);

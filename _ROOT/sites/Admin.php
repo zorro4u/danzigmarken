@@ -23,7 +23,7 @@ class Admin extends Pre
         self::formEvaluation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("account");
         #Footer::show("empty");
 
@@ -32,9 +32,9 @@ class Admin extends Pre
 
 
     /****************************
-     * Summary of siteOutput
+     * Summary of view
      */
-    private static function siteOutput()
+    private static function view()
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;

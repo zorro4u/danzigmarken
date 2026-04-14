@@ -35,17 +35,17 @@ class Table extends TablePrep
         self::dataPreparation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show();
     }
 
 
     /***********************
-     * Summary of siteOutput
+     * Summary of view
      *
      * @return void
      */
-    private static function siteOutput()
+    private static function view()
     {
         // Klassenvariblen laden
         $maxID = self::$maxID;

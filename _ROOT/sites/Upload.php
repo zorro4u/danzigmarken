@@ -25,13 +25,13 @@ class Upload extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("auth");
     }
 
 
     /********************************* */
-    protected static function siteOutput()
+    protected static function view()
     {
 
         $ausgabe = Tools::statusmeldungAusgeben();

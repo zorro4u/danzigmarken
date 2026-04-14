@@ -15,15 +15,15 @@ class About
     public static function show()
     {
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("impressum");
     }
 
 
     /****************************
-     * Summary of siteOutput
+     * Summary of view
      */
-    private static function siteOutput()
+    private static function view()
     {
 ?>
 

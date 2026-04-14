@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\PrintViewData as Data;
+use Dzg\SiteData\PrintView as Data;
 use Dzg\Tools\{Auth, Tools};
 
 date_default_timezone_set('Europe/Berlin');

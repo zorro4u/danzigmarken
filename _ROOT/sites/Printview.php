@@ -23,7 +23,7 @@ class PrintView extends Pre
         self::siteEntryCheck();
 
         Header::loadHtmlHead();
-        self::seitenausgabe();
+        self::view();
         Footer::show("empty");
     }
 
@@ -185,7 +185,7 @@ class PrintView extends Pre
     /**
      * zentrale html Ausgabe
      */
-    private static function seitenausgabe()
+    private static function view()
     {
         // bei Aufruf per Admin-Seite, Filter zurücksetzen
         if (isset($_GET['thema']) && (int)$_GET['thema'] === 100) {

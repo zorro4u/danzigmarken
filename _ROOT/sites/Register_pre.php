@@ -42,7 +42,7 @@ class RegisterPre
         self::dataPreparation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show("auth");
     }
 
@@ -146,9 +146,9 @@ class RegisterPre
 
 
     /****************************
-     * Summary of siteOutput
+     * Summary of view
      */
-    public static function siteOutput()
+    public static function view()
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;

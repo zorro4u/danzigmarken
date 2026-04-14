@@ -26,7 +26,7 @@ class Change extends Pre
         self::formEvaluation();
 
         Header::show();
-        self::siteOutput();
+        self::view();
         Footer::show();
     }
 
@@ -34,7 +34,7 @@ class Change extends Pre
     /***********************
      * HTML erzeugen
      */
-    private static function siteOutput()
+    private static function view()
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
