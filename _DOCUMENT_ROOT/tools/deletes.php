@@ -1,12 +1,11 @@
 <?php
-namespace Dzg\Test;
+namespace Dzg\Tools;
 
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
 require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/tools/database.php";
 use Dzg\Tools\Database as DB;
-use Exception;
 
 
 Delete::delete_deaktiv_files();

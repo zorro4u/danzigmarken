@@ -54,18 +54,19 @@ class Register
         */
 
         $error_msg = "";
+        $input_code = "";
 
         // Registrierungs-Code checken
         if (!isset($_GET['code'])) {
-            $error_msg = "Es fehlt ein gültiger Registrierungs-Link. <br>Wende dich dafür an den Seitenbetreiber.";
+            $error_msg = "Die Registrierung funktioniert nur mit dem per Email zugesandten Link. <br>Überprüfe nochmal deinen Posteingang und den Spam-Ordner. Wiederhole ggf. die Registrierung. <br>";
         } else {
             $input_code = htmlspecialchars(Tools::cleanInput($_GET['code']));
 
             // Plausi-Check
             if ($input_code === "")
-                $error_msg = 'Es wurden kein Code zum Start der Registrierung übermittelt.';
-            elseif (!preg_match('/^[a-zA-Z0-9]{1,1000}/', $input_code))
-                $error_msg = 'Der Code enhält ungültige Zeichen.';
+                $error_msg = 'Der Registrierungs-Code fehlt. Überprüfe nochmal den Link in deiner Email.';
+            elseif (!preg_match('/^[a-zA-Z0-9]{1,100}$/', $input_code))
+                $error_msg = '<b>Manipulationsverdacht: </b><br>Es wurden ungültige Zeichen im Registrierungs-Code erkannt.';
             else {}
         }
 
@@ -76,7 +77,7 @@ class Register
             $usr_data = Data::getUser($input_code);
 
             if (!$usr_data) {
-                $error_msg = "Registrierungs-Link wurde verändert oder ist nicht gültig.";
+                $error_msg = "Der Registrierungs-Link ist nicht gültig. Wiederhole die Registrierung. ";
 
             } elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {  // +1 Std. Karenz
                 // veralteten Eintrag löschen
@@ -93,3 +94,6 @@ class Register
     }
 
 }
+
+
+// EOF

@@ -2,6 +2,8 @@
     "require": {
         "gregwar/captcha": "1.*",
         "phpauth/phpauth.l10n": "^0.2.0",
-        "phpauth/phpauth": "^1.5"
+        "phpauth/phpauth": "^1.5",
+        "avadim/fast-excel-writer": "^6.12",
+        "avadim/fast-excel-reader": "^3.0"
     }
 }

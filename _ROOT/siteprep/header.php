@@ -65,7 +65,9 @@ class Header extends SiteConfig
         // manipulierten URL-Aufruf blockieren
         $ip  = CheckIP::getIP();
         $url = $_SERVER["REQUEST_URI"] ?? '';
-        if (str_contains($url, "%")) {
+        if (str_contains($url, "%")
+            || str_contains($url, "//"))
+        {
             $ipc = new CheckIP("clear");
             $ipc->under_suspicion($ip, true);
             $ipc = null;

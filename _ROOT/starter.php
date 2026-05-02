@@ -3,6 +3,10 @@ namespace Dzg;
 use Dzg\Sites;
 use Dzg\SitePrep\SiteConfig as Init;
 
+session_start();
+date_default_timezone_set('Europe/Berlin');
+error_reporting(E_ERROR | E_PARSE);
+
 require_once __DIR__.'/siteprep/siteconfig.php';
 
 
@@ -13,13 +17,20 @@ class Starter
 {
     /**
      * setzt anhand der Startdatei globale Werte,
-     * die aus der SiteConfig kommen
+     * die aus der SiteConfig kommen.
+     *
+     * ggf. Seiten-Übergabe als Parameter
+     * in Form: 'name.extension'
      */
     public static function loadSiteConfig(?string $site=null)
     {
         # ??= steht für: if(!isset(x)) x=y else x=x;             - existiert nicht
         # ?:  steht für: if(isset(x) && empty(x)) z=y else z=x;  - existiert, aber leer
+
         $site ??= basename($_SERVER['PHP_SELF']);
+        if (!pathinfo($site, PATHINFO_EXTENSION)) {
+            $site .= '.php';
+        }
         $page = Init::PAGE[$site] ?? Init::PAGE['dummy'];
 
         // globaler Wert für weiteren Seitenaufbau
@@ -128,3 +139,5 @@ class Starter
         endswitch;
     }
 }
+
+// EOF

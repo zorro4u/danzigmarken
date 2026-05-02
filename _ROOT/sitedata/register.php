@@ -7,7 +7,7 @@ require_once __DIR__.'/../tools/database.php';
 
 class Register
 {
-    public static function getUser($input_code): array
+    public static function getUser(string $input_code)
     {
         // Registrierungs-Link auf Gültigkeit prüfen
         $stmt =
@@ -50,3 +50,5 @@ class Register
     }
 }
 
+
+// EOF

@@ -37,6 +37,7 @@ class Register extends Prep
         $usr_data  = self::$usr_data;
         $error_msg = self::$error_msg;
 
+        $input_usr = "";
         $success_msg = "";
         $exist = False;
         $show_form = True;

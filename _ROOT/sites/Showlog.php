@@ -122,8 +122,9 @@ class ShowLog
                         };
 
                         // manipulierter URL-Aufruf
-                        if ($key === "url" &&
-                            str_contains($value, "%"))
+                        if ($key === "url"
+                            && (str_contains($value, "%") ||
+                                str_contains($value, "//")))
                         {
                             $style0 = $style1 = "color:red;";
                             $value = urldecode($value);
@@ -149,7 +150,7 @@ class ShowLog
             $out .= "Du hast den 'rechten' Pfad verlassen und wirst hier nix sehen.";
         endif;
 
-        // wird schon im Header/antiflood bzw. Footer/Log gemacht
+        // wird schon im Header/antiflood gemacht
         if($suspect) {
             $ipc = new CheckIP("clear");
             foreach($suspect as $ip) {

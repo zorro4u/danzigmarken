@@ -6,21 +6,22 @@ use PDO;
 use PDOException;
 use Exception;
 
+require_once __DIR__ . '/../private/account_data.php';
+
 date_default_timezone_set('Europe/Berlin');
 
-require_once __DIR__.'/../private/account_data.php';
 
-
-/***********************
+/**
  * Summary of Database
  */
 class Database
 {
-    /***********************
+    /**
      *  Datenbank-Verbindung, Maria-DB
      * -- alte Bezeichnung, wird noch verwendet --
      */
-    public static function connectMyDB() :PDO {
+    public static function connectMyDB(): PDO
+    {
         return self::getPDO();
     }
 
@@ -29,35 +30,37 @@ class Database
     {
         if (!is_object(self::$pdo)) {
             self::setPDO();
-        };
+        }
+        ;
         return self::$pdo;
     }
 
-    /***********************
+    /**
      * Verbindung zur Datenbank herstellen
      */
     protected static function setPDO()
     {
-        $user     = MyData\DBUSER;
+        $user = MyData\DBUSER;
         $password = MyData\DBPW;
         $database = MyData\DBASE;
-        $host     = "localhost:3306";
-        $charset  = 'utf8mb4';
-        $options  = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        $host = MyData\HOST;
+        $charset = 'utf8mb4';
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NUM,
             #PDO::ATTR_EMULATE_PREPARES   => false,
         ];
         # vs. PDO::FETCH_BOTH, PDO::FETCH_ASSOC / PDO::FETCH_COLUMN, PDO::FETCH_KEY_PAIR
 
-        $maria_host  = "mysql:host=$host;dbname=$database;charset=$charset";
+        $maria_host = "mysql:host=$host;dbname=$database;charset=$charset";
 
         try {
             $pdo = new PDO($maria_host, $user, $password, $options);
 
-            } catch(PDOException $e) {
-            die($e->getMessage().': #1.mariaDB.stamps');
-        };
+        } catch (PDOException $e) {
+            die($e->getMessage() . ': #1.mariaDB.stamps');
+        }
+        ;
 
         // PHP-Fehlermeldungen anzeigen
         error_reporting(E_ALL);
@@ -68,7 +71,7 @@ class Database
     }
 
 
-    /****************************
+    /*******
      * Summary of sendSQL
      * zentrale DB-Abruffunktion,
      * vereint: prepare, bindParam, execute, (fetch) - Abfolge
@@ -80,26 +83,28 @@ class Database
      * @param bool $many .. execute_many, default: false
      */
     public static function sendSQL(
-        string      $sql,
-        array       $data_array=[],
-        string|true $fetch_mode='no',
-        string      $pdo_mode='assoc',
-        bool        $many=false )
-    {
+        string $sql,
+        array $data_array = [],
+        string|bool $fetch_mode = 'no',
+        string $pdo_mode = 'assoc',
+        bool|string $executemany = false
+    ) {
         // in 'execute_many' Routine springen
-        if ($many) {
+        if ($executemany) {
             return self::executemanyDB($sql, $data_array, null, $fetch_mode, $pdo_mode);
-        };
+        }
+        ;
 
         // Datenbank-Handle / Verbindung
         $dbh = self::getPDO();
 
         // leeren SQL-Befehl empfangen, Abbruch
-        if (empty(trim($sql))) return;
+        if (empty(trim($sql)))
+            return;
 
         // SQL-Befehl übergeben
         $qry = $dbh->prepare(trim($sql));
-
+#echo $sql . PHP_EOL;exit;
         // DB-Abfrage-Format festlegen
         switch (strtolower($pdo_mode)) {
             case "num":
@@ -116,7 +121,8 @@ class Database
                 $qry->setFetchMode(PDO::FETCH_ASSOC);
 
             // PDO::FETCH_NAMED PDO::FETCH_CLASS PDO::FETCH_OBJ PDO::FETCH_BOUND PDO::FETCH_LAZY PDO::FETCH_KEY_PAIR
-        };
+        }
+        ;
 
         // die zu sendenden Daten an ihr Format binden und dem SQL-Befehl hinzufügen
         if (!empty($data_array)) {
@@ -146,12 +152,15 @@ class Database
                     case (is_object($v)):
                     default:
                         var_dump($v);
-                        exit("Error_bindParam: nicht unterstützte Datenstruktur - ".gettype($v));
+                        exit("Error_bindParam: nicht unterstützte Datenstruktur - " . gettype($v));
 
                     // PDO::PARAM_LOB - large_object, image_data
-                };
-            };
-        };
+                }
+                ;
+            }
+            ;
+        }
+        ;
 
         $query = [];
         try {
@@ -159,7 +168,8 @@ class Database
             #var_dump($qry, $dbh);echo'<br>***<br>';
             $qry->execute();
 
-            if (strpos($sql, "INSERT") !== false) return;
+            if (strpos($sql, "INSERT") !== false)
+                return;
 
             // DB-Antwort empfangen
             switch (strtolower($fetch_mode)) {
@@ -178,27 +188,29 @@ class Database
 
                 default:
                     return;     # ohne DB-Antwort zurück
-            };
+            }
+            ;
 
-            } catch (PDOException $e) {
-            die($e->getMessage()." *** ".$sql);
-        };
+        } catch (PDOException $e) {
+            die($e->getMessage() . " *** " . $sql);
+        }
+        ;
 
         return $query;
     }
 
 
-    /***********************
+    /**
      * sql_Befehl mehrfach an DB senden (prepare, bindParam, execute)
      * $data  im array-format: [[a], [b], ...]
      */
     public static function executemanyDB(
         string $sql,
         array $data,
-        $pdo=Null,
-        string|true $fetch_mode='no',
-        string      $pdo_mode='assoc')
-    {
+        $pdo = Null,
+        string|bool $fetch_mode = 'no',
+        string $pdo_mode = 'assoc'
+    ) {
         /*
         https://phpdelusions.net/pdo_examples/insert
         make sure that the emulation mode is turned off, as there will be no speed benefit otherwise, however small it is. PDO::ATTR_EMULATE_PREPARES
@@ -232,7 +244,8 @@ class Database
                 $qry->setFetchMode(PDO::FETCH_ASSOC);
 
             // PDO::FETCH_NAMED PDO::FETCH_CLASS PDO::FETCH_OBJ PDO::FETCH_BOUND PDO::FETCH_LAZY PDO::FETCH_KEY_PAIR
-        };
+        }
+        ;
 
         $query = [];
         try {
@@ -269,15 +282,18 @@ class Database
                         };
                     };
                     */
-                    for ($i=0; $i < count($dataset); ++$i) {
+                    for ($i = 0; $i < count($dataset); ++$i) {
                         if (is_int($dataset[$i])) {
-                            $qry->bindParam($i+1, $dataset[$i], PDO::PARAM_INT);
+                            $qry->bindParam($i + 1, $dataset[$i], PDO::PARAM_INT);
                         } elseif (is_string($dataset[$i])) {
-                            $qry->bindParam($i+1, $dataset[$i], PDO::PARAM_STR);
-                        };
-                    };
+                            $qry->bindParam($i + 1, $dataset[$i], PDO::PARAM_STR);
+                        }
+                        ;
+                    }
+                    ;
 
-                };
+                }
+                ;
 
 
                 try {
@@ -290,43 +306,50 @@ class Database
 
                             case "fetchall":
                             case "all":
-                                $query []= $qry->fetchAll();
+                                $query[] = $qry->fetchAll();
                                 break;
 
                             case "fetch":
                             case "yes":
                             case "true":
                             case true:
-                                $query []= $qry->fetch();
+                                $query[] = $qry->fetch();
                                 break;
 
                             default:
                                 break;     # ohne DB-Antwort weiter
-                        };
-                    };
+                        }
+                        ;
+                    }
+                    ;
 
-                    } catch (PDOException $e) {
-                        die($e->getMessage()." *** ".$sql);
-                };
-            };
+                } catch (PDOException $e) {
+                    die($e->getMessage() . " *** " . $sql);
+                }
+                ;
+            }
+            ;
 
             $pdo_db->commit();
             $success = True;
 
-            } catch (Exception $e) {
-                $query = [];
-                $success = False;
-                $pdo_db->rollback();
-                die($e->getMessage().": Error Executing_manyData on MariaDB");
-                #throw $e;
-        };
+        } catch (Exception $e) {
+            $query = [];
+            $success = False;
+            $pdo_db->rollback();
+            die($e->getMessage() . ": Error Executing_manyData on MariaDB");
+            #throw $e;
+        }
+        ;
 
-        if (!is_object($pdo)) {$pdo_db = Null;}
+        if (!is_object($pdo)) {
+            $pdo_db = Null;
+        }
         return $query;
     }
 
 
-    /***********************
+    /**
      * sql_Befehl an DB senden (prepare, bindParam, execute, fetch)
      * $data im array-format: [a, b, ...]
      * "all" -> fetchall
@@ -341,18 +364,19 @@ class Database
         foreach ($params as $param) {
             if (is_object($param)) {
                 $pdo = $param;
-            }
-            elseif (is_string($param)) {
+            } elseif (is_string($param)) {
                 $all = $param;
-            }
-            elseif (is_array($param)) {
+            } elseif (is_array($param)) {
                 $data = $param;
-            };
-        };
+            }
+            ;
+        }
+        ;
 
         if ($all === "many") {
             return self::executemanyDB($sql, $data, $pdo);
-        };
+        }
+        ;
 
         $pdo_db = (is_object($pdo))
             ? $pdo
@@ -360,37 +384,47 @@ class Database
         $qry = $pdo_db->prepare($sql);
 
         if (!empty($data)) {
-            for ($i=0; $i < count($data); $i++) {
+            for ($i = 0; $i < count($data); $i++) {
                 if (is_int($data[$i])) {
-                    $qry->bindParam($i+1, $data[$i], PDO::PARAM_INT);
+                    $qry->bindParam($i + 1, $data[$i], PDO::PARAM_INT);
                 } elseif (is_string($data[$i])) {
-                    $qry->bindParam($i+1, $data[$i], PDO::PARAM_STR);
-                };
-            };
-        };
+                    $qry->bindParam($i + 1, $data[$i], PDO::PARAM_STR);
+                }
+                ;
+            }
+            ;
+        }
+        ;
 
         try {
             $qry->execute();
             $query = ($all === "all")
                 ? $qry->fetchAll(PDO::FETCH_NUM)      #(PDO::FETCH_ASSOC)
                 : $qry->fetch(PDO::FETCH_NUM);
-            } catch (PDOException $e) {
-            die($e->getMessage().": Error Fetching on MariaDB");
-        };
+        } catch (PDOException $e) {
+            die($e->getMessage() . ": Error Fetching on MariaDB");
+        }
+        ;
 
-        if (!is_object($pdo)) {$pdo_db = Null;}
+        if (!is_object($pdo)) {
+            $pdo_db = Null;
+        }
         return $query;
     }
 
 
-    /***********************
+    ////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+    /**
      * Summary of version
      */
-    public static function version() {
+    public static function version()
+    {
         // Verbindung zur Datenbank
         $pdo_db = (is_object(self::$pdo))
-        ? self::getPDO()
-        : self::connectMyDB();
+            ? self::getPDO()
+            : self::connectMyDB();
 
         # neuestes Datum aus created/changed: dzg_file, dzg_group
         # MAX-Werte der einzelnen Spalten holen,
@@ -427,6 +461,6 @@ class Database
         $_SESSION['version'] = $version;
         return $version;
     }
-
-
 }
+
+// EOF

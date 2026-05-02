@@ -53,11 +53,46 @@ class CheckIP
         128 => 0
     ];
 
+     public static $net4_arr1 = [
+         8 => 1,
+        16 => 2,
+        24 => 3,
+        32 => 4
+    ];
+    public static $net6_arr1 = [
+        16  => 1,
+        32  => 2,
+        48  => 3,
+        64  => 4,
+        80  => 5,
+        96  => 6,
+        112 => 7,
+        128 => 8
+    ];
+
+    public static $net4_old_new = [
+        3 => 1,
+        2 => 2,
+        1 => 3,
+        0 => 4
+    ];
+    public static $net6_old_new = [
+        7 => 1,
+        6 => 2,
+        5 => 3,
+        4 => 4,
+        3 => 5,
+        2 => 6,
+        1 => 7,
+        0 => 8
+    ];
+
     private ?string $ip=null;    # (?) - kann Null oder String sein
     private bool $denied=false;
     private ?string $status=null;
     private ?string $message=null;
     private ?string $error=null;
+    private static bool $ip6=false;
 
     // getter
     public function ip() {return $this->ip;}
@@ -226,9 +261,11 @@ class CheckIP
         $userip = $this->get_IP($ip);
 
         if (filter_var($userip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            self::$ip6 = false;
             $this->check_IP4($userip);
 
         } elseif (filter_var($userip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            self::$ip6 = true;
             $this->check_IP6($userip);
         }
 
@@ -270,9 +307,11 @@ class CheckIP
     {
         $ip = null;
         if (filter_var($ip_input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            self::$ip6 = false;
             $ip = $ip_input;
 
         } elseif (filter_var($ip_input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            self::$ip6 = true;
             $ip = $ip_input;
         };
         return $ip;
@@ -302,7 +341,7 @@ class CheckIP
                 #$max = 10**($net+1);    # 10/100/1.000/10.000
                 $max = 10*($net+1);     # 10/20/30/40
                 if (($count > $max) || ($denied > intdiv($max, 4))) {
-                    self::DB_block_ip4($ip_arr[$net], $net);
+                    self::DB_block_ip($ip_arr[$net], $net);
                     $message = "Bereich ({$ip_arr[$net]['cut']}) jetzt geblockt...<br>";
                 }
 
@@ -365,7 +404,7 @@ class CheckIP
                 // mehrfach im Bereich gefunden/gesperrt -> auffällig, IP/Bereich sperren
                 $max = 10*($net+1);
                 if (($count > $max) || ($denied > intdiv($max, 4))) {
-                    self::DB_block_ip4($ip_arr[$net], $net);
+                    self::DB_block_ip($ip_arr[$net], $net);
                     $message = "Bereich ({$ip_arr[$net]['cut']}) jetzt geblockt...<br>";
                     $ct++;
                 }
@@ -447,6 +486,29 @@ class CheckIP
     }
 
 
+    private static function ip6_status($ip)
+    {
+        if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return true;
+        }
+        return false;
+    }
+    private static function convert_mask2code($ip, $mask)
+    {
+        return (self::ip6_status($ip))
+            ? self::$net6_arr[$mask]
+            : self::$net4_arr[$mask];
+    }
+    private static function convert_code2mask($ip, $code)
+    {
+        $net4_rev = array_flip(self::$net4_arr);
+        $net6_rev = array_flip(self::$net6_arr);
+        return (self::ip6_status($ip))
+            ? $net6_rev[$code]
+            : $net4_rev[$code];
+    }
+
+
     /**
      * Summary of DB_get_data
      * @param string $ip
@@ -484,7 +546,7 @@ class CheckIP
         WHERE ip LIKE {$like} AND `block`=1),
 
         netcode AS (
-        SELECT max(net) mask FROM site_blacklist
+        SELECT min(net) mask FROM site_blacklist
         WHERE ip LIKE {$like} AND `block`=1)
 
         SELECT * FROM black_list, ct_black, ct_block, netcode
@@ -518,7 +580,7 @@ class CheckIP
     }
 
 
-    private static function DB_block_ip4(array $ip_arr, int $net) :void
+    private static function DB_block_ip(array $ip_arr, int $net) :void
     {
         $ip = $ip_arr['cut'];
         # wenn IP mit Pkt endet, dann Bereichsuche mit %, sonst suche Einzel-IP
@@ -538,7 +600,6 @@ class CheckIP
             ':block' => (int)$block,]
         : $input;
 
-
         $stmt1 =
             "INSERT INTO site_blacklist (ip, `block`)
             SELECT :ip, :block
@@ -556,7 +617,7 @@ class CheckIP
                 WHERE userid=2 GROUP BY ip)
             ";
 
-        $stmt = count($data) == 1 ? $stmt1 : $stmt2;
+        $stmt = count($data) == 2 ? $stmt1 : $stmt2;
         Database::sendSQL($stmt, $data);
     }
 
@@ -658,6 +719,9 @@ class CheckIP
         $file = $_SERVER['DOCUMENT_ROOT']."/../logs/error_log";
         #$file = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/error_log.1";
         #$file = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/error_log.2";
+        if (!is_file($file)){
+            return;
+        };
         $file_arr = file($file);
 
         $data = [];
@@ -1230,9 +1294,7 @@ function ip_long()
         echo str_pad(dechex(ord($char)), 2, '0', STR_PAD_LEFT);
 
 
-
-
-
-
 }
 
+
+// EOF

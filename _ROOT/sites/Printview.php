@@ -4,9 +4,6 @@ use Dzg\SitePrep\PrintView as Pre;
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\Auth;
 
-date_default_timezone_set('Europe/Berlin');
-session_start();
-
 require_once __DIR__.'/../siteprep/printview.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 require_once __DIR__.'/../tools/auth.php';

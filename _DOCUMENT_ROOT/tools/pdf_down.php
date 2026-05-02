@@ -1,10 +1,9 @@
 <?php
-namespace Dzg\Test;
+namespace Dzg\Tools;
 
 date_default_timezone_set('Europe/Berlin');
 session_start();
 
-#require_once __DIR__.'/../functions/database.func.php';     // Datenbank-Verbindung $pdo
 require_once __DIR__.'/../auth/includes/auth.func.php';
 
 /*
@@ -24,6 +23,10 @@ if ((int)$_SESSION['su'] !== 1) {
 }
 
 */
+
+
+Download::pdfDownloadSeite();
+
 
 class Download
 {
@@ -55,11 +58,8 @@ class Download
             #unlink($ffn);                                    # Datei löschen
         }
     }
+
 }
 
 
-Download::pdfDownloadSeite();
-
-
-
-
+// EOF

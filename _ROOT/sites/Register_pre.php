@@ -9,10 +9,6 @@ namespace Dzg\Sites;
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\{Database, Auth, Tools};
 
-date_default_timezone_set('Europe/Berlin');
-error_reporting(E_ERROR | E_PARSE);
-session_start();
-
 require_once __DIR__.'/../siteprep/loader_default.php';
 require_once __DIR__.'/../tools/database.php';
 require_once __DIR__.'/../tools/auth.php';

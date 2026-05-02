@@ -83,7 +83,7 @@ class Admin extends Pre
         <li role='presentation' class='" . $active['user'] . "'><a href='#user' aria-controls='user' role='tab' data-toggle='tab'>Nutzer</a></l>
         <li role='presentation' class='" . $active['autologin'] . "'><a href='#autologin' aria-controls='autologin' role='tab' data-toggle='tab'>Autologin</a></li>
         <li role='presentation' class='" . $active['regis'] . "'><a href='#regis' aria-controls='regis' role='tab' data-toggle='tab'>Reg-Links</a></li>
-        <li role='presentation' class='" . $active['sonst'] . "'><a href='#sonst' aria-controls='sonst' role='tab' data-toggle='tab'>Sonstiges</a></li>
+        <li role='presentation' class='" . $active['sonst'] . "'><a href='#sonst' aria-controls='sonst' role='tab' data-toggle='tab'>Sonstiges</a></li>        <li role='presentation' class='" . $active['tools'] . "'><a href='#tools' aria-controls='tools' role='tab' data-toggle='tab'>Tools</a></li>
     </ul>
 
     <div class='tab-content'>";
@@ -134,6 +134,7 @@ class Admin extends Pre
             $autologin = (!empty($login_data['autologin'])) ? "*" : "";
             $out_group = $log_data['ct_group'] ?? "0";
             $out_singl = $log_data['ct_singl'] ?? "0";
+            $single_ratio = ($out_singl) ? round($out_group / $out_singl * 100) : '-';
             $out_black = $log_data['ct_black'] ?? "0";
             $out_block = $log_data['ct_block'] ?? "0";
             $out_nblck = (!empty(self::$new_blocked))
@@ -163,25 +164,21 @@ class Admin extends Pre
         <tr><td>&nbsp;</td><td></td></tr>
         <tr><td>last:</td><td>" . $out_date . "</td></tr>
         <tr><td>&nbsp;</td><td></td></tr>
-        <tr><td>log:</td><td>" . $out_group . "&nbsp;/&nbsp;" . $out_singl . "</td></tr>
+        <tr><td>log_ratio:</td><td>" . $single_ratio . "%&nbsp;single</td></tr>
         <tr><td>block:</td><td>" . $out_block . "&nbsp;/&nbsp;" . $out_black . $out_nblck . "</td></tr>
     </table>
-
 
     <!-- Zusatz Buttons -->
 
     <br><hr>
-    <form action='../tools/showlog' method='POST'>
-        <button class='btn btn-primary' type=''>Log-Protokoll</button>&emsp;&emsp;
-        <button formaction='../tools/maillog_show' class='btn btn-primary' type='' value='' name=''>Mail-Log</button>&emsp;&emsp;
-        <button formaction='../tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
-        <button formaction='../tools/pdf_down' class='btn btn-primary' type='' value='' name=''>PDF_Download</button>&emsp;&emsp;
-        <button formaction='../tools/printview.php?thema=100' class='btn btn-primary' type='' value='' name=''>PDF anzeigen</button>&emsp;&emsp;
-        <button formaction='https://www.danzigmarken.de/yiisite/web/index.php' class='btn btn-primary' type='' value='' name=''>Yii_Site</button>&emsp;&emsp;
-        <button formaction='../tools/deletes.php' class='btn btn-primary' type='' value='' name=''>DB cleaning</button>&emsp;&emsp;
+    <form method='POST'>
+        <button formaction='../tools/showlog' class='btn btn-primary' type=''>Log-Protokoll</button>&emsp;&emsp;
     </form>
+
 </div>
 ";
+#         <button formaction='https://www.danzigmarken.de/yiisite/web/index.php' class='btn btn-primary' type='' value='' name=''>Yii_Site</button>&emsp;&emsp;
+
             unset($changed, $endtime, $out_created, $out_ip, $out_date, $out_log, $out_black, $out_block, $act);
             // -- ende: Info --
 
@@ -398,6 +395,7 @@ class Admin extends Pre
 
     ";
                 $ct_reg = 0;
+                $reglinks_vorhanden = false;
                 foreach ($reglinks as $link) :
                     if (count($link) > 2) {
                         // wenn RegLink vorhanden
@@ -535,6 +533,68 @@ document.addEventListener(\"DOMContentLoaded\", function () {
 
             unset($changed, $endtime, $out_created, $out_ip, $out_date, $act);
             // -- ende: Sonstiges --
+
+            // -- TAB: Tools --
+            $output .= "
+    <div role='tabpanel' class='tab-pane " . $active['tools'] . "' id='tools'>
+        <p><br></p>";
+
+            $output .= "
+    <form method='POST'>
+    <table style='border-collapse: separate; border-spacing: 10px 5px;'>
+        <tr><td>
+        <button formaction='../tools/lokal1.php' class='btn btn-primary' type='' value='' name=''>import.1</button>&emsp;&emsp;
+        </td><td>
+        (neue) Dateien in Excel-Liste speichern
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/lokal2.php' class='btn btn-primary' type='' value='' name=''>import.2</button>&emsp;&emsp;
+        </td><td>
+        (neue) Daten aus Excel-Liste in DB speichern
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/lokal3.php' class='btn btn-primary' type='' value='' name=''>import.3</button>&emsp;&emsp;
+        </td><td>
+        von (neuen) Excel-Daten webpics erstellen
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/lokal4.php' class='btn btn-primary' type='' value='' name=''>import.4</button>&emsp;&emsp;
+        </td><td>
+        DB in Excel speichern / Backup
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/maillog_show' class='btn btn-primary' type='' value='' name=''>Mail-Log</button>&emsp;&emsp;
+        </td><td>
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
+        </td><td>
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/pdf_down' class='btn btn-primary' type='' value='' name=''>PDF_Download</button>&emsp;&emsp;
+        </td><td>
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/printview.php?thema=100' class='btn btn-primary' type='' value='' name=''>PDF anzeigen</button>&emsp;&emsp;
+        </td><td>
+        </td></tr>
+
+        <tr><td>
+        <button formaction='../tools/deletes.php' class='btn btn-primary' type='' value='' name=''>DB cleaning</button>&emsp;&emsp;
+        </td><td>
+        </td></tr>
+
+    </table>
+    </form>";
+
+            // -- ende: Tools --
 
 
             $output .= "</div> ";  # -- tab-content --
@@ -677,3 +737,6 @@ fileid: 674
 prev: 674
 next: 673
 */
+
+
+// EOF

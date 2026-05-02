@@ -5,6 +5,7 @@
 account_data.p*
 
 # Verzeichnisse
+*test*
 */data/_*
 */download/work/
 fontawesome*/
@@ -24,6 +25,7 @@ _*.*
 *.ffs_lock
 *.db
 *.pdf
+*.xlsx
 *OLD*
 about.txt
 */data/*.*

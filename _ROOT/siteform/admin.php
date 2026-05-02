@@ -193,7 +193,7 @@ class Admin extends Prep
         // Marker setzen, um wieder auf den letzten Tab-Reiter zu springen
         //
         // Liste der #Tab-ID's
-        $site_tabs = ["info", "user", "autologin", "regis", "sonst"];
+        $site_tabs = ["info", "user", "autologin", "regis", "sonst", "tools"];
 
         $active = [];
         if (isset($_GET['tab']) && in_array($_GET['tab'], $site_tabs)) {
