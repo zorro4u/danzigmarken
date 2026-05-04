@@ -14,7 +14,7 @@ class ShowLog
      * wird als Button in admin.php aufgerufen
      * wurde in footer.php angelegt
      */
-    public static function show()
+    public static function show(): void
     {
        // Nutzer nicht angemeldet? Dann weg hier ...
         if (!isset($_SESSION['userid'])) {
@@ -32,6 +32,7 @@ class ShowLog
 
 
         $out = "";
+        $show = [];
         $suspect = [];
 
         // nur bei Seitenaufruf über admin.php anzeigen
@@ -210,7 +211,12 @@ class ShowLog
         </html>
         ";
 
+
+        // HTML Ausgabe
+        //
         echo $output;
     }
-
 }
+
+
+// EOF

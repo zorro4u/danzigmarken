@@ -30,8 +30,10 @@ class Upload extends Pre
     }
 
 
-    /********************************* */
-    protected static function view()
+    /**
+     * HTML Ausgabe
+     */
+    private static function view(): void
     {
 
         $ausgabe = Tools::statusmeldungAusgeben();
@@ -90,12 +92,11 @@ class Upload extends Pre
         endif;  // Seite anzeigen
 
 
-
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $ausgabe;
-
     }
-
 }
+
+
+// EOF

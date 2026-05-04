@@ -15,10 +15,16 @@ class Dummy
     }
 
 
-    private static function view($msg)
+    /**
+     * HTML Ausgabe
+     */
+    private static function view(?string $msg=null): void
     {
         echo "
             <div class='container main-container registration-form'>
             <br><br><p>{$msg}</p></div>";
     }
 }
+
+
+// EOF

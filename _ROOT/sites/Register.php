@@ -9,15 +9,15 @@ require_once __DIR__.'/../siteform/register.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-/***********************
- * Summary of Register
+/**
+ * Summary of Class Register
  */
 class Register extends Pre
 {
-    /****************************
-     * Summary of show
+    /**
+     * zentraler Startpunkt der Seite
      */
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
         self::formEvaluation();
@@ -28,18 +28,19 @@ class Register extends Pre
     }
 
 
-    /****************************
-     * Summary of view
+    /**
+     * HTML Seitenausgabe, Registrierung
      */
-    private static function view()
+    private static function view(): void
     {
-        $show_form = self::$show_form;
-        $status_message = self::$status_message;
-        $usr_data = self::$usr_data;
+        $usr_data   = self::$usr_data;
         $input_code = self::$input_code;
-        $input_usr = self::$input_usr;
+        $show_form  = self::$show_form;
+        $input_usr  = self::$input_usr;
+        $error_msg  = self::$error_msg;
+        $status_message  = self::$status_message;
         $activate_needed = self::$activate_needed;
-        $error_msg = self::$error_msg;
+
 
         $output = "<div class='container'>";
         $output .= $status_message;
@@ -49,7 +50,9 @@ class Register extends Pre
             <h2>Registrierung</h2>
             <p><br></p>";
 
+
         // Seite anzeigen
+        //
         if ($show_form):
 
         $pre_user = (!empty($usr_data['username']))
@@ -61,16 +64,16 @@ class Register extends Pre
 
         $output .= "
 
-<form action='./register.php?code=".$input_code."&regon=1' method='POST' style='margin-top: 30px;'>
+<form action='./register.php?code=$input_code&regon=1' method='POST' style='margin-top: 30px;'>
 
 <div class='form-group'>
     <label for='inputName'>Benutzername: <span style='color:red'>*</span></label>
-    <input type='text' required id='inputName' name='username' autocomplete='name' value='".$pre_user."' size='40' maxlength='250' class='form-control' >
+    <input type='text' required id='inputName' name='username' autocomplete='name' value='$pre_user' size='40' maxlength='250' class='form-control' >
 </div>
 
 <div class='form-group'>
     <label for='inputEmail'>E-Mail: <span style='color:red'>*</span></label>
-    <input type='email' required id='inputEmail' name='email' autocomplete='email' value='".$pre_mail."' size='40' maxlength='250' class='form-control' >
+    <input type='email' required id='inputEmail' name='email' autocomplete='email' value='$pre_mail' size='40' maxlength='250' class='form-control' >
 </div>
 
 <div class='form-group'>
@@ -96,11 +99,13 @@ class Register extends Pre
 <!--    <li>Du wirst eine Email mit einem Bestätigungs-Link zur Verifizierung erhalten. Danach ist eine Anmeldung möglich.</li> -->
 </ul>";
 
-// positive Statusausgabe ohne Formular
-elseif (!$activate_needed && $error_msg === ''):  # positive Statusausgabe ohne Formular
+        // positive Statusausgabe ohne Formularanzeige
+        //
+        elseif (!$activate_needed && $error_msg === ''):
+
         $output .= "
 <br><br><hr><br>
-<div><form action='./login.php?usr=".$input_usr."' method='POST'>
+<div><form action='./login.php?usr=$input_usr' method='POST'>
     <button class='btn btn-lg btn-primary btn-block'>Anmelden</button>
 </form></div>
 
@@ -110,17 +115,18 @@ elseif (!$activate_needed && $error_msg === ''):  # positive Statusausgabe ohne 
 
 </form></div>";
 
-endif;
+        endif;
 
 
         $output .= "</div>";
         $output .= "</div>";
 
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $output;
     }
-
 }
+
+
+// EOF

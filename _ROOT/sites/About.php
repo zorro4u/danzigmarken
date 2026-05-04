@@ -20,10 +20,10 @@ class About
     }
 
 
-    /****************************
-     * Summary of view
+    /**
+     * HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
 ?>
 
@@ -71,3 +71,6 @@ www.rainbow-web.com</a>&nbsp;
 <?php
     }
 }
+
+
+// EOF

@@ -22,7 +22,10 @@ class Logout extends Pre
     }
 
 
-    private static function view()
+    /**
+     * HTML Ausgabe
+     */
+    private static function view(): void
     {
         $show_form = self::$show_form;
         $root_site = self::$root_site;
@@ -61,6 +64,12 @@ class Logout extends Pre
         endif;
         $output .= "</div>";
 
+
+        // HTML Ausgabe
+        //
         echo $output;
     }
 }
+
+
+// EOF

@@ -14,7 +14,7 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 #use Gregwar\Captcha\PhraseBuilder;
 
 
-/***********************
+/**
  * Webseite: Kontaktformular
  */
 class Contact
@@ -30,7 +30,7 @@ class Contact
     }
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     protected static function dataPreparation()
@@ -39,21 +39,21 @@ class Contact
         $question = [[],[]];
 
         if ($cfg['Sicherheitsfrage']) {
-            $question = AntiSpam::getRandomQuestion();      # [id, question]
+            $question = AntiSpam::getRandomQuestion();  // [id, question]
 
-            // Bei Erstaufruf 'frage_id' setzen (statt per Formular zu senden)
-            // Abfrage, ob existiert oder nicht leer.
-            // Da richtige Antwort nie '0', ist alles okay.
+            # Bei Erstaufruf 'frage_id' setzen (statt per Formular zu senden)
+            # Abfrage, ob existiert oder nicht leer.
+            # Da richtige Antwort nie '0', ist alles okay.
             if (empty($_POST['answer']))
                 $_SESSION['Sicherheitsfrage'] = $question[0];
         }
 
-        // ggf. übrig gebliebene Werte löschen
+        # ggf. übrig gebliebene Werte löschen
         if ($cfg['Sicherheitscode'] && empty($_POST['sicherheitscode'])) {
             unset($_SESSION['captcha_code'], $_SESSION['captcha'], $_SESSION['phrase']);
         }
 
-        // Herkunftsseite speichern
+        # Herkunftsseite speichern
         Tools::lastSite(['index', 'index2', 'details', 'settings', 'admin']);
 
         self::$question = $question;

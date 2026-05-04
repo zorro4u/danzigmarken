@@ -29,10 +29,10 @@ class PWreset extends Pre
     }
 
 
-    /****************************
-     * Summary of view
+    /**
+     * HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
@@ -81,10 +81,11 @@ endif;
         $output .= "</div>";
 
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $output;
     }
-
 }
+
+
+// EOF

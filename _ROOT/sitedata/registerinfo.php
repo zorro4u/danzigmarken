@@ -5,11 +5,13 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
+/**
+ * Summary of Class RegisterInfo
+ */
 class RegisterInfo
 {
     public static function storeUser($data)
     {
-        // Nutzerdaten schon einmal in DB temporär erfassen
         $stmt =
             "INSERT INTO site_users
                 (username, email, `status`, pwcode_endtime, notiz, vorname, nachname)
@@ -18,3 +20,5 @@ class RegisterInfo
     }
 }
 
+
+// EOF

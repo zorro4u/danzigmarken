@@ -24,7 +24,10 @@ class Login extends Pre
     }
 
 
-    private static function view()
+    /**
+     * HTML Ausgabe
+     */
+    private static function view(): void
     {
         /**
          * Passwort-Eingabe sichtbar machen,
@@ -195,6 +198,12 @@ class Login extends Pre
         </script>
         ";
 
+
+        // HTML Ausgabe
+        //
         echo $output;
     }
 }
+
+
+// EOF

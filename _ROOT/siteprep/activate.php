@@ -10,83 +10,75 @@ require_once __DIR__.'/../sitedata/activate.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
- * Summary of Activate
+/**
+ * Summary of Class Activate
  */
 class Activate
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
-    protected static $show_form;
+    protected static bool $show_form;
     protected static string $status_message;
-    protected static $usr_data;
+    protected static array $usr_data;
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     protected static function dataPreparation()
     {
+        Tools::lastSite();
+
+        $input_code  = "";
         $success_msg = "";
         $error_msg = "";
-
-        // Herkunftsseite speichern
-        $return2 = ['index', 'index2', 'details'];
-        if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
-            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
-            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
-            $fn_referer = pathinfo($referer)['filename'];
-            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
-                ? $referer
-                : $_SESSION['main'];
-        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
-            // wenn nix gesetzt ist, auf Standard index.php verweisen
-            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-        }
-        unset($return2, $referer, $fn_referer);
-
+        $usr_data  = [];
 
         // Übergabewert auf Plausibilität prüfen
+        //
         if (isset($_GET['code'])) {
             $input_code = htmlspecialchars(Tools::cleanInput($_GET['code']));
-            $error_msg = "";
 
-            // Code prüfen (nur alphanumerisch)
-            if($input_code && preg_match('/^[a-zA-Z0-9]+$/', $input_code) == 0) {
+            # Code prüfen (nur alphanumerisch)
+            if ($input_code
+                && preg_match('/^[a-zA-Z0-9]+$/', $input_code) == 0)
+            {
                 $error_msg = 'Code enthält ungültige Zeichen';
-            }
-        } else $error_msg = 'Kein Code übermittelt.';
+            };
+        }
+        else {
+            $error_msg = 'Kein Code übermittelt.';
+        };
+
 
         // Code in Datenbank suchen
-        if(isset($error_msg) && $error_msg === "") {
+        //
+        if (isset($error_msg) && $error_msg === "") {
 
-            // Nutzer mit Aktivierungscode suchen
+            # Nutzer mit Aktivierungscode suchen
             $usr_data = Data::getUser($input_code);
 
-            // Nutzer (code) gefunden
+            # Nutzer (code) gefunden
             if ($usr_data) {
 
-                // Code noch nicht abgelaufen?
+                # Code noch nicht abgelaufen?
                 if ($usr_data['pwcode_endtime'] < (string)time()) {
 
-                    // Status auf 'activated' setzen -> zur späteren Auswertung
+                    # Status auf 'activated' setzen -> zur späteren Auswertung
                     Data::setActivated($usr_data['userid']);
 
                     $success_msg = 'Dein Konto ist aktiviert. Du kannst dich jetzt <a href="login.php?usr='.$usr_data['username'].'">anmelden</a>!';
+                }
 
-                } else {
-                    // veralteten Eintrag löschen
+                # veralteten Eintrag löschen
+                else {
                     Data::deleteOld($usr_data['userid']);
 
                     $error_msg = 'Die Aktivierungsfrist von 4 Wochen ist am '.date("d.m.y", $usr_data['pwcode_endtime']).' abgelaufen.';
-                }
+                };
 
             } else {
                 $error_msg = 'Das Konto ist bereits aktiviert oder existiert nicht.';
-            }
-        }
+            };
+        };
 
         $show_form = ($success_msg !== "") ? True : False;
         $status_message = Tools::statusOut($success_msg, $error_msg);
@@ -98,3 +90,5 @@ class Activate
     }
 }
 
+
+// EOF

@@ -31,10 +31,10 @@ class Change extends Pre
     }
 
 
-    /***********************
-     * HTML erzeugen
+    /**
+     * HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
@@ -432,8 +432,8 @@ class Change extends Pre
 
         $output .= "</div>";  # ende container
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+
+        // HTML Ausgabe
         //
         echo $output;
     }
@@ -477,3 +477,6 @@ array(21) {
 
 }
 */
+
+
+// EOF

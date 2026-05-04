@@ -53,6 +53,7 @@ class PrintView extends Pre
 
         $akt_file_idx = self::$akt_file_idx;
         $stamps = self::$stamps;
+        $data = [];
 
         foreach (self::$spaltennamen as $spalte_db => $spalte_web) {
 
@@ -180,9 +181,9 @@ class PrintView extends Pre
 
 
     /**
-     * zentrale html Ausgabe
+     * zentrale HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
         // bei Aufruf per Admin-Seite, Filter zurücksetzen
         if (isset($_GET['thema']) && (int)$_GET['thema'] === 100) {
@@ -203,6 +204,7 @@ class PrintView extends Pre
 
             $i = 0;
             foreach ($id_liste as $id) {
+
                 // html-Ausgabe
                 echo self::erzeugeEinzelseite($id);
 
@@ -219,4 +221,4 @@ class PrintView extends Pre
 }
 
 
-
+// EOF

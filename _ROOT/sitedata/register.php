@@ -5,11 +5,14 @@ use Dzg\Tools\Database;
 require_once __DIR__.'/../tools/database.php';
 
 
+/**
+ * Summary of Class Register
+ */
 class Register
 {
     public static function getUser(string $input_code)
     {
-        // Registrierungs-Link auf Gültigkeit prüfen
+        # Registrierungs-Link auf Gültigkeit prüfen
         $stmt =
             "SELECT userid, email, pwcode_endtime
             FROM site_users WHERE `status`=:status";
@@ -18,20 +21,20 @@ class Register
     }
 
 
-    public static function deleteOldEntry($userid): void
+    public static function deleteOldEntry(int $userid): void
     {
-        // veralteten Eintrag löschen
+        # veralteten Eintrag löschen
         $stmt0 = "UPDATE site_users
             SET `status`=NULL, pwcode_endtime=NULL, notiz=NULL, pwc=NULL WHERE userid=:userid";
         $stmt = "DELETE FROM site_users WHERE userid=:userid";
-        $data = [':userid' => $userid];     # int
+        $data = [':userid' => $userid];     // int
         Database::sendSQL($stmt, $data);
     }
 
 
-    public static function searchActivatedUser($data): array
+    public static function searchActivatedUser(array $data): array
     {
-        // usernamen/email im Bestand suchen
+        # usernamen/email im Bestand suchen
         $stmt = "SELECT username, email FROM site_users
             WHERE `status`='activated'
             AND (username=:username OR email=:email)";
@@ -39,9 +42,9 @@ class Register
     }
 
 
-    public static function storeUser($data): void
+    public static function storeUser(array $data): void
     {
-        // Nutzerdaten in DB eintragen
+        # Nutzerdaten in DB eintragen
         $stmt = "UPDATE site_users
             SET username=:username, email=:email, pw_hash=:pw_hash,
                 `status`=:status, pwcode_endtime=:pwcode_endtime, notiz=:notiz

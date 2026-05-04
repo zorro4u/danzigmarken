@@ -9,12 +9,8 @@ require_once __DIR__.'/../sitedata/change.php';
 require_once __DIR__.'/../tools/auth.php';
 
 
-/***********************
- * Summary of Change
- * Webseite:
- *
- * __public__
- * show()
+/**
+ * Summary of Class Change
  */
 class Change extends Details
 {
@@ -35,10 +31,10 @@ class Change extends Details
 
     protected static function dataPreparation()
     {
-        // Details Hauptroutine ausführen
+        # Details Hauptroutine ausführen
         parent::dataPreparation();
 
-        // Seiten-Check bisher okay
+        # Seiten-Check bisher okay
         if (self::$show_form):
 
 
@@ -47,21 +43,21 @@ class Change extends Details
         $spaltennamen = self::$spaltennamen;
         $abfrage_db = [];
 
-        // diese Einträge nicht anzeigen
+        # diese Einträge nicht anzeigen
         unset($spaltennamen['created']);
         unset($spaltennamen['changed']);
 
-        // noch zusätzliche Spalte (im Vgl. zur Detail-Seite) zur Ausgabe anhängen
+        # noch zusätzliche Spalte (im Vgl. zur Detail-Seite) zur Ausgabe anhängen
         #$spaltennamen += ['kat23' => 'Bildursprung'];
         $spaltennamen += ['print' => 'druckbar'];
 
-        // die Spalte(n) am Schluss ausgeben
+        # die Spalte(n) am Schluss ausgeben
         $tmp_prn['print'] = $spaltennamen['print'];
         unset($spaltennamen['print']);
         $spaltennamen += $tmp_prn;
 
-
-        // wenn eine Bildgruppe besteht, dann IDs anzeigen, um Gruppe ändern zu können
+        # wenn eine Bildgruppe besteht, dann IDs anzeigen,
+        # um Gruppe ändern zu können
         if ($max_file > 1) {
             #$spaltennamen['fid'] = 'Bild.ID';
             #$spaltennamen['gid'] = 'Marken.ID';
@@ -69,11 +65,12 @@ class Change extends Details
 
         // zusätzliche Vorbereitungen wegen Formularverwendung
         //
-        // DropDown-Bezeichnungen holen für Thema, Frankatur, Ansicht, Attest
+        # DropDown-Bezeichnungen holen
+        # für Thema, Frankatur, Ansicht, Attest
         $results = Data::getDropEntry();
 
+        # abfrage_array nach Spalten (select Statement) aufsplitten
         $qry_arr = [];
-        // abfrage_array nach Spalten (select Statement) aufsplitten
         foreach ($results AS $entry) {
             foreach($entry AS $k=>$v) {
                 $qry_arr[$k] []= $v; {
@@ -81,21 +78,21 @@ class Change extends Details
             }
         }
 
-        // doppelte Einträge in den Spalten aufgrund der kombinerten DB-Abfrage löschen
-        // [$theme_db, $franka_db, $ansicht_db, $attest_db] = $abfrage_db;
+        # doppelte Einträge in den Spalten aufgrund
+        # der kombinerten DB-Abfrage löschen
+        # [$theme_db, $franka_db, $ansicht_db, $attest_db] = $abfrage_db;
         foreach ($qry_arr AS $col) {
             $abfrage_db []= array_values(array_unique($col));
         }
 
-        // temp. Hilfs-Variablen löschen
-        unset($stmt, $results, $qry_arr);
-
-        // globale Variablen setzen
+        # globale Variablen setzen
         self::$spaltennamen = $spaltennamen;
         self::$abfrage_db = $abfrage_db;
 
 
-        endif;      # Seiten-Check okay
+        endif;      // Seiten-Check okay
     }
 }
 
+
+// EOF

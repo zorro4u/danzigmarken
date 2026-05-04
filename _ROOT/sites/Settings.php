@@ -27,10 +27,10 @@ class Settings extends Pre
     }
 
 
-    /****************************
-     * Summary of view
+    /**
+     * HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
@@ -276,8 +276,8 @@ class Settings extends Pre
         #$sz = "BKMGTP";
         #return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$sz[$factor];
 
-        if ($factor > 0) $sz = "KMGT";
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor))." ".@$sz[$factor - 1]."B";
+        $sz = ($factor > 0) ? "KMGT" : "";
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor))." ".@$sz[(int)$factor - 1]."B";
     }
     $file = "/download/dzg_90.pdf";
     $ffn = $_SERVER["DOCUMENT_ROOT"].$file;
@@ -394,12 +394,11 @@ class Settings extends Pre
         </script>
         ";
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+
+        // HTML Ausgabe
         //
         echo $output;
     }
-
 }
 
 
@@ -479,3 +478,6 @@ document.addEventListener("DOMContentLoaded", function () {
 resizeObserver
 Window.matchMedia()
 */
+
+
+// EOF

@@ -147,34 +147,46 @@ class Tools
     }
 
 
-    /***********************
-     * Summary of lastsite
-     * @return void
+    /**
+     * Herkunftsseite speichern
+     * - @return string $_SESSION['main']
+     * - @return string $_SESSION['lastsite']
      */
-    public static function lastSite($return2=[])
+    public static function lastSite(array $return2 = []): void
     {
-        // Herkunftsseite speichern
-        if (empty($return2)) $return2 = ["index", "index2", "details"];
-        if (!isset($_SESSION['main'])) $_SESSION['main'] = $_SESSION['rootdir'].'/index.php';
+        $return2 = ($return2) ?: ["index", "index2", "details"];
+        #$_SESSION['main'] ??= $_SESSION['rootdir'].'/index.php';
+        $_SESSION['main'] ??= "/";
 
-        if (isset($_SERVER['HTTP_REFERER']) &&
-            (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
+        if (isset($_SERVER['HTTP_REFERER'])
+            && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
         {
-            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
+            # wenn VorgängerSeite bekannt und
+            # nicht die aufgerufene Seite selbst ist, speichern
             $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
             $fn_referer = pathinfo($referer)['filename'];
 
-            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
+            # wenn Herkunft von den target-Seiten,
+            # dann zu diesen, ansonsten Standardseite
+            $_SESSION['lastsite'] = (in_array($fn_referer, $return2))
                 ? $referer
                 : $_SESSION['main'];
-
-        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
-            // wenn nix gesetzt ist, auf Standard index.php verweisen
-            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-
-        } elseif (empty($_SERVER['HTTP_REFERER']) && !empty($_SESSION['lastsite'])) {
         }
+
+        # wenn nix gesetzt ist, auf Standard index.php verweisen
+        elseif (empty($_SERVER['HTTP_REFERER'])
+            && empty($_SESSION['lastsite']))
+        {
+            $_SESSION['lastsite'] = (!empty($_SESSION['main']))
+                ? $_SESSION['main']
+                : "/";
+        }
+
+        #elseif (empty($_SERVER['HTTP_REFERER']) && !empty($_SESSION['lastsite'])) {}
+
+        else {
+            $_SESSION['lastsite'] = $_SESSION['main'];
+        };
     }
 
 
@@ -307,3 +319,5 @@ class Tools
 
 }
 
+
+// EOF

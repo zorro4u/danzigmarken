@@ -25,37 +25,26 @@ class PWforget
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    protected static $show_form;
+    protected static bool $show_form;
     protected static string $status_message;
-    protected static $success_msg;
-    protected static $pre_email;
+    protected static string $success_msg;
+    protected static string $pre_email;
 
 
     /***********************
      * Summary of dataPreparation
      */
-    protected static function dataPreparation()
+    protected static function dataPreparation(): void
     {
         // Herkunftsseite speichern
         $return2 = ['index', 'index2', 'details', 'login'];
-        if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
-            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
-            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
-            $fn_referer = pathinfo($referer)['filename'];
-            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
-                ? $referer
-                : $_SESSION['main'];
-        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
-            // wenn nix gesetzt ist, auf Standard index.php verweisen
-            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-        }
-        unset($return2, $referer, $fn_referer);
+        Tools::lastSite($return2);
 
         #$error_msg = "Zum Zurücksetzen des Passwortes wende dich an den Seitenbetreiber.";
 
-        $error_msg = "";
+        $input_email = "";
         $success_msg = "";
+        $error_msg = "";
         $show_form = True;
 
         // Formularwerte empfangen
@@ -186,3 +175,6 @@ class PWforget
         self::$pre_email = $pre_email;
     }
 }
+
+
+// EOF

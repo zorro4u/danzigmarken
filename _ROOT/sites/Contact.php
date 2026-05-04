@@ -35,7 +35,7 @@ class Contact extends Pre
      * Summary of view
      * [https://www.kontaktformular.com/]
      */
-    private static function view()
+    private static function view(): void
     {
         /*
         $act_pth = explode('/', __DIR__);
@@ -759,14 +759,10 @@ $output .= "</div>";
 $output .= "</div>";
 
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $output;
-
-
     }
-
 }
 
 
@@ -788,3 +784,6 @@ $output .= "</div>";
 #print_r('token: '.$_COOKIE['securitytoken'].'<br>');
 #print_r('token: '.sha1($_COOKIE['securitytoken']).'<br>');
 #print_r(pathinfo($_SESSION['main']));
+
+
+// EOF

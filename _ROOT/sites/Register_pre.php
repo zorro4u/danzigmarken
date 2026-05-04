@@ -141,10 +141,10 @@ class RegisterPre
     }
 
 
-    /****************************
-     * Summary of view
+    /**
+     * HTML Ausgabe
      */
-    public static function view()
+    private static function view(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
@@ -178,9 +178,11 @@ class RegisterPre
         $output .= "</div>";
 
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $output;
     }
 }
+
+
+// EOF

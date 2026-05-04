@@ -31,10 +31,10 @@ class Admin extends Pre
     }
 
 
-    /****************************
-     * Summary of view
+    /**
+     * HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
@@ -164,8 +164,8 @@ class Admin extends Pre
         <tr><td>&nbsp;</td><td></td></tr>
         <tr><td>last:</td><td>" . $out_date . "</td></tr>
         <tr><td>&nbsp;</td><td></td></tr>
-        <tr><td>log_ratio:</td><td>" . $single_ratio . "%&nbsp;single</td></tr>
-        <tr><td>block:</td><td>" . $out_block . "&nbsp;/&nbsp;" . $out_black . $out_nblck . "</td></tr>
+        <tr><td>log:</td><td>" . $out_group . "&nbsp;/&nbsp;" . $single_ratio . "%&nbsp;single</td></tr>
+        <tr><td>block:</td><td>" . $out_block . $out_nblck . "</td></tr>
     </table>
 
     <!-- Zusatz Buttons -->
@@ -622,8 +622,7 @@ O1nJ8Z5bY
         $output .= "</div>";  # -- container main-container --
 
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $output;
     }
@@ -699,9 +698,14 @@ for (var i = 0; i < anchors.length; i++) {
 
         ";     // ende von $output
 
+
+        // HTML Ausgabe
+        //
         echo $output;
     }
 }
+
+
 
 #foreach ($_COOKIE AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
 #foreach ($_SESSION AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";

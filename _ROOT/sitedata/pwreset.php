@@ -10,7 +10,7 @@ class PWreset
     /**
      * PassCode holen
      */
-    public static function getPassCode($pwcode_hash)
+    public static function getPassCode(string $pwcode_hash): array
     {
         $data = [':pwcode_hash' => $pwcode_hash];
         $stmt = "SELECT userid, username, email, vorname, nachname, pwcode_endtime
@@ -22,9 +22,9 @@ class PWreset
     /**
      * PassCode deaktivieren
      */
-    public static function deletePassCode($userid): void
+    public static function deletePassCode(int $userid): void
     {
-        $data = [':userid' => $userid];     # int
+        $data = [':userid' => $userid];     // int
         $stmt = "UPDATE site_users
             SET pwcode_hash=NULL, pwcode_endtime=NULL,
             pwc=NULL, notiz=NULL WHERE userid=:userid";
@@ -35,7 +35,8 @@ class PWreset
     /**
      * Passwort speichern, PassCode löschen
      */
-    public static function storeNewPassword($userid, $passwort_hash): void
+    public static function
+    storeNewPassword(int $userid, string $passwort_hash): void
     {
         // TODO: alle Autologins beenden
         $data = [':userid' => $userid, ':pw_hash' => $passwort_hash];
@@ -45,6 +46,7 @@ class PWreset
             WHERE userid = :userid";
         Database::sendSQL($stmt, $data);
     }
-
 }
 
+
+// EOF

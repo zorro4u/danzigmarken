@@ -9,7 +9,7 @@ require_once __DIR__.'/../tools/database.php';
 
 class Login
 {
-    public static function searchUser($data): array
+    public static function searchUser(array $data): array
     {
         // Nutzerdaten in DB finden & holen
         $stmt = "SELECT * FROM site_users
@@ -18,7 +18,7 @@ class Login
     }
 
 
-    public static function storePWhash($data): void
+    public static function storePWhash(array $data): void
     {
         $stmt = "UPDATE site_users
             SET pw_hash=:pw_hash, chg_ip=:ip, chg_by=:userid
@@ -30,7 +30,7 @@ class Login
     /**
      * Autologin: Identifier/Token eintragen
      */
-    public static function storeToken($data)
+    public static function storeToken(array $data)
     {
         // Datenbank öffnen
         $pdo = Database::connectMyDB();
@@ -65,7 +65,7 @@ class Login
     }
 
 
-    public static function storeLogin($data): void
+    public static function storeLogin(array $data): void
     {
         // Login speichern
         $stmt = "INSERT INTO site_login (userid, `login`, ip)
@@ -74,3 +74,5 @@ class Login
     }
 }
 
+
+// EOF

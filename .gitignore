@@ -26,6 +26,7 @@ _*.*
 *.db
 *.pdf
 *.xlsx
+*info.txt
 *OLD*
 about.txt
 */data/*.*

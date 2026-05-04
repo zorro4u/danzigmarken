@@ -18,18 +18,18 @@ class SiteConfig
     META = [
         'cache_no' => "must-revalidate, no-store", #, no-cache, max-age=0, private",
         'cache_0'  => "no-cache, max-age=0, must-revalidate, private",
-        'cache_1h' => "max-age=3600, stale-if-error=86400, private",    # 1h+1d
-        'cache_1d' => "max-age=604800, stale-if-error=86400, private",  # 1+1Tage
-        'cache_1w' => "max-age=604800, stale-if-error=86400, private",  # 7+1Tage
+        'cache_1h' => "max-age=3600, stale-if-error=86400, private",    // 1h+1d
+        'cache_1d' => "max-age=604800, stale-if-error=86400, private",  // 1+1Tage
+        'cache_1w' => "max-age=604800, stale-if-error=86400, private",  // 7+1Tage
 
-        'expires_0'  => "0",                  # no-cache
-        'expires_1h' => "3600",               # 1 Std Cache
-        'expires_1d' => "86400",              # 1 Tag
-        'expires_1w' => "604800",             # 1 Woche
+        'expires_0'  => "0",                  // no-cache
+        'expires_1h' => "3600",               // 1 Std Cache
+        'expires_1d' => "86400",              // 1 Tag
+        'expires_1w' => "604800",             // 1 Woche
 
-        'robots_index'  => "index, nofollow,",      # indiziert
+        'robots_index'  => "index, nofollow,",      // indiziert
         'robots_no'     => "noindex, nofollow,",
-        'robots_follow' => "noindex, follow,",      # Seitenlinks folgen
+        'robots_follow' => "noindex, follow,",      // Seitenlinks folgen
 
         'google0' => "",
         'google1' => "nopagereadaloud",
@@ -319,5 +319,6 @@ class SiteConfig
         ],
     ];
 }
+
 
 // EOF

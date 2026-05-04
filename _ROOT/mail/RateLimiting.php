@@ -82,7 +82,7 @@ class RateLimiting
 
         else {
             // Füge die IP-Adresse in die Logdatei ein
-            file_put_contents($logfile, $visitor_ip . "\n", FILE_APPEND | LOCK_EX);
+            file_put_contents($logfile, $visitor_ip . " - " . date('Y-m-d h:i:s', time()) . "\n", FILE_APPEND | LOCK_EX);
         }
 
         endif;

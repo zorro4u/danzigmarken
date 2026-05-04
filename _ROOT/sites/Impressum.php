@@ -38,7 +38,7 @@ class Impressum
 
 
     /**
-     * Summary of view
+     * HTML Ausgabe
      */
     private static function view()
     {
@@ -94,3 +94,6 @@ www.rainbow-web.com</a>&nbsp;
 <?php
     }
 }
+
+
+// EOF

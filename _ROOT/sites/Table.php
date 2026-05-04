@@ -40,12 +40,10 @@ class Table extends TablePrep
     }
 
 
-    /***********************
-     * Summary of view
-     *
-     * @return void
+    /**
+     * HTML Ausgabe
      */
-    private static function view()
+    private static function view(): void
     {
         // Klassenvariblen laden
         $maxID = self::$maxID;
@@ -80,6 +78,7 @@ class Table extends TablePrep
 
         // < Tabellen-NAVI >  Seiten-, Filter-Wahl
         //
+        $stamps_db = [];
         #if (1===1) {
         if (Auth::isCheckedIn()) {
             // Nutzer angemeldet, Ausgabe Tabellen-Navi
@@ -214,12 +213,10 @@ class Table extends TablePrep
         $output .= "</div>";   # ende < /CONTENT >
 
 
-        ///////////////////////////////////////////////////
-        // html Ausgabe
+        // HTML Ausgabe
         //
         echo $output;
     }
-
 }
 
 
@@ -239,3 +236,7 @@ class Table extends TablePrep
 #print_r('token: '.$_COOKIE['securitytoken'].'<br>');
 #print_r('token: '.sha1($_COOKIE['securitytoken']).'<br>');
 #print_r(pathinfo($_SESSION['main']));
+
+
+
+// EOF

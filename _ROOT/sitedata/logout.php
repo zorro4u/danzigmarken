@@ -7,7 +7,7 @@ require_once __DIR__.'/../tools/database.php';
 
 class Logout
 {
-    public static function setLogout($userid, $identifier): void
+    public static function setLogout(int $userid, string $identifier): void
     {
         // alle anderen Autologins beenden, wenn mit Autologin auch angemeldet
         $stmt0 = "UPDATE site_login
@@ -37,3 +37,5 @@ class Logout
     }
 }
 
+
+// EOF

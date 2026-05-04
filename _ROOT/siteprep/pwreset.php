@@ -23,45 +23,32 @@ class PWreset
     /***********************
      * Klassenvariablen / Eigenschaften
      */
-    protected static $show_form;
+    protected static bool $show_form;
     protected static string $status_message;
-    protected static $success_msg;
-    protected static $name;
-    protected static $input_code;
-    protected static $usr_data;
+    protected static string $success_msg;
+    protected static string $name;
+    protected static string $input_code;
+    protected static array $usr_data;
 
 
     /***********************
      * Summary of dataPreparation
      */
-    protected static function dataPreparation()
+    protected static function dataPreparation(): void
     {
         // Herkunftsseite speichern
-        $return2 = ['index', 'index2', 'details'];
-        if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
-            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
-            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
-            $fn_referer = pathinfo($referer)['filename'];
-            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
-                ? $referer
-                : $_SESSION['main'];
-        } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
-            // wenn nix gesetzt ist, auf Standard index.php verweisen
-            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-        }
-        unset($return2, $referer, $fn_referer);
+        Tools::lastSite();
 
 
         /*
         * Seitenaufruf mit passwortcode
         */
-
+        $usr_data  = [];
         $error_msg = "";
         $success_msg = "";
+        $input_code  = "";
+        $show_form   = True;
         $name = "";
-        $input_code = "";
-        $show_form = True;
 
         if (!isset($_GET['pwcode'])) {
             $error_msg = "Ohne Legitimations-Code kann das Passwort nicht zurückgesetzt werden.";
@@ -162,3 +149,5 @@ class PWreset
     }
 }
 
+
+// EOF

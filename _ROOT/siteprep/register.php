@@ -1,98 +1,83 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\Register as Data;
+use Dzg\SiteData\Register as Database;
 use Dzg\Tools\Tools;
-
-session_start();
-date_default_timezone_set('Europe/Berlin');
-error_reporting(E_ERROR | E_PARSE);
 
 require_once __DIR__.'/../sitedata/register.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
- * Summary of Register
+/**
+ * Summary of Class Register
  */
 class Register
 {
-    protected static $usr_data;
-    protected static $input_code;
-    protected static $error_msg;
+    protected const MSG = [
+        10 => "Die Registrierung funktioniert nur mit dem per Email zugesandten Link. <br>Überprüfe nochmal deinen Posteingang und den Spam-Ordner. Wiederhole ggf. die Registrierung. <br>",
+        11 => "Der Registrierungs-Code fehlt. Überprüfe nochmal den Link in deiner Email.",
+        12 => "<b>Manipulationsverdacht: </b><br>Es wurden ungültige Zeichen im Registrierungs-Code erkannt.",
+        13 => "Der Registrierungs-Link ist nicht gültig. Wiederhole die Registrierung.",
+        14 => "Der Registrierungs-Link ist nach 4 Wochen abgelaufen."
+    ];
+
+    protected static array $usr_data;
+    protected static string $input_code;
+    protected static string $error_msg;
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
-    protected static function dataPreparation()
+    protected static function dataPreparation(): void
     {
-        // Herkunftsseite speichern
-        $return2 = ['index', 'index2', 'details'];
+        Tools::lastSite();
 
-        if (isset($_SERVER['HTTP_REFERER']) &&
-            (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false))
-        {
-            // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
-            $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
-            $fn_referer = pathinfo($referer)['filename'];
-            // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-            $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
-                ? $referer
-                : $_SESSION['main'];
-
-        } elseif (empty($_SERVER['HTTP_REFERER']) &&
-            empty($_SESSION['lastsite']))
-        {
-            // wenn nix gesetzt ist, auf Standard index.php verweisen
-            $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-        }
-        unset($return2, $referer, $fn_referer);
-
-
-        /*
-        * Seitenaufruf mit Registrierungscode
-        */
-
+        // Registrierungscode überprüfen
+        //
+        $usr_data = [];
         $error_msg = "";
         $input_code = "";
 
-        // Registrierungs-Code checken
+        # Seitenaufruf ohne Code
         if (!isset($_GET['code'])) {
-            $error_msg = "Die Registrierung funktioniert nur mit dem per Email zugesandten Link. <br>Überprüfe nochmal deinen Posteingang und den Spam-Ordner. Wiederhole ggf. die Registrierung. <br>";
-        } else {
+            $error_msg = self::MSG[10];
+        };
+
+        if ($error_msg === "") {
             $input_code = htmlspecialchars(Tools::cleanInput($_GET['code']));
 
-            // Plausi-Check
-            if ($input_code === "")
-                $error_msg = 'Der Registrierungs-Code fehlt. Überprüfe nochmal den Link in deiner Email.';
-            elseif (!preg_match('/^[a-zA-Z0-9]{1,100}$/', $input_code))
-                $error_msg = '<b>Manipulationsverdacht: </b><br>Es wurden ungültige Zeichen im Registrierungs-Code erkannt.';
-            else {}
-        }
+            # keinen Code übergeben
+            if ($input_code === "") {
+                $error_msg = self::MSG[11];
+            }
 
-        // Link mit DB abgleichen
+            # verwendete Zeichen im Code nicht okay
+            elseif (!preg_match('/^[a-zA-Z0-9]{1,100}$/', $input_code)) {
+                $error_msg = self::MSG[12];
+            };
+        };
+
+        # Code mit DB abgleichen
         if ($error_msg === "") {
+            $usr_data = Database::getUser($input_code);
 
-            // Registrierungs-Link auf Gültigkeit prüfen
-            $usr_data = Data::getUser($input_code);
-
+            # Code nicht in DB gefunden
             if (!$usr_data) {
-                $error_msg = "Der Registrierungs-Link ist nicht gültig. Wiederhole die Registrierung. ";
+                $error_msg = self::MSG[13];
+            }
 
-            } elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {  // +1 Std. Karenz
-                // veralteten Eintrag löschen
-                Data::deleteOldEntry($usr_data['userid']);
-
-                $error_msg = "Registrierungs-Link ist nach 4 Wochen am ".date('d.m.Y', $usr_data['pwcode_endtime'])." abgelaufen.";
-
-            } else {}
-        }
+            # Zeitfenster (+1 Std. Karenz) überschritten,
+            # veralteten Eintrag löschen
+            elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {
+                Database::deleteOldEntry($usr_data['userid']);
+                $error_msg = self::MSG[14].date(' d.m.Y', $usr_data['pwcode_endtime']);
+            };
+        };
 
         self::$usr_data   = $usr_data;
         self::$input_code = $input_code;
         self::$error_msg  = $error_msg;
     }
-
 }
 
 
