@@ -30,7 +30,7 @@ class Starter
         $site ??= basename($_SERVER['PHP_SELF']);
         if (!pathinfo($site, PATHINFO_EXTENSION)) {
             $site .= '.php';
-        }
+        };
         $page = Init::PAGE[$site] ?? Init::PAGE['dummy'];
 
         // globaler Wert für weiteren Seitenaufbau
@@ -139,5 +139,6 @@ class Starter
         endswitch;
     }
 }
+
 
 // EOF

@@ -26,7 +26,7 @@ class Activate extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show("auth");
     }
 
@@ -34,36 +34,28 @@ class Activate extends Pre
     /**
      * HTML Ausgabe
      */
-    private static function view(): void
+    private static function show_body(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;
         $usr_data = self::$usr_data;
+?>
 
-        $output = "<div class='container'>";
-        $output .= $status_message;
+<div class='container'>
+<?= $status_message ?>
+<div class='small-container-330 form-signin'>
+<h2 class='form-signin-heading'>Aktivierung</h2>
+<br>
 
-        $output .= "<div class='small-container-330 form-signin'>";
-        $output .= "
-            <h2 class='form-signin-heading'>Aktivierung</h2>
-            <br>";
+<?php if ($show_form): ?>
+<form action='./login.php?usr=<?= $usr_data['username'] ?>' method='POST' style='margin-top: 30px;'>
+<button class='btn btn-lg btn-primary btn-block' type='submit'>Anmelden</button>
+</form>
+<?php endif; ?>
 
-        // Seite anzeigen
-        if ($show_form):
-        $output .= "
-        <form action='./login.php?usr=".$usr_data['username']."' method='POST' style='margin-top: 30px;'>
-            <button class='btn btn-lg btn-primary btn-block' type='submit'>Anmelden</button>
-        </form>";
+</div></div>
 
-        endif;
-
-        $output .= "</div>";
-        $output .= "</div>";
-
-
-        // HTML Ausgabe
-        //
-        echo $output;
+<?php
     }
 }
 

@@ -24,7 +24,7 @@ class PWreset extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show("auth");
     }
 
@@ -32,7 +32,7 @@ class PWreset extends Pre
     /**
      * HTML Ausgabe
      */
-    private static function view(): void
+    private static function show_body(): void
     {
         $show_form = self::$show_form;
         $status_message = self::$status_message;

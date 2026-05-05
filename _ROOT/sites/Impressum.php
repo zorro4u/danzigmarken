@@ -19,7 +19,7 @@ class Impressum
         self::siteEntryCheck();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show("impressum");
     }
 
@@ -40,7 +40,7 @@ class Impressum
     /**
      * HTML Ausgabe
      */
-    private static function view()
+    private static function show_body()
     {
 ?>
 
@@ -73,12 +73,14 @@ Zorro4U</a>&nbsp;
 -->
 
 <?php if (Auth::isCheckedIn()): ?>
+
 &emsp;|&emsp;
 <a href='https://github.com/zorro4u/danzigmarken'
     title='Code @ github.com' rel='noopener noreferrer nofollow'
     target='_blank' style='background-color:transparent'>
 GitHub</a>&nbsp;
 <img src='/assets/pic/extlink.png' width='12' height='12'></p>
+
 <?php endif; ?>
 
 <br />
@@ -90,6 +92,7 @@ www.rainbow-web.com</a>&nbsp;
 <img src='/assets/pic/extlink.png' width='12' height='12'></p>
 
 </div>
+
 
 <?php
     }

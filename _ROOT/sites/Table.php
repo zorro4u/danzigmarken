@@ -35,7 +35,7 @@ class Table extends TablePrep
         self::dataPreparation();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show();
     }
 
@@ -43,7 +43,7 @@ class Table extends TablePrep
     /**
      * HTML Ausgabe
      */
-    private static function view(): void
+    private static function show_body(): void
     {
         // Klassenvariblen laden
         $maxID = self::$maxID;

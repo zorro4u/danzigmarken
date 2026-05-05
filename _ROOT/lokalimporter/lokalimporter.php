@@ -39,7 +39,7 @@ war ursprünglich in python, jetzt nach php transferiert und in Webseite integri
  * -3- von (neuen) Excel-Daten webpics erstellen
  * -4- DB in Excel speichern / Backup
  */
-class LokalImport
+class LokalImporter
 {
     /**
      * -1- (neue) Dateien in Excel-Liste speichern

@@ -17,7 +17,7 @@ class Logout extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show("auth");
     }
 
@@ -25,49 +25,49 @@ class Logout extends Pre
     /**
      * HTML Ausgabe
      */
-    private static function view(): void
+    private static function show_body(): void
     {
         $show_form = self::$show_form;
         $root_site = self::$root_site;
         $status_message = self::$status_message;
+?>
 
-        $output = "
-            <div class='container small-container-330 form-signin'>
-            <h2 class='form-signin-heading'>Abmelden</h2>";
+<div class='container small-container-330 form-signin'>
+<h2 class='form-signin-heading'>Abmelden</h2>
+<?= $status_message ?>
 
-        #$output .= statusmeldungAusgeben();
-        $output .= $status_message;
+<?php if ($show_form): ?>
 
-        // Seite anzeigen
-        if ($show_form):
-            $output .= "
-                <form action='?logout' method='POST'>
-                <br>";
+<form action='?logout' method='POST'>
+<br>";
 
-            if (!empty($_SESSION['autologin'])):
-                $output .= "
-                    <div class='checkbox' style='padding-top: 15px;'>
-                    <label>
-                    <input type='checkbox' name='logout_all' value='1' autocomplete='off'> geräteübergreifend alle meine Anmeldungen beenden (Grand Logout)
-                    </label>
-                    </div>";
-            endif;
-            $output .= "
-                <button class='btn btn-lg btn-primary btn-block' style='margin-top: 20px;' type='submit'>Logout</button>
-                </form>";
-        else:
-            $output .= "
-                <br><br><hr><br>
-                <div><form action=".$root_site." method='POST'>
-                <button class='btn btn-lg btn-primary btn-block' type='submit'>Startseite</button>
-                </form></div>";
-        endif;
-        $output .= "</div>";
+<?php if (!empty($_SESSION['autologin'])): ?>
+
+<div class='checkbox' style='padding-top: 15px;'>
+<label>
+<input type='checkbox' name='logout_all' value='1' autocomplete='off'>
+    geräteübergreifend alle meine Anmeldungen beenden (Grand Logout)
+</label></div>";
+
+<?php endif;   // autologin ?>
+
+<button class='btn btn-lg btn-primary btn-block' style='margin-top: 20px;' type='submit'>
+    Logout</button>
+</form>
+
+<?php else: ?>
+
+<br><br><hr><br>
+<div><form action=".$root_site." method='POST'>
+<button class='btn btn-lg btn-primary btn-block' type='submit'>
+    Startseite</button>
+</form></div>
+
+<?php endif;   // Seite anzeigen ?>
+</div>
 
 
-        // HTML Ausgabe
-        //
-        echo $output;
+<?php
     }
 }
 

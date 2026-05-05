@@ -1,7 +1,7 @@
 <?php
 namespace Dzg\Import;
 
-require_once __DIR__.'/lokalimport.php';
+require_once __DIR__.'/lokalimporter.php';
 require_once __DIR__.'/toolbox.php';
 
 date_default_timezone_set('Europe/Berlin');
@@ -23,16 +23,16 @@ function main(int $switch = 1)
     $time1 = microtime(true);
 
     if ($switch == 1) {
-        LokalImport::step1();
+        LokalImporter::step1();
 
     } elseif ($switch == 2) {
-        LokalImport::step2();
+        LokalImporter::step2();
 
     } elseif ($switch == 3) {
-        LokalImport::step3();
+        LokalImporter::step3();
 
     } elseif ($switch == 4) {
-        LokalImport::step4();
+        LokalImporter::step4();
     }
 
     $time2 = microtime(true) - $time1;

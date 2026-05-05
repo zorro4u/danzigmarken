@@ -23,7 +23,7 @@ class Register extends Pre
         self::formEvaluation();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show("auth");
     }
 
@@ -31,7 +31,7 @@ class Register extends Pre
     /**
      * HTML Seitenausgabe, Registrierung
      */
-    private static function view(): void
+    private static function show_body(): void
     {
         $usr_data   = self::$usr_data;
         $input_code = self::$input_code;
@@ -62,7 +62,7 @@ class Register extends Pre
             ? str_replace("_dummy_", "", $usr_data['email'])
             : '';
 
-        $output .= "
+        $output .= <<<EOT
 
 <form action='./register.php?code=$input_code&regon=1' method='POST' style='margin-top: 30px;'>
 
@@ -97,7 +97,8 @@ class Register extends Pre
     <li><span style='text-decoration:underline;'>Name</span>: Buchstaben, Zahlen oder Bindestriche</li>
     <li><span style='text-decoration:underline;'>Passwort</span>: Buchstaben, Zahlen oder ausgewählte Sonderzeichen, mind. 4 Zeichen</li><br>
 <!--    <li>Du wirst eine Email mit einem Bestätigungs-Link zur Verifizierung erhalten. Danach ist eine Anmeldung möglich.</li> -->
-</ul>";
+</ul>
+EOT;
 
         // positive Statusausgabe ohne Formularanzeige
         //

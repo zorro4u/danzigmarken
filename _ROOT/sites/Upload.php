@@ -25,7 +25,7 @@ class Upload extends Pre
         self::dataPreparation();
 
         Header::show();
-        self::view();
+        self::show_body();
         Footer::show("auth");
     }
 
@@ -33,7 +33,7 @@ class Upload extends Pre
     /**
      * HTML Ausgabe
      */
-    private static function view(): void
+    private static function show_body(): void
     {
 
         $ausgabe = Tools::statusmeldungAusgeben();
