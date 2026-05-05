@@ -8,14 +8,11 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
+/**
  * Summary of Details
  */
 class Details
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
     protected static int $akt_file_id;
     protected static int $akt_file_idx;
     protected static array $spaltennamen;
@@ -33,7 +30,7 @@ class Details
     function __destruct() {}
 
 
-    /***********************
+    /**
      * Summary of siteEntryCheck
      *
      * Seitenaufruf nur mit file_id möglich.
@@ -92,7 +89,7 @@ class Details
     }
 
 
-    /***********************
+    /**
      * Summary of checkGroupID
      */
     protected static function checkGroupID(int $gid=0)
@@ -119,7 +116,7 @@ class Details
     }
 
 
-    /***********************
+    /**
      * ermittelt Vorgänger und Nachfolger der akt. Seite
      *
      * !!! in PDO\SQLite funktioniert nicht die sql-Funktion: ROW_NUMBER() OVER (ORDER BY ...)
@@ -196,7 +193,7 @@ class Details
     }
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     protected static function dataPreparation()

@@ -2,7 +2,7 @@
 namespace Dzg\Tools;
 date_default_timezone_set('Europe/Berlin');
 
-/****************************
+/**
  * Funktionscontainer für den Anmelde- und Verifizierungsprozess
  *
  * inspired by:
@@ -22,7 +22,7 @@ require_once __DIR__.'/auth.password.func.php';
 # use PHPAuth\Auth as PHPAuth;
 
 
-/****************************
+/**
  * Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
  * sonst Probleme zB. mit css Aufruf
  * nötig für Cookies, Header, Footer
@@ -32,32 +32,30 @@ if (!isset($_SESSION['main']))
     $_SESSION['main'] = $_SESSION['rootdir'].'/index.php';
 
 
-/****************************
+/**
  * Summary of class Auth
  * Funktionscontainer für den Anmelde- und Verifizierungsprozess
  */
 class Auth
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
     private const TOKEN_TIMER_DAY = 365;  # Autologin gültig für 1 Jahr
     private const PWCODE_TIMER_DAY = 30;  # PW-Code gültig für 30 Tage
 
     private static array $error_arr;
 
 
-    /***********************
+    /**
      * Timer
      */
-    public static function getTokenTimer(int $duration_day=0): int
+    public static function getTokenTimer(int $duration_day = 0): int
     {
         $day = (empty($duration_day))
             ? self::TOKEN_TIMER_DAY
             : $duration_day;
         return time() + 3600*24 * $day;
     }
-    public static function getPWcodeTimer(int $duration_day=0): int
+
+    public static function getPWcodeTimer(int $duration_day = 0): int
     {
         $day = (empty($duration_day))
             ? self::PWCODE_TIMER_DAY
@@ -66,16 +64,17 @@ class Auth
     }
 
 
-    /***********************
+    /**
      * Summary of login
      * Logge den Benutzer ein, hole dessen Daten aus der DB
      *
      * @param mixed $userid
      * @return array<mixed|string>
      */
-    private static function login($userid): array
+    private static function login(int $userid): array
     {
         // userid prüfen
+        $usr_data = [];
         if ($userid == (int)$userid) {
             $error_arr = [];
 
@@ -85,49 +84,37 @@ class Auth
             // UserID in DB gefunden, globale Login-Session-Werte setzen
             if ($usr_data) {
                 self::setLoginSession($usr_data);
-
             } else {
                 $error_arr []= "#login: User-ID nicht gefunden ";
                 self::logout();
-            }
-        } else
+            };
+        }
+        else {
             $error_arr []= "#login: keine korrekte Login-User-ID übergeben ";
+        };
 
-        if (!empty($error_arr)) self::$error_arr []= $error_arr;
+        if (!empty($error_arr)) {
+            self::$error_arr []= $error_arr;
+        };
+
         return [$usr_data, Tools::arr2str($error_arr)];
     }
 
 
-    /***********************
+    /**
      * Summary of logout
      */
-    public static function logout($target = "")
+    public static function logout(string $target = ""): void
     {
         if ($target == "") {
             if (empty($_SESSION['lastsite'])) {
 
                 // Herkunftsseite speichern
                 $return2 = ['index', 'index2', 'details', 'login', 'email'];
-                if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], $_SERVER['PHP_SELF']) === false)) {
-
-                    // wenn VorgängerSeite bekannt und nicht die aufgerufene Seite selbst ist, speichern
-                    $referer = str_replace("change", "details", $_SERVER['HTTP_REFERER']);
-                    $fn_referer = pathinfo($referer)['filename'];
-
-                    // wenn Herkunft von den target-Seiten, dann zu diesen, ansonsten Standardseite
-                    $_SESSION['lastsite'] =  (in_array($fn_referer, $return2))
-                        ? $referer
-                        : $_SESSION['main'];
-
-                } elseif (empty($_SERVER['HTTP_REFERER']) && empty($_SESSION['lastsite'])) {
-
-                    // wenn nix gesetzt ist, auf Standard index.php verweisen
-                    $_SESSION['lastsite'] = (!empty($_SESSION['main'])) ? $_SESSION['main'] : "/";
-                }
-            }
+                tools::lastSite($return2);
+            };
             $target = $_SESSION['lastsite'];
-        }
-
+        };
         self::logout2();
 
         header("location: {$target}");
@@ -170,29 +157,33 @@ class Auth
                     $data = [":userid" => $userid];     # int
                     Database::sendSQL($stmt, $data);
                     $status = true;
-                }
-            }
-        }
-        if (!empty($error_arr)) self::$error_arr []= $error_arr;
+                };
+            };
+        };
+
+        if (!empty($error_arr)) {
+            self::$error_arr []= $error_arr;
+        };
 
         #$session = ['userid', 'status', 'su', 'sort', 'dir', 'col', 'start', 'proseite', 'thema', 'search', 'loggedin', 'autologin'];
         $session = ['userid', 'status', 'su', 'loggedin', 'autologin'];
         foreach($session AS $i) {
             unset($_SESSION[$i]);
-        }
-        #unset($_REQUEST, $_POST, $_GET);
+        };
 
         return $status;
     }
 
 
-    /***********************
+    /**
      * Summary of deleteAutocookies
      */
-    private static function deleteAutocookies()
+    private static function deleteAutocookies(): void
     {
         // Remove Cookies
-        if (isset($_COOKIE['auto_identifier']) || isset($_COOKIE['auto_token'])) {
+        if (isset($_COOKIE['auto_identifier'])
+            || isset($_COOKIE['auto_token']))
+        {
             setcookie("auto_identifier", "", time() - 3600, "/", "", 1);
             setcookie("auto_token", "", time() - 3600, "/", "", 1);
             unset($_COOKIE['auto_identifier'], $_COOKIE['auto_token']);
@@ -206,13 +197,15 @@ class Auth
             </script>";*/
 
             #session_regenerate_id();
-        }
+        };
 
         $session = ['login_id', 'ident', 'autologin'];
-        foreach ($session as $k) {unset($_SESSION[$k]);}
+        foreach ($session as $k) {unset($_SESSION[$k]);};
 
         // Remove OLD Cookies
-        if (isset($_COOKIE['login_ID']) || isset($_COOKIE['login_token'])) {
+        if (isset($_COOKIE['login_ID'])
+            || isset($_COOKIE['login_token']))
+        {
             setcookie("login_ID", "", time() - 3600, "/", "", 1);
             setcookie("login_token", "", time() - 3600, "/", "", 1);
             unset($_COOKIE['login_ID'], $_COOKIE['login_token']);
@@ -226,14 +219,14 @@ class Auth
             </script>";*/
 
             #session_regenerate_id();
-        }
+        };
     }
 
 
-    /***********************
+    /**
      * Autologin-Cookies/Session löschen und aus Datenbank austragen
      */
-    private static function deleteAutologin()
+    private static function deleteAutologin(): void
     {
         // wenn Autologin-Cookies --> DB auslogen
         if (self::checkAutocookie()) {
@@ -246,11 +239,11 @@ class Auth
             $data = [':ident' => $identifier, ':token_hash' => $token_hash];
             Database::sendSQL($stmt, $data);
             self::deleteAutocookies();
-        }
+        };
     }
 
 
-    /***********************
+    /**
      * Summary of checkAutocookie
      */
     private static function checkAutocookie(): bool
@@ -269,20 +262,25 @@ class Auth
             // random_16bytes: 32 Zeichen
             if (!preg_match("/^[a-zA-Z0-9]{32}$/", $identifier)) {
                 $error_arr []= "*** unzulässige Zeichen im Identifier-Cookies ***";
-            }
+            };
             // sha1_hash: 40 Zeichen
             if (!preg_match("/^[a-zA-Z0-9]{40}$/", $token_hash)) {
                 $error_arr []= "*** unzulässige Zeichen im Token-Cookie ***";
-            }
+            };
 
             if (!empty($error_arr)) {
                 self::deleteAutocookies();  # Remove Autologin-Cookies
                 #self::logout();
-            }
-        } else $error_arr []= "keine Autologin-Cookies gefunden";
+            };
+        }
+
+        else {
+            $error_arr []= "keine Autologin-Cookies gefunden";
+        };
 
 
         if (isset($_COOKIE['login_ID'], $_COOKIE['login_token'])) {
+
             // Set New Cookies
             setcookie("auto_identifier", $_COOKIE['login_ID'], time() + 3600*24*180, "/", "", 1);
             setcookie("auto_token", $_COOKIE['login_token'], time() + 3600*24*180, "/", "", 1);
@@ -295,18 +293,21 @@ class Auth
             unset($_COOKIE['login_ID'], $_COOKIE['login_token']);
 
             #session_regenerate_id();
-        }
+        };
 
-        if (!empty($error_arr)) self::$error_arr []= $error_arr;
+        if (!empty($error_arr)) {
+            self::$error_arr []= $error_arr;
+        };
+
         return (empty($error_arr)) ? true : false;
     }
 
 
-    /***********************
+    /**
      * Summary of getUserData
      * Benutzerdaten aus DB holen
      */
-    private static function getUserData($userid): array
+    private static function getUserData(int $userid): array
     {
         $stmt = "SELECT * FROM site_users WHERE userid = :userid";
         $data = [":userid" => $userid];     # int
@@ -315,11 +316,11 @@ class Auth
     }
 
 
-    /***********************
+    /**
      * Summary of getLoginData
      * Login-Daten aus DB holen
      */
-    private static function getLoginData(int $userid=0): array
+    private static function getLoginData(int $userid = 0): array
     {
         // mit Autologin
         if (!$userid) {
@@ -333,41 +334,47 @@ class Auth
                         AND identifier = :ident";
             $data = [':token_hash' => $token_hash, ':ident' => $identifier];
             $login_data = Database::sendSQL($stmt, $data, 'fetch');
+        }
 
         // ohne Autologin
-        } else {
+        else {
             $stmt = "SELECT * FROM site_login
                     WHERE userid = :userid
                         AND identifier IS NULL";
             $data = [':userid', $userid];   # int
             $login_data = Database::sendSQL($stmt, $data, 'fetch');
-        }
+        };
 
         # wenn kein Eintrag gefunden wurde
-        if (!$login_data) $login_data = [];
+        if (!$login_data) {
+            $login_data = [];
+        };
 
         return $login_data;
     }
 
 
-    /***********************
+    /**
      * Summary of setLoginSession
      */
-    public static function setLoginSession($usr_data)
+    public static function setLoginSession(array $usr_data): void
     {
         $_SESSION['userid'] = $usr_data['userid'];
         $_SESSION['loggedin'] = true;
         $_SESSION['su'] = ($usr_data['su'] == 1) ? true : null;
         $_SESSION['status'] = ($usr_data['status'] === "activated") ? "activ" : null;
         foreach ($_SESSION as $k=>$v) {
-            if ($v === null) unset($_SESSION[$k]);
-        }
+            if ($v === null) {
+                unset($_SESSION[$k]);
+            };
+        };
     }
 
-    /***********************
+
+    /**
      * Summary of setAutologinSession
      */
-    public static function setAutologinSession($login_id, $identifier)
+    public static function setAutologinSession($login_id, string $identifier): void
     {
         $_SESSION['login_id'] = $login_id;
         $_SESSION['ident'] = $identifier;
@@ -375,7 +382,7 @@ class Auth
     }
 
 
-    /***********************
+    /**
      * Summary of refreshAutologin
      *
      * neuen Token & Gültigkeitsdauer setzen
@@ -384,7 +391,7 @@ class Auth
      *
      * @param mixed $login_data
      */
-    private static function refreshAutologin(&$login_data)
+    private static function refreshAutologin(array &$login_data): void
     {
         #if (self::checkAutocookie()):
 
@@ -437,12 +444,14 @@ class Auth
         $new = [
             'token_hash' => $newtoken_hash,
             'token_endtime' => $token_endtime,
-            'ip' => $ip];
+            'ip' => $ip
+        ];
+        
         $login_data = array_merge($login_data, $new);
     }
 
 
-    /***********************
+    /**
      * Summary of checkUser
      *
      * Checks that the user is logged in.
@@ -484,12 +493,14 @@ class Auth
             '1' => "{$_1} auto.login",
             '2' => "{$_2} auto.login",
             '3' => "{$_3} login",
-            '4' => "" ];
+            '4' => ""
+        ];
 
         // -0- Heimnetz -> ohne Anmeldung
 
         // -1- nicht angemeldet, aber Cookies (dauerhaft) --> anmelden
-        if (!isset($_SESSION['userid']) && self::checkAutocookie()):
+        if (!isset($_SESSION['userid'])
+            && self::checkAutocookie()):
 
             // mit den Autologin-Cookies die DB-Login-Daten holen
             $login_data = self::getLoginData();
@@ -499,29 +510,33 @@ class Auth
                 self::deleteAutocookies();
                 $error_arr []= $error_txt['1.0'];
                 #$exit = true;
+            }
 
             // Token ist veraltet --> no login
-            } elseif (strtotime($login_data['token_endtime']) < $now) {
+            elseif (strtotime($login_data['token_endtime']) < $now) {
                 self::deleteAutologin();
                 $error_arr []= $error_txt['1.1'];
                 #$exit = true;
+            }
 
             // Cookie-ID/Token in DB gefunden, aber abgemeldet auto=0
-            } elseif (empty($login_data['autologin'])) {
+            elseif (empty($login_data['autologin'])) {
                 self::deleteAutocookies();
                 $error_arr []= $error_txt['1.2'];
                 #$exit = true;
+            }
 
             // Cookie-Ident/Token korrekt --> einloggen
-            } else {
+            else {
                 self::refreshAutologin($login_data);
                 [$usr_data, $error_X] = self::login($login_data['userid']);
                 $success_msg = $success_txt['1'];
-            }
+            };
 
 
         // -2- angemeldet, mit Autologin-Cookies
-        elseif (!empty($_SESSION['userid']) && self::checkAutocookie()):
+        elseif (!empty($_SESSION['userid'])
+            && self::checkAutocookie()):
 
             $userid = $_SESSION['userid'];
 
@@ -533,9 +548,10 @@ class Auth
             {
                 $error_arr []= $error_txt['2.1'];
                 $exit = true;
+            }
 
             // Plausi-Check okay --> Anmeldeprozedur
-            } else {
+            else {
 
                 // mit den Autologin-Cookies die DB-Login-Daten holen
                 $login_data = self::getLoginData();
@@ -545,37 +561,42 @@ class Auth
                     self::deleteAutocookies();
                     $error_arr []= $error_txt['2.2'];
                     $exit = true;
+                }
 
                 // Token ist veraltet --> ausloggen
-                } elseif (strtotime($login_data['token_endtime']) < $now) {
+                elseif (strtotime($login_data['token_endtime']) < $now) {
                     self::deleteAutologin();
                     $error_arr []= $error_txt['2.3'];
                     $exit = true;
+                }
 
                 // Cookie-ID/Token in DB gefunden, aber abgemeldet auto=0
-                } elseif (empty($login_data['autologin'])) {
+                elseif (empty($login_data['autologin'])) {
                     self::deleteAutocookies();
                     $error_arr []= $error_txt['2.4'];
                     $exit = true;
+                }
 
                 // DB_login.UserID <> Session_UserID verschieden --> ausloggen
-                } elseif ($login_data['userid'] != $userid) {
+                elseif ($login_data['userid'] != $userid) {
                     self::deleteAutocookies();
                     $error_arr []= $error_txt['2.5'];
                     $exit = true;
+                }
 
                 // UserID & Cookie-Ident/Token korrekt --> einloggen
-                } else {
+                else {
                     self::refreshAutologin( $login_data);
                     [$usr_data, $error_X] = self::login($login_data['userid']);
                     $success_msg = $success_txt['2'];
-                }
+                };
 
-            }  // Plausi-Check okay
+            };  // Plausi-Check okay
 
 
         // -3- angemeldet, ohne Cookie
-        elseif (!empty($_SESSION['userid']) && !self::checkAutocookie()):
+        elseif (!empty($_SESSION['userid'])
+            && !self::checkAutocookie()):
 
             $userid = $_SESSION['userid'];
 
@@ -583,9 +604,10 @@ class Auth
             if ($userid != (int)$userid) {
                 $error_arr []= $error_txt['3.1'];
                 $exit = true;
+            }
 
             // Plausi-Check okay --> Login erneuern
-            } else {
+            else {
 
                 // userid in DB suchen
                 $stmt = "SELECT userid FROM site_login
@@ -604,12 +626,12 @@ class Auth
                     [$usr_data, $error_X] = self::login($userid);
                     $login_data = self::getLoginData($userid);
                     $success_msg = $success_txt['3'];
-
-                } else {
+                }
+                else {
                     $error_arr []= $error_txt['3.2'];
                     $exit = true;
-                }
-            }
+                };
+            };
 
         // -4- nicht angemeldet, keine Cookies
         else:
@@ -620,27 +642,27 @@ class Auth
         // Erfolgsmeldung
         if ($success_msg !== "") {
             #echo $msg;
-        }
+        };
 
         // Fehlermeldung
         if (!empty($error_arr)) {
             self::$error_arr []= $error_arr;
             $error_msg = Tools::arr2str($error_arr);
             #echo $msg;
-        }
+        };
 
         if ($exit) {
             #self::logout2();
             #exit;
             self::logout();
             #self::logout($_SERVER['PHP_SELF']);
-        }
+        };
 
         return [$usr_data, $login_data, $error_msg];
     }
 
 
-    /***********************
+    /**
      * Returns true when the user is checked in, else false
      */
     public static function isCheckedIn(): bool
@@ -654,7 +676,7 @@ class Auth
     }
 
 
-    /***********************
+    /**
      * abfragende Adresse
      */
     public static function remoteAddr(): string
@@ -663,7 +685,7 @@ class Auth
     }
 
 
-    /***********************
+    /**
      * Returns a random string
      */
     public static function generateRandomString(): string
@@ -671,24 +693,29 @@ class Auth
         if (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes(16);
             $str = bin2hex($bytes);
-        } else {
+        }
+        else {
             // Replace 'your_secret_string' with a string of your choice (>12 characters) ... Die_Sonne_Der_Mond_Hurz
             $str = md5(uniqid('M;0bAP&2hsS(8nxJS5~S6=kuC', true));
             echo '--> auth.functions.inc.php -> func -> generateRandomString() -> (Zeile 353)';
-        }
+        };
         return $str;
     }
 
-    private static function generateRandomString0($length = 10) {
+
+    private static function generateRandomString0(int $length = 10): string
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $random_string = '';
 
         for ($i = 0; $i < $length; $i++) {
             $random_string .= $characters[random_int(0, $charactersLength - 1)];
-        }
+        };
 
         return $random_string;
     }
 }
 
+
+// EOF

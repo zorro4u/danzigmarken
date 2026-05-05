@@ -10,9 +10,6 @@ require_once __DIR__.'/../tools/tools.php';
 
 class Logout
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
     protected static bool $show_form;
     protected static string $root_site;
     protected static string $status_message;

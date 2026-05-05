@@ -9,7 +9,7 @@ require_once __DIR__.'/../sitedata/tabledata.php';
 require_once __DIR__.'/../tools/auth.php';
 
 
-/***********************
+/**
  * Summary of TableBody
  * Tabellenkopf & Tabellenkörper
  *
@@ -19,7 +19,7 @@ require_once __DIR__.'/../tools/auth.php';
  */
 class TableBody
 {
-    /***********************
+    /**
      * Summary of htmlTabkopf
      * Tabellenkopf erstellen
      *
@@ -176,7 +176,7 @@ class TableBody
     }
 
 
-    /***********************
+    /**
      * Summary of htmlTabelle
      * Tabellen erstellen, Werte ausgeben
      *

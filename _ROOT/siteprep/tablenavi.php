@@ -7,7 +7,7 @@ require_once __DIR__.'/tableprep.php';
 require_once __DIR__.'/../sitedata/tabledata.php';
 
 
-/***********************
+/**
  * Summary of TableNavi
  * Container für Navigations-Funktionen
  *
@@ -19,7 +19,7 @@ require_once __DIR__.'/../sitedata/tabledata.php';
  */
 class TableNavi
 {
-    /***********************
+    /**
      * Summary of datenbereich
      * setzt den Startwert und die Schrittweite der Tabellenausgabe
      *
@@ -78,7 +78,7 @@ class TableNavi
     }
 
 
-    /***********************
+    /**
      * Summary of feldSeitenwahl
      * -- Pagination --
      * Übergabeparameter für seitenweise Ausgabe in Abhängigkeit anpassen
@@ -330,7 +330,7 @@ class TableNavi
     }
 
 
-    /***********************
+    /**
      * Summary of feldAnzeigewahl
      * "Dropdown-proSeite"
      *
@@ -382,7 +382,7 @@ class TableNavi
     }
 
 
-    /***********************
+    /**
      * Summary of feldThemenwahl
      * "Dropdown Thema"
      *
@@ -441,7 +441,7 @@ class TableNavi
     }
 
 
-    /***********************
+    /**
      * Summary of feldSuchen
      * "Suche"
      * @return string

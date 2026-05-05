@@ -18,22 +18,16 @@ require_once __DIR__.'/../tools/tools.php';
 RegisterPre::show();
 
 
-/***********************
- * Summary of Register_pre
+/**
+ * Summary of Class RegisterPre
  */
 class RegisterPre
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
-    private static $show_form;
+    private static bool $show_form;
     private static string $status_message;
 
 
-    /****************************
-     * Summary of show
-     */
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
 
@@ -43,7 +37,7 @@ class RegisterPre
     }
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     private static function dataPreparation()

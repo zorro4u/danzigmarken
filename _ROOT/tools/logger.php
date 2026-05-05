@@ -14,7 +14,7 @@ class Logger
      * in Log schreiben
      * wird in footer.php aufgerufen
      */
-    public static function log()
+    public static function log(): void
     {
         // Test auf Heimnetz
         $remaddr = $_SERVER['REMOTE_ADDR'];
@@ -106,7 +106,7 @@ class Logger
     /**
      * log-Einträge löschen
      */
-    public static function delete_logs()
+    public static function delete_logs(): void
     {
         // erst 'admin' Einträge löschen, dauert länger :-/
         $stmt =
@@ -124,7 +124,7 @@ class Logger
         $stmt = "SELECT count(*)-{$keep} FROM site_log";
         $del  = Database::sendSQL($stmt,[],'fetch','num')[0];
 
-        if($del > 0) {
+        if ($del > 0) {
             $stmt = "DELETE FROM site_log ORDER BY id LIMIT {$del}";
             Database::sendSQL($stmt, []);
         };

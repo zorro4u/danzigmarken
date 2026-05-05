@@ -9,10 +9,7 @@ require_once __DIR__.'/../private/account_data.php';
 
 class About
 {
-    /***********************
-     * Anzeige der Webseite
-     */
-    public static function show()
+    public static function show(): void
     {
         Header::show();
         self::show_body();

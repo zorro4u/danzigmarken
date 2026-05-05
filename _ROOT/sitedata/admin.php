@@ -7,7 +7,7 @@ require_once __DIR__.'/../tools/database.php';
 
 class Admin
 {
-    /****************************
+    /**
      * Summary of getDBregistryLink
      */
     public static function getDBregistryLink(): array
@@ -21,7 +21,7 @@ class Admin
     }
 
 
-    /****************************
+    /**
      * Summary of getDBuserList
      */
     public static function getDBuserList($userid, $identifier): array
@@ -463,3 +463,5 @@ class Admin
     }
 }
 
+
+// EOF

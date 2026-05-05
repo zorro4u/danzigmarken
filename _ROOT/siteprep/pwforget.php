@@ -17,21 +17,18 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
+/**
  * Summary of Pw_forget
  */
 class PWforget
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
     protected static bool $show_form;
     protected static string $status_message;
     protected static string $success_msg;
     protected static string $pre_email;
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     protected static function dataPreparation(): void

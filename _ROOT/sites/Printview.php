@@ -15,7 +15,7 @@ require_once __DIR__.'/../tools/auth.php';
  */
 class PrintView extends Pre
 {
-    public static function show()
+    public static function show(): void
     {
         self::siteEntryCheck();
 

@@ -11,10 +11,7 @@ require_once __DIR__.'/../private/account_data.php';
 
 class Impressum
 {
-    /**
-     * Anzeige der Webseite
-     */
-    public static function show()
+    public static function show(): void
     {
         self::siteEntryCheck();
 

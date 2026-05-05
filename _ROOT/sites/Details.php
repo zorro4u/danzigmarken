@@ -16,19 +16,12 @@ Controller,     Steuerung: Data <--> Ansicht
 */
 
 
-/***********************
- * Summary of Details
- * Webseite:
- *
- * __public__
- * show()
+/**
+ * Summary of Class Details
  */
 class Details extends Pre
 {
-    /***********************
-     * Anzeige der Webseite
-     */
-    public static function show()
+    public static function show(): void
     {
         self::siteEntryCheck();
         self::dataPreparation();

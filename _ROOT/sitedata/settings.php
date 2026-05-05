@@ -135,3 +135,5 @@ class Settings
 
 }
 
+
+// EOF

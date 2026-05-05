@@ -17,7 +17,7 @@ class Database extends DB
      * holt das Datum der jüngsten Datei,
      * als Indikator der letzten DB-Erweiterung
      */
-    public static function lastimport() :string
+    public static function lastimport(): string
     {
         #$sql = "SELECT MAX(dat_change) FROM dzg_file";
         $sql = "SELECT MAX(dat_create) FROM dzg_file";
@@ -35,7 +35,7 @@ class Database extends DB
      * vergleicht die Dateiliste mit der DB nach Namen und
      * gibt die nichtgefundenen als Liste zurück
      */
-    public static function neue_liste_name(array $file_list) :array
+    public static function neue_liste_name(array $file_list): array
     {
         $starttime = time();
 
@@ -98,7 +98,7 @@ class Database extends DB
      * vergleicht die Dateiliste mit der DB nach Erstellungsdatum und
      * gibt die nichtgefundenen als Liste zurück
      */
-    public static function neue_liste_zeit(array $file_list) :array
+    public static function neue_liste_zeit(array $file_list): array
     {
         $notfound   = [];
         $found_list = [];
@@ -119,7 +119,7 @@ class Database extends DB
             ($filedate > $lastimport)
                 ? $notfound   []= $dataset
                 : $found_list []= $dataset;
-        }
+        };
 
         return $notfound;
     }
@@ -134,7 +134,7 @@ class Database extends DB
      *
      * Daten & Thumbs in MariaDB Datenbank schreiben
      */
-    public static function store_list_to_maria(array $file_list) :void
+    public static function store_list_to_maria(array $file_list): void
     {
         $starttime = time();
         echo("Daten in MariaDB Datenbank schreiben in ");
@@ -158,7 +158,7 @@ class Database extends DB
      * wenn Bild-Datei noch nicht in DB,
      * dann hinzufügen, Web-Bilder erstellen und Thumb in DB eintragen
      */
-    private static function add_filelist_to_database(array $file_list) :void
+    private static function add_filelist_to_database(array $file_list): void
     {
         #$backup  = False
 
@@ -182,7 +182,7 @@ class Database extends DB
             self::root();       # dzg_dirliste
             self::sub1();       # dzg_dirsub1
             self::prefix();     # dzg_fileprefix
-        }
+        };
 
         ## Werte eintragen, Abhängigkeiten prüfen
         #
@@ -194,7 +194,7 @@ class Database extends DB
             $step = 1000;
         } else {
             echo ' ';
-        }
+        };
 
         # 1. Datei-Daten in DB-Tabellen eintragen
         #
@@ -205,7 +205,7 @@ class Database extends DB
             if ($i == $step) {
                 $i = 0;
                 echo '*';
-            }
+            };
 
             # Liste der IDs der Daten für Fremdschlüsselverknüpfung
             $id = [];
@@ -339,10 +339,8 @@ class Database extends DB
      * root-verzeichnis
      * < anhängen vs. updaten ?? >
      */
-    private static function root() :void
+    private static function root(): void
     {
-        #cursor = connection.cursor()
-
         $table  = 'dzg_dirliste';
         $column = array_slice(Init::DB[$table], 1, 2);     # ('localroot', 'webroot')
         # die Liste der Tabellen-Spaltennamen in ein String wandeln,
@@ -364,10 +362,8 @@ class Database extends DB
         $txt = "(SELECT count(1) FROM $table), ";
         for ($i = 0; $i < 2; $i++) {
             $txt .= "(SELECT count(1) FROM $table WHERE {$column[$i]}='{$data[$i]}'), ";
-        }
+        };
         $sql = "SELECT " . substr($txt, 0, -2);
-        #$cursor->execute($sql);
-        #$chk = $cursor->fetchone();     # one: tuple (1,1,1), all: list [(1,1,1)]
         $chk = self::sendSQL($sql, [], 'fetch', 'num');
 
         # beide Werte ('localroot', 'webroot') nicht in DB
@@ -398,17 +394,13 @@ class Database extends DB
             self::sendSQL($sql, []);
         }
 
-        else {  # beide Werte schon in DB
-        };
-
-        #connection.commit();
+        # beide Werte schon in DB
+        else {};
     }
 
 
-    private static function sub1() :void
+    private static function sub1(): void
     {
-        #cursor = connection.cursor()
-
         $table  = 'dzg_dirsub1';
         $column = Init::DB[$table][1];  # 'sub1'
         $placeholder = '?';
@@ -421,13 +413,10 @@ class Database extends DB
         };
         $txt = substr($txt, 0, -2);
         $sql = "SELECT " . $txt;
-        #$cursor->execute($sql);
-        #$chk = $cursor->fetchone();     # (0,1,1,0,1)
         $chk = self::sendSQL($sql, [], 'fetch', 'num');
 
         # alles gefunden (1,1,1..)
-        if (array_sum($chk) == count($data)) {
-        }
+        if (array_sum($chk) == count($data)) {}
 
         # nix gefunden, alles anhängen (0,0,0..)
         elseif (array_sum($chk) == 0) {
@@ -445,17 +434,15 @@ class Database extends DB
                 };
             };
         };
-        #connection.commit()
     }
 
 
-    private static function prefix() :void
+    private static function prefix(): void
     {
         /*
         dzg_fileprefix, (subdir1, prefix)
         'prefix' fehlt in globaler Variablen!!, -> verschiebt andere Zugriffe!
         */
-        #cursor = connection.cursor()
 
         $table  = 'dzg_fileprefix';
         $column = array_reverse(array_slice(Init::DB[$table], 1, 2));   # ('id_sub1', 'prefix')
@@ -476,7 +463,6 @@ class Database extends DB
         $data = Init::array_zip(Init::WEB_SUBDIR, Init::WEB_PRE);
 
         # -- Bestand abfragen --
-        #for (s1, w1), (s2, w2) in [list(Init::array_zip($column, $i)) foreach ($data as $i)] {
 
         # Arbeitliste zusammensetzen, um die SQL-Abfrage zu erstellen:
         # [[sub1, large], [prefix, l_]], [[sub1, medium], [prefix, m_]], ...]
@@ -500,25 +486,20 @@ class Database extends DB
         (SELECT count(1) FROM dzg_fileprefix a LEFT JOIN dzg_dirsub1 b ON b.id=a.id_sub1 WHERE b.sub1='original'),
         (SELECT count(1) FROM dzg_fileprefix WHERE prefix=''), ...
         */
-        #cursor.execute(sql)
-        #chk = cursor.fetchone()  # (0,1,1,0,1)
         $chk = self::sendSQL($sql, [], 'fetch', 'num');
-
 
         # [(0,1),(1,0),..)
         $tmp = [];
         for ($i = 0; $i < count($chk); $i += 2) {
             $tmp[] = [$chk[$i], $chk[$i + 1]];
-        }
+        };
         $chk = $tmp;
-
 
         for ($i = 0; $i < count($chk); $i++) {
             $count = $chk[$i];
 
             # alles gefunden (1,1)
-            if (array_sum($count) == count($count)) {
-            }
+            if (array_sum($count) == count($count)) {}
 
             # anhängen (0,0) (0,1) (1,0)
             # --> Abhängige Tabellen! Funktioniert so nicht.
@@ -538,7 +519,7 @@ class Database extends DB
     }
 
 
-    private static function sub2(array $dataset, array &$id) :array
+    private static function sub2(array $dataset, array &$id): array
     {
         $table  = 'dzg_dirsub2';
         $column = Init::DB[$table][1];  # 'sub2'
@@ -551,12 +532,8 @@ class Database extends DB
         if (!$idx) {  # nicht gefunden, anhängen
             $sql = "INSERT INTO $table ($column) VALUES ('$data')";
             self::sendSQL($sql, []);
-            # connection.commit()
+
             # noch neue id holen
-            # SQLITE:
-            #idx = cursor.execute("SELECT last_insert_rowid()").fetchone()
-            # MARIADB
-            #cursor.execute("SELECT last_insert_id()")
             $idx = self::sendSQL("SELECT last_insert_id()", [], 'fetch', 'num');
         };
 
@@ -566,15 +543,11 @@ class Database extends DB
     }
 
 
-    private static function suffix(array $dataset, array &$id) :array
+    private static function suffix(array $dataset, array &$id): array
     {
         $table  = 'dzg_filesuffix';
         $column = Init::DB[$table][1];  # 'suffix'
         $data   = $dataset[26];
-
-        # cls.__sqlite_tabelle_leeren(table, connection)
-        # cls.__sqlite_tabelle_LOESCHEN(table, connection)
-        # cls.__NEW_tabellen_erzeugen(connection)
 
         # -- Bestand abfragen --
         $sql = "SELECT id FROM $table WHERE $column='$data'";
@@ -583,11 +556,8 @@ class Database extends DB
         if (!$idx) {  # nicht gefunden, hinzufügen
             $sql = "INSERT INTO $table ($column) VALUES ('$data')";
             self::sendSQL($sql, []);
-            # connection.commit()
+
             # noch neue id holen
-            #idx = cursor.execute("SELECT last_insert_rowid()").fetchone()
-            #cursor.execute("SELECT last_insert_id()")
-            #idx = cursor.fetchone()
             $idx = self::sendSQL("SELECT last_insert_id()", [], 'fetch', 'num');
         };
 
@@ -596,7 +566,7 @@ class Database extends DB
     }
 
 
-    private static function view(array $dataset, array &$id) :array
+    private static function view(array $dataset, array &$id): array
     {
         $table  = 'dzg_kat20';
         $column = Init::DB[$table][1];  # 'kat20'
@@ -605,15 +575,17 @@ class Database extends DB
         # -- Bestand abfragen --
         $sql = "SELECT count(1) FROM $table WHERE $column='$data'";
         $chk = self::sendSQL($sql, [], 'fetch', 'num')[0];
-        if (!$chk) {  # nicht gefunden, hinzufügen
+
+        # nicht gefunden, hinzufügen
+        if (!$chk) {
             $sql = "INSERT INTO $table ($column) VALUES ('$data')";
             self::sendSQL($sql, []);
-        }
+        };
         return $id;
     }
 
 
-    private static function cat_group(array $dataset, array &$id, bool $backup=false) :array
+    private static function cat_group(array $dataset, array &$id, bool $backup = false): array
     {
         $table  = 'dzg_group';
         # id_thema, datum, kat10..kat13 (PostAmt, AMT, StempNr, Wolff)
@@ -626,8 +598,10 @@ class Database extends DB
 
         if ($backup) {
             $idx = [(int)$dataset[42],];    # sta_id / id_group
-        } else {
-            # -- Bestand abfragen --
+        }
+
+        # -- Bestand abfragen --
+        else {
             $sql = "SELECT id FROM $table
                 WHERE $column[0]='$data[0]' AND $column[1]='$data[1]'
                 AND $column[2]='$data[2]' AND $column[3]='$data[3]'
@@ -635,12 +609,12 @@ class Database extends DB
             $idx = self::sendSQL($sql, [], 'fetch', 'num');
         };
 
-        if (!$idx && !$backup) {  # nicht gefunden, hinzufügen
-            # Werte eintragen
+        # nicht gefunden, hinzufügen
+        if (!$idx && !$backup) {
             $sql = "INSERT INTO $table ($column_str) VALUES ($placeholder)";
             self::sendSQL($sql, $data);
+
             # noch neue id holen
-            #idx = cursor.execute("SELECT last_insert_rowid()").fetchone()
             $idx = self::sendSQL("SELECT last_insert_id()", [], 'fetch', 'num');
         };
 
@@ -649,7 +623,7 @@ class Database extends DB
     }
 
 
-    private static function cat_file(array $dataset, array &$id) :array
+    private static function cat_file(array $dataset, array &$id): array
     {
         $table = 'dzg_file';
 
@@ -686,7 +660,6 @@ class Database extends DB
         self::sendSQL($sql, $data);
 
         # noch neue id holen
-        #idx = cursor.execute("SELECT last_insert_rowid()").fetchone()
         $id['file'] = self::sendSQL("SELECT last_insert_id()", [], 'fetch', 'num');
 
         return $id;
@@ -697,7 +670,8 @@ class Database extends DB
     /**
      * Datenbank in Excel-Datei speichern
      */
-    public static function make_backup(string $outFileName = '', bool $add_date = true) :void
+    public static function
+    make_backup(string $outFileName = '', bool $add_date = true): void
     {
         # Spalten, die ausgelesen werden
         $col = Init::DB_COL;
@@ -712,7 +686,7 @@ class Database extends DB
         dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23, sta.id, dat.id";
 
         # Abfragebefehl
-        $sql = "
+        $sql = <<<EOT
         SELECT {$col}
         FROM dzg_file AS dat
             LEFT JOIN dzg_group AS sta ON sta.id=dat.id_group
@@ -727,7 +701,7 @@ class Database extends DB
             LEFT JOIN dzg_fileprefix AS pre ON pre.id_sub1=sub1.id
         WHERE {$where}
         ORDER BY {$sort}
-        ";
+        EOT;
 
         # Datenbank-Abfrage senden/empfangen
         # 'num'/Index_Array empfangen,
@@ -744,7 +718,9 @@ class Database extends DB
             foreach ($data as $k => $v) {
                 #if (!is_string($v)){echo gettype($v).': '. $k.'->'.$v.PHP_EOL;}
                 $v ??= '';
-                $v = is_bool($v) ? ($v ? '1' : '0') : $v;
+                $v = is_bool($v)
+                    ? ($v ? '1' : '0')
+                    : $v;
                 $v = is_int($v) ? (string)$v : $v;
                 $db_list[$idx][$k] = $v;
             };
@@ -803,7 +779,7 @@ class Database extends DB
         #    pass
 
     }
-
 }
+
 
 // EOF

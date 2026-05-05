@@ -10,27 +10,12 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 require_once __DIR__.'/../tools/auth.php';
 
 
-/***********************
- * Summary of Table
- * Webseite:
- * Tabellenausgabe der Datenbank
- *
- * __public__
- * show()
- * spaltennamen()
- * getSession()
- * setSession()
- * DBspalten
- * $maxID
- * $stamps_db
- * $_session
+/**
+ * Summary of Class Table
  */
 class Table extends TablePrep
 {
-    /***********************
-     * Anzeige der Webseite
-     */
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
 

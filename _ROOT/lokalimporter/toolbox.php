@@ -33,7 +33,7 @@ class ToolBox
      * 105.3214 -> '1m 41s'
      * 216105.3 -> '2d 12h 1m'
      */
-    public static function time2str(float $sec_to_convert) :string
+    public static function time2str(float $sec_to_convert): string
     {
         $day = $hour = $minute = 0;
         $str_time = '';
@@ -84,7 +84,7 @@ class ToolBox
     /**
      * ganzzahlige Division mit ganzzahligem Restwert
      */
-    public static function divmod(int $dividend, int $divisor) :array
+    public static function divmod(int $dividend, int $divisor): array
     {
         return [intdiv($dividend, $divisor), $dividend % $divisor];
     }
@@ -169,3 +169,6 @@ class ProgressBar
 
 
 ## -------- E N D E -------- ##
+
+
+// EOF

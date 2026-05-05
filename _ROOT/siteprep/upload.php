@@ -7,7 +7,7 @@ use Dzg\Tools\Auth;
 require_once __DIR__.'/../tools/auth.php';
 
 
-/***********************
+/**
  * Summary of Upload
  */
 class Upload
@@ -54,7 +54,7 @@ class Upload
 
 
 
-    /********************************* */
+    /************ */
     private static function anzeigen_1()
     {
         /***
@@ -110,7 +110,7 @@ class Upload
 
 
 
-    /*********************************
+    /************
      * Erzeugen eines neuen Dateinamens
      *
      * Für unseren Anwendungszweck nehmen wir an, dass der Zeitraum zwischen dem Prüfen und dem
@@ -137,7 +137,7 @@ class Upload
 
 
 
-    /*********************************
+    /************
      * Datei mit einem PHP-Skript ausliefern
      */
     private static function showFile()
@@ -161,7 +161,7 @@ class Upload
 
 
 
-    /*********************************
+    /************
      * Generieren einer Fehlermeldung
      */
     private static function errorMessage()
@@ -216,7 +216,7 @@ class Upload
 
 
 
-    /********************************* */
+    /************ */
     private static function dateinameBereinigen($dateiname)
     {
         // erwünschte Zeichen erhalten bzw. umschreiben
@@ -252,7 +252,7 @@ class Upload
         return ($dateiname);
     }
 
-    /********************************* */
+    /************ */
     private static function anzeigen_2()
     {
         /***
@@ -298,7 +298,7 @@ class Upload
 
 
 
-    /********************************* */
+    /************ */
     protected static function dataPreparation()
     {
         //-------------------------------------------------

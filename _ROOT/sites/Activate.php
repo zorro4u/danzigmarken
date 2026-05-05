@@ -12,16 +12,12 @@ require_once __DIR__.'/../siteprep/activate.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-/***********************
- * Summary of Activate
+/**
+ * Summary of Class Activate
  */
 class Activate extends Pre
 {
-
-    /****************************
-     * Summary of show
-     */
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
 

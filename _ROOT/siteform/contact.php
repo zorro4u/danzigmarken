@@ -16,24 +16,24 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 #use Gregwar\Captcha\PhraseBuilder;
 
 
-/***********************
+/**
  * Webseite: Kontaktformular
  */
 class Contact extends Prep
 {
-    protected static $show_form;
+    protected static bool $show_form;
     protected static string $status_message;
-    protected static $success_msg;
-    protected static $input_name;
-    protected static $input_email;
-    protected static $input_message_first;
+    protected static string $success_msg;
+    protected static string $input_name;
+    protected static string $input_email;
+    protected static string $input_message_first;
     protected static $cfg;
     protected static $fehler;
     protected static $datenschutzerklaerung;
     public static $captcha;
 
 
-    /***********************
+    /**
      * Summary of formEvaluation
      * [https://www.kontaktformular.com/]
      */
@@ -57,6 +57,7 @@ class Contact extends Prep
         $input_name  = "";
         $input_email = "";
         $input_message_first = "";
+        $input_message = "";
         $fehler = [];
 
         // Formularwerte empfangen

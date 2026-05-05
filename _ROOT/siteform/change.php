@@ -9,12 +9,12 @@ require_once __DIR__.'/../sitedata/change.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
+/**
  * Auswertung der Formulareingabe
  */
 class Change extends Prep
 {
-    /***********************
+    /**
      * ABBRUCH - Button
      */
     protected static function executeCancelButton()
@@ -26,7 +26,7 @@ class Change extends Prep
     }
 
 
-    /***********************
+    /**
      * DELETE - Button
      */
     protected static function executeDeleteButton()
@@ -86,7 +86,7 @@ class Change extends Prep
     }
 
 
-    /***********************
+    /**
      * UNDELETE - Button
      */
     protected static function executeUndeleteButton()
@@ -122,7 +122,7 @@ class Change extends Prep
     }
 
 
-    /***********************
+    /**
      * SPLIT - Button
      */
     protected static function executeSplitButton()
@@ -192,7 +192,7 @@ class Change extends Prep
     }
 
 
-    /***********************
+    /**
      * CHANGE - Button
      */
     protected static function executeChangeButton()
@@ -379,7 +379,7 @@ class Change extends Prep
     }
 
 
-    /***********************
+    /**
      * Formular-Eingabe verarbeiten
      * und an DB schicken
      */

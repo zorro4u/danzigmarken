@@ -8,7 +8,7 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
+/**
  * Summary of Table
  * Webseite:
  * Tabellenausgabe der Datenbank
@@ -105,7 +105,7 @@ class TablePrep
     ];
 
 
-    /***********************
+    /**
      * Summary of spaltennamen
      * Zuordnung der Spaltennamen: DatenbankTabelle -> WebTabelle
      * Reihenfolge -> Ausgabe
@@ -164,7 +164,7 @@ class TablePrep
     {}
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      * @return void
      */

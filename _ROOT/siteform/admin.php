@@ -10,7 +10,7 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/****************************
+/**
  * Summary of Admin
  * class A extends B implements C
  */
@@ -20,7 +20,7 @@ class Admin extends Prep
     protected static $active;
 
 
-    /****************************
+    /**
      * Summary of formEvaluation
      * Änderungsformular empfangen, Eingaben verarbeiten
      */

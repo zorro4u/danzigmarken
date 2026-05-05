@@ -10,15 +10,12 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 #use Gregwar\Captcha\PhraseBuilder;
 
 
-/***********************
- * Webseite: Kontaktformular
+/**
+ * Kontaktformular
  */
 class Contact extends Pre
 {
-    /***********************
-     * Anzeige der Webseite
-     */
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
         self::formEvaluation();
@@ -31,7 +28,7 @@ class Contact extends Pre
     }
 
 
-    /***********************
+    /**
      * Summary of view
      * [https://www.kontaktformular.com/]
      */

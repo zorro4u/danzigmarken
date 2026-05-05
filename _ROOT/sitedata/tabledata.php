@@ -7,25 +7,12 @@ require_once __DIR__.'/../siteprep/tableprep.php';
 require_once __DIR__.'/../tools/database.php';
 
 
-/***********************
- * Summary of TableData
- * Funktionen für Datenbank-Abfragen
- *
- * __public__
- * getMaxID($filter)
- * getData()
- * getThumbPath($gid)
- * getThumbBlob($gid)
- * kategorieBezeichnungen()
+/**
+ * Datenbank-Abfragen
  */
 class TableData
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
-
-
-    /***********************
+    /**
      * Summary of getMaxID
      * Anzahl der Einträge der Datenbank ermitteln,
      * 'maxID' wird für die Seiten-Navigation benötigt.
@@ -79,7 +66,7 @@ class TableData
     }
 
 
-    /***********************
+    /**
      * Summary of getData
      * Zentral-Werte aus Datenbank auslesen
      *
@@ -182,7 +169,7 @@ class TableData
     }
 
 
-    /***********************
+    /**
      * Summary of getThumbPath
      * alle Verzeichnispfade der Thumb-Bilder einer Gruppe holen
      * und zum Fullfilename zusammensetzen
@@ -192,6 +179,8 @@ class TableData
      */
     public static function getThumbPath(int $gid): array
     {
+        $thb_ffn = [];
+        
         $sort = "sta.kat10, sta.datum, sta.kat11, sta.kat12, sta.kat13, sta.kat14, sta.kat15,
                 sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23,
                 sta.id, dat.id";
@@ -228,7 +217,7 @@ class TableData
     }
 
 
-    /***********************
+    /**
      * Summary of getThumbBlob
      * alle Thumb-BLOB-Bilder einer Gruppe holen,
      * Thumbs der Einzeldateien der Gruppe abrufen,
@@ -262,7 +251,7 @@ class TableData
     }
 
 
-    /***********************
+    /**
      * Summary of kategorieBezeichnungen
      *
      * @return array
@@ -273,5 +262,7 @@ class TableData
         $result = Database::sendSQL($stmt, [], 'fetchall', 'num');
         return $result;
     }
-
 }
+
+
+// EOF

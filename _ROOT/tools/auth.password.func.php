@@ -312,3 +312,5 @@ namespace PasswordCompat\binary {
     }
 }
 
+
+// EOF

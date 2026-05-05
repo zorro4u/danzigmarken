@@ -34,14 +34,14 @@ class Download
 
 
     // ______________
-    public static function dbSpalten() :array
+    public static function dbSpalten(): array
     {
         if (empty(self::$db_spalten)) {
             self::setDBspalten();
         }
         return self::$db_spalten;
     }
-    protected static function setDBspalten() :void
+    protected static function setDBspalten(): void
     {
         // Sp0/Sp1 (thema, datum) aufheben
         $tmp1 = array_slice(self::DB_SPALTEN, 0, 2);
@@ -62,14 +62,14 @@ class Download
 
 
     // Spaltennamen, kommt aus excel_read
-    public static function colName() :array
+    public static function colName(): array
     {
         if (empty(self::$col_name)) {
             self::setColName(self::dbSpalten());
         }
         return self::$col_name;
     }
-    protected static function setColName(array $value) :void
+    protected static function setColName(array $value): void
     {
         self::$col_name = $value;
     }
@@ -192,7 +192,7 @@ class Download
     /**
      * FastExcelWriter, Datei wird immer neu angelegt
      */
-    public static function writeExcel(array $datalist, string $fullfilename) :bool
+    public static function writeExcel(array $datalist, string $fullfilename): bool
     {
         $status = false;
 

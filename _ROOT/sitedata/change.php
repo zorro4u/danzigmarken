@@ -9,7 +9,9 @@ require_once __DIR__.'/../tools/database.php';
 
 class Change
 {
-    // DropDown-Bezeichnungen holen für Thema, Frankatur, Ansicht, Attest
+    /**
+     * DropDown-Bezeichnungen holen für Thema, Frankatur, Ansicht, Attest
+     */
     public static function getDropEntry(): array
     {
         $stmt = "WITH
@@ -122,3 +124,5 @@ class Change
 
 }
 
+
+// EOF

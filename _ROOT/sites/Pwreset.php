@@ -11,15 +11,12 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 
 // TODO: alle Autologins beenden
 
-/***********************
- * Summary of Pw_reset
+/**
+ * Summary of Class PWreset
  */
 class PWreset extends Pre
 {
-    /****************************
-     * Summary of show
-     */
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
 

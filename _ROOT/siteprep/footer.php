@@ -6,7 +6,7 @@ require_once __DIR__.'/../tools/database.php';
 #require_once __DIR__.'/..tools/logger.php';
 
 
-/***********************
+/**
  * Summary of Footer
  */
 class Footer
@@ -42,7 +42,7 @@ class Footer
     }
 
 
-    /***********************
+    /**
      * Klassenvariablen / Eigenschaften
      */
     private const PROJECT_DIRS = ['',

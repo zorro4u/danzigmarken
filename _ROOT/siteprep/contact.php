@@ -21,7 +21,6 @@ class Contact
 {
     protected static $question;
 
-
     protected static function siteClose()
     {
         if (!empty($_POST)) {

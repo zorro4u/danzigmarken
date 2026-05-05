@@ -4,7 +4,7 @@ namespace Dzg\Tools;
 require_once __DIR__.'/database.php';
 
 
-/****************************
+/**
  * Class CheckIP
  *
  * sucht BesucherIP in Blackliste
@@ -111,7 +111,7 @@ class CheckIP
         $this->set_status("error");
     }
 
-    private function setter(string $ip, ?string $message)
+    private function setter(string $ip, ?string $message): void
     {
         $this->set_ip($ip);
         $this->set_message($message);
@@ -141,7 +141,8 @@ class CheckIP
      *
      * wird in header.php aufgerufen
      */
-    public static function antiflood(int $loads=5, int $time_gap=3, ?string $ip=null) :bool
+    public static function
+    antiflood(int $loads = 5, int $time_gap = 3, ?string $ip = null): bool
     {
         // IP mit Blockliste abgleichen,
         // wenn mehrfach dann (Bereich) blocken
@@ -194,7 +195,9 @@ class CheckIP
         };
 
         // wenn mal Zugriff auf Detailseite, dann ausnutzen und das errorlog auslesen
-        if(3 == $_SESSION['siteid'] ?? 0){self::write_errorlog_into_DB();}
+        if (3 == $_SESSION['siteid'] ?? 0) {
+            self::write_errorlog_into_DB();
+        };
 
         return $ip_address->denied();
     }
@@ -203,11 +206,11 @@ class CheckIP
     /**
      * IP in Blackliste speichern
      */
-    public function under_suspicion(?string $ipinput=null, bool $block=false) :void
+    public function under_suspicion(?string $ipinput = null, bool $block = false): void
     {
         $ip = !$ipinput
-        ? $this->ip
-        : self::valid_IP($ipinput);
+            ? $this->ip
+            : self::valid_IP($ipinput);
 
         if ($ip) {
             self::write_into_blacklist($ip, $block);
@@ -227,7 +230,7 @@ class CheckIP
     /**
      * Besucher IP ermitteln
      */
-    public function get_IP(?string $ip=null) :string
+    public function get_IP(?string $ip = null): string
     {
         $userip = self::getIP($ip);
 
@@ -240,11 +243,11 @@ class CheckIP
             return $userip;
     }
 
-    public static function getIP(?string $ip=null) :string
+    public static function getIP(?string $ip = null): string
     {
         $userip = !$ip
-        ? self::get_user_IP()
-        : self::valid_IP($ip);
+            ? self::get_user_IP()
+            : self::valid_IP($ip);
         return $userip;
     }
 
@@ -256,15 +259,16 @@ class CheckIP
      * -- Instanzen-Start --
      * überprüft, ob Besucher IP gesperrt ist
      */
-    private function check_IP(?string $ip=null) :void
+    private function check_IP(?string $ip = null): void
     {
         $userip = $this->get_IP($ip);
 
         if (filter_var($userip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             self::$ip6 = false;
             $this->check_IP4($userip);
+        }
 
-        } elseif (filter_var($userip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        elseif (filter_var($userip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             self::$ip6 = true;
             $this->check_IP6($userip);
         }
@@ -278,7 +282,7 @@ class CheckIP
     /*---------------------------*/
     // Private Helper Function
 
-    private static function get_user_IP() :mixed
+    private static function get_user_IP(): mixed
     {
         //check ip from share internet
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -303,14 +307,14 @@ class CheckIP
     /**
      * IP validieren
      */
-    private static function valid_IP(string $ip_input) :mixed
+    private static function valid_IP(string $ip_input): mixed
     {
         $ip = null;
         if (filter_var($ip_input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             self::$ip6 = false;
             $ip = $ip_input;
-
-        } elseif (filter_var($ip_input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        }
+        elseif (filter_var($ip_input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             self::$ip6 = true;
             $ip = $ip_input;
         };
@@ -318,7 +322,7 @@ class CheckIP
     }
 
 
-    private function check_IP4(string $userip) :void
+    private function check_IP4(string $userip): void
     {
         // Netzbereiche bestimmen
         $ip_arr = self::netmask4($userip);
@@ -357,13 +361,13 @@ class CheckIP
 
                 // Schleife/Bereichserweiterung beenden
                 if ($message) break;
-            }
+            };
         };
         $this->setter($userip, $message);
     }
 
 
-    private static function netmask4(string $userip) :array
+    private static function netmask4(string $userip): array
     {
         // netmask/CIDR: /32, /24, /16, /8
         // 0: (/32) a.b.c.d - IP
@@ -381,7 +385,7 @@ class CheckIP
     }
 
 
-    private function check_IP6(string $userip) :void
+    private function check_IP6(string $userip): void
     {
         // Netzbereiche bestimmen
         $ip_arr = self::netmask6($userip);
@@ -471,35 +475,38 @@ class CheckIP
     }
 
 
-    private static function ip6_long(string $ip) :string
+    private static function ip6_long(string $ip): string
     {
         // Convert address to packed format
         $addr = inet_pton($ip);
 
         // Convert address to long hexadecimal format
         $long = '';
-        foreach (str_split($addr) as $char)
+        foreach (str_split($addr) as $char) {
             $long .= str_pad(dechex(ord($char)), 2, '0', STR_PAD_LEFT);
+        };
 
         // seperated with ':'
         return implode(':', str_split($long, 4));
     }
 
 
-    private static function ip6_status($ip)
+    private static function ip6_status(string $ip): bool
     {
-        if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             return true;
-        }
+        };
         return false;
     }
-    private static function convert_mask2code($ip, $mask)
+
+    private static function convert_mask2code(string $ip, string $mask): bool
     {
         return (self::ip6_status($ip))
             ? self::$net6_arr[$mask]
             : self::$net4_arr[$mask];
     }
-    private static function convert_code2mask($ip, $code)
+
+    private static function convert_code2mask(string $ip, string $code): bool
     {
         $net4_rev = array_flip(self::$net4_arr);
         $net6_rev = array_flip(self::$net6_arr);
@@ -514,20 +521,24 @@ class CheckIP
      * @param string $ip
      * @return array['result','count','denied','mask']
      */
-    private static function DB_get_data(string $ip) :array
+    private static function DB_get_data(string $ip): array
     {
-        if (substr($ip, -2, 2) === "::")
+        if (substr($ip, -2, 2) === "::") {
             $ip = substr($ip, 0, -1);
+        };
 
         # wenn IP mit Pkt endet, dann Bereichsuche mit %, sonst suche Einzel-IP
-        if (substr($ip, -1, 1) === "." ||
-            substr($ip, -1, 1) === ":") {
+        if (substr($ip, -1, 1) === "."
+            || substr($ip, -1, 1) === ":")
+        {
             $x = '%';
             $g = '';
-        } else {
+        }
+        else {
             $x = '';
             $g = '-- ';
         };
+
         $like  = "'{$ip}{$x}'";
         $group = "\n{$g}GROUP BY ip\n";   # ggf als Kommentare, dann aber nur auf seperater Zeile
 
@@ -580,7 +591,7 @@ class CheckIP
     }
 
 
-    private static function DB_block_ip(array $ip_arr, int $net) :void
+    private static function DB_block_ip(array $ip_arr, int $net): void
     {
         $ip = $ip_arr['cut'];
         # wenn IP mit Pkt endet, dann Bereichsuche mit %, sonst suche Einzel-IP
@@ -593,12 +604,12 @@ class CheckIP
     }
 
 
-    private static function write_into_blacklist($input, bool $block=false) :void
+    private static function write_into_blacklist(mixed $input, bool $block=false): void
     {
         $data = (!is_array($input))
-        ? [ ':ip'    => $input,
-            ':block' => (int)$block,]
-        : $input;
+            ? [ ':ip'    => $input,
+                ':block' => (int)$block,]
+            : $input;
 
         $stmt1 =
             "INSERT INTO site_blacklist (ip, `block`)
@@ -623,7 +634,7 @@ class CheckIP
 
 
 
-    private static function info($ip_arr, $userip)
+    private static function info(array $ip_arr, $userip): void
     {
         $ip_cut = $ip_arr['cut'];
         #$ip_lo  = $ip_arr['lo'];
@@ -632,7 +643,9 @@ class CheckIP
         $count  = $ip_arr['count'];
         $denied = $ip_arr['denied'];
         $result = $ip_arr['result'];
-        $block  = (!empty($ip_arr['result'])) ? $ip_arr['result'][0]['block'] : 0;
+        $block  = (!empty($ip_arr['result']))
+            ? $ip_arr['result'][0]['block']
+            : 0;
 
         echo $userip.' | '.$ip_cut.' | '.$count.' | '.$denied.' | '.$block.'<br>';
         #var_dump($stmt); echo'<br>';
@@ -656,7 +669,7 @@ class CheckIP
      * wenn sie sich nicht korrekt über Reverse DNS verifizieren lassen.
      * https://webwerkstatt-berlin.de/ki-crawler-blockieren-inhalte-schuetzen/
      */
-    public static function block_ai_bots_by_rdns()
+    public static function block_ai_bots_by_rdns(): void
     {
         if (empty($_SERVER['REMOTE_ADDR']) || empty($_SERVER['HTTP_USER_AGENT'])) {
             return; // Kein valider Request
@@ -693,40 +706,39 @@ class CheckIP
                 $forward_ip = $hostname ? @gethostbyname($hostname) : '';
 
                 // Prüfen: Domain-Endung und Forward-IP muss identisch sein
-                if (
-                    !$hostname ||
-                    !$forward_ip ||
-                    $forward_ip !== $ip ||
-                    !preg_match($bot['domain'], $hostname)
-                ) {
+                if (!$hostname
+                    || !$forward_ip
+                    || $forward_ip !== $ip
+                    || !preg_match($bot['domain'], $hostname))
+                {
                     // Spoofing-Verdacht -> Blockieren
                     header('HTTP/1.1 403 Forbidden');
                     header('Content-Type: text/plain');
                     echo "Access denied.";
                     exit;
-                }
-            }
-        }
+                };
+            };
+        };
     }
 
 
     /* ============= */
 
-    public static function write_errorlog_into_DB()
+    public static function write_errorlog_into_DB(): int
     {
         $myIPs = self::my_reg_ips();
 
         $file = $_SERVER['DOCUMENT_ROOT']."/../logs/error_log";
         #$file = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/error_log.1";
         #$file = $_SERVER['DOCUMENT_ROOT']."/../data/dzg/error_log.2";
-        if (!is_file($file)){
-            return;
+        if (!is_file($file)) {
+            return 0;
         };
         $file_arr = file($file);
 
         $data = [];
         $ips  = [];
-        foreach($file_arr as $line_num => $line){
+        foreach ($file_arr as $line_num => $line) {
 
             $line = str_replace('[', '', $line);
             $row  = explode('] ', $line);
@@ -750,7 +762,7 @@ class CheckIP
             #var_dump(inet_ntop(inet_pton($ip)));echo'<br>';
             #var_dump(inet_ntop(inet_pton($ip6)));echo'<br><br>';
 
-            if(!in_array($ip, $myIPs)){
+            if (!in_array($ip, $myIPs)) {
                 $ips []= $ip;
                 /*
                 $data[$line_num] = [
@@ -772,14 +784,14 @@ class CheckIP
 
         $block = [];
         $ip4 = $ip6 = '';
-        foreach($ip_count as $ip => $ct){
+        foreach ($ip_count as $ip => $ct) {
             #echo "{$ip} : {$ct}<br>";
 
             # nur ab 80 Vorkommen für DB-Speicherung berücksichtigen
-            if($ct>=50 && $ct<700){
+            if ($ct>=50 && $ct<700) {
                 (strpos($ip, ':') === false)
-                ? $ip4 = $ip     # '::ffff:'.$ip
-                : $ip6 = $ip;
+                    ? $ip4 = $ip     # '::ffff:'.$ip
+                    : $ip6 = $ip;
                 #$block []= [$ip4, $ip6];
                 $block []= [$ip];
                 #echo "{$ip} : {$v}<br>";
@@ -788,7 +800,7 @@ class CheckIP
 
         // in DB schreiben
         $insert = $update = [];
-        if($block){
+        if ($block) {
 
             // IP vorhanden?
             $stmt = "WITH
@@ -808,50 +820,51 @@ class CheckIP
             $qry = Database::sendSQL($stmt, $block, true, 'assoc', true);
 
             // Insert oder Update?
-            foreach($qry as $ip){
+            foreach ($qry as $ip) {
                 !$ip['found']
                 ? $insert []= [$ip['address']]
                 : ($ip['upd']>0 ? $update []= [$ip['address']] : 0);
-            }
+            };
 
             // IP blocken
-            if($insert){
+            if ($insert) {
                 $stmt = "INSERT INTO site_blacklist
                     (ip, net, `block`, notiz)
                     VALUES (?, 1, 1, 'from error_log')";
                 #    ON DUPLICATE KEY UPDATE id=id ";
                 $data = $insert;
             }
-            elseif($update){
+            elseif ($update) {
                 $stmt = "UPDATE site_blacklist
                     SET net=1, `block`=1, notiz='from error_log'
                     WHERE ip=? ";
                 $data = $update;
-            }
+            };
             Database::sendSQL($stmt, $data, false, 'num', true);
             #$stmt = "ALTER TABLE `site_blacklist` AUTO_INCREMENT=0";
             #Database::sendSQL($stmt, []);
 
             #echo "= errorlog: +".count($insert)."/".count($ip_count)." =<br><br>";
-        }
+        };
+
         return count($insert);
     }
 
 
-    public static function my_reg_ips()
+    public static function my_reg_ips(): array
     {
         $stmt = "SELECT ip FROM site_login WHERE userid=2 GROUP BY ip";
         $result = Database::sendSQL($stmt, [], 'fetchall', 'num');
 
         $myIPs = [];
-        foreach($result as $i){
+        foreach ($result as $i) {
             $myIPs []= $i[0];
-        }
+        };
         return $myIPs;
     }
 
 
-    public static function write_htaccess_into_DB()
+    public static function write_htaccess_into_DB(): array
     {
         $file = $_SERVER['DOCUMENT_ROOT']."/.htaccess";
         $file_arr = file($file);
@@ -860,12 +873,12 @@ class CheckIP
         $net6_arr = self::$net6_arr;
 
         $block  = [];
-        foreach($file_arr as $line){
+        foreach ($file_arr as $line) {
 
             // IP Zeile finden
             $cut = 'Require not ip ';
             $lcut = strlen($cut);
-            if(strpos($line, $cut) !== false){
+            if (strpos($line, $cut) !== false) {
 
                 // Zeile ohne führenden Text
                 $row = trim(substr($line, $lcut));
@@ -878,13 +891,13 @@ class CheckIP
 
                 // netmask Zahl
                 $netm = $netpos
-                ? (int)substr($row, strrpos($row, '/') + 1)
-                : ($ip6 ? 128 : 32);
+                    ? (int)substr($row, strrpos($row, '/') + 1)
+                    : ($ip6 ? 128 : 32);
 
                 // interner Code dafür
                 $netcode = $ip6
-                ? $net6_arr[$netm]
-                : $net4_arr[$netm];
+                    ? $net6_arr[$netm]
+                    : $net4_arr[$netm];
 
                 // IP Adresse ohne netmask-string
                 $ip  = substr($row, 0, $netpos);
@@ -903,7 +916,7 @@ class CheckIP
     }
 
 
-    public static function write_DB_into_htaccess()
+    public static function write_DB_into_htaccess(): void
     {
         #$file = $_SERVER['DOCUMENT_ROOT']."/tools/.htaccess.txt";
         $file = $_SERVER['DOCUMENT_ROOT']."/.htaccess";
@@ -917,18 +930,18 @@ class CheckIP
 
         // IPs aus File lesen
         $file_str = [];
-        foreach($file_input as $line_num => $line){
+        foreach ($file_input as $line_num => $line) {
 
             // IP Zeile finden
             $cut = 'Require not ip ';
             $lcut = strlen($cut);
-            if(strpos($line, $cut) !== false){
+            if (strpos($line, $cut) !== false) {
 
                 // Zeile ohne führenden Text
                 $file_str []= trim(substr($line, $lcut));
             }
 
-            elseif(strpos($line, '</RequireAll>') !== false){
+            elseif (strpos($line, '</RequireAll>') !== false) {
                 $ip_section_end = $line_num-1;
             };
         };
@@ -945,17 +958,17 @@ class CheckIP
         $db_str  = [];
         $ip4_arr = [];
         $ip6_arr = [];
-        foreach($db_input as $db){
+        foreach ($db_input as $db) {
             $ip6 = (strpos($db['ip'], ':') !== false) ? true : false;
 
             $netm = $db['net'] !== 0
-            ? ($ip6 ? $net6_rev[$db['net']] : $net4_rev[$db['net']])
-            : false;
+                ? ($ip6 ? $net6_rev[$db['net']] : $net4_rev[$db['net']])
+                : false;
             $netm_str = $netm ? '/'.$netm : '';
 
             ($ip6)
-            ? $ip6_arr += [$db['ip'] => $netm_str]
-            : $ip4_arr += [ip2long($db['ip']) =>  $netm_str];
+                ? $ip6_arr += [$db['ip'] => $netm_str]
+                : $ip4_arr += [ip2long($db['ip']) =>  $netm_str];
         };
 
         // Array sortieren
@@ -963,44 +976,45 @@ class CheckIP
         ksort($ip6_arr);
 
         // Ausgabe-Array inkl Netmaske als String bilden
-        foreach($ip4_arr as $k=>$netm_str){
+        foreach ($ip4_arr as $k=>$netm_str) {
             $ip = long2ip($k);
             $db_str []= $ip.$netm_str;
-        }
-        foreach($ip6_arr as $k=>$netm_str){
+        };
+
+        foreach ($ip6_arr as $k=>$netm_str) {
             $ip = $k;
             $db_str []= $ip.$netm_str;
-        }
+        };
 
 
         // Abgleich: DB-IP nicht in File enthalten
         $write = [];
-        foreach($db_str as $ip){
-            if(in_array($ip, $file_str) === false){
+        foreach ($db_str as $ip) {
+            if (in_array($ip, $file_str) === false) {
                 $write []= $ip;
                 #echo $ip.'<br>';
-            }
-        }
+            };
+        };
 
 
         // File neu schreiben
-        if($write){
+        if ($write) {
 
             // Datei-Inhalt erstellen (alt+neu)
             $new_file_arr = [];
-            foreach($file_input as $line_num => $line){
+            foreach ($file_input as $line_num => $line) {
 
-                if($line_num != $ip_section_end){
+                if ($line_num != $ip_section_end) {
                     $new_file_arr []= $line;
                 }
 
                 // vor Ende IP-Section neue IPs einfügen
-                else{
+                else {
                     #$date = date("d.m.Y H:i:s");
                     #$new_file_arr []= "# added at {$date}\n";
-                    foreach($write as $ip_str){
+                    foreach ($write as $ip_str) {
                         $new_file_arr []= 'Require not ip '.$ip_str."\n";
-                    }
+                    };
                     $new_file_arr []= $line;
                 };
             };
@@ -1017,11 +1031,10 @@ class CheckIP
 
             echo "= htaccess: +".count($new_file_arr)-count($file_input)." =<br><br>";
         };
-
     }
 
 
-    public static function clear_htaccess_ip()
+    public static function clear_htaccess_ip(): void
     {
         #$file = $_SERVER['DOCUMENT_ROOT']."/tools/.htaccess.txt";
         $file = $_SERVER['DOCUMENT_ROOT']."/.htaccess";
@@ -1029,8 +1042,8 @@ class CheckIP
 
         $skip = 'Require not ip ';
         $new_file_arr = [];
-        foreach($file_input as $line){
-            if(strpos($line, $skip) === false){
+        foreach ($file_input as $line) {
+            if (strpos($line, $skip) === false) {
                 $new_file_arr []= $line;
             };
         };
@@ -1048,7 +1061,8 @@ class CheckIP
 
 #################################################################
 
-function ip_test() {
+function ip_test(): void
+{
     // Our Example IP's
     $ip4= "10.22.99.129";
     $ip6= "fe80:1:2:3:a:bad:1dea:dad";
@@ -1112,7 +1126,8 @@ function decbin32 ($dec) {
 // The function will return true if the supplied IP is within the range.
 // Note little validation is done on the range inputs - it expects you to
 // use one of the above 3 formats.
-function ip_in_range($ip, $range) {
+function ip_in_range($ip, $range): bool
+{
     if (strpos($range, '/') !== false) {
         // $range is in IP/NETMASK format
         list($range, $netmask) = explode('/', $range, 2);
@@ -1142,7 +1157,7 @@ function ip_in_range($ip, $range) {
             $netmask_dec = ~ $wildcard_dec;
 
             return (($ip_dec & $netmask_dec) == ($range_dec & $netmask_dec));
-        }
+        };
     }
 
     else {
@@ -1152,7 +1167,7 @@ function ip_in_range($ip, $range) {
             $lower = str_replace('*', '0', $range);
             $upper = str_replace('*', '255', $range);
             $range = "$lower-$upper";
-        }
+        };
 
         if (strpos($range, '-')!==false) { // A-B format
             list($lower, $upper) = explode('-', $range, 2);
@@ -1160,12 +1175,13 @@ function ip_in_range($ip, $range) {
             $upper_dec = (float)sprintf("%u",ip2long($upper));
             $ip_dec = (float)sprintf("%u",ip2long($ip));
             return ( ($ip_dec>=$lower_dec) && ($ip_dec<=$upper_dec) );
-        }
+        };
 
         echo 'Range argument is not in 1.2.3.4/24 or 1.2.3.4/255.255.255.0 format';
         return false;
-    }
+    };
 }
+
 
 /**
  * Check if a given ip is in a network
@@ -1173,10 +1189,12 @@ function ip_in_range($ip, $range) {
  * @param  string $range IP/CIDR netmask eg. 127.0.0.0/24, also 127.0.0.1 is accepted and /32 assumed
  * @return boolean true if the ip is in this range / false if not.
  */
-function ip_in_range_1( $ip, $range ) {
+function ip_in_range_1($ip, $range): bool
+{
     if ( strpos( $range, '/' ) === false ) {
         $range .= '/32';
-    }
+    };
+
     // $range is in IP/CIDR format eg 127.0.0.1/24
     list( $range, $netmask ) = explode( '/', $range, 2 );
     $range_decimal = ip2long( $range );
@@ -1202,7 +1220,7 @@ $block->contains('10.0.0.42'); // true
 /**
  * Zeit abfangen
  */
-function antiflood0()
+function antiflood0(): void
 {
     $wait = 2;    # sec
     $now  = time();
@@ -1214,14 +1232,14 @@ function antiflood0()
             // if it makes requests faster than delay
             header("location: /flood.html");
             exit;
-        }
-    }
+        };
+    };
     $_SESSION['request_delay'] = $now + $wait;
 }
 
 
 
-function ip_long()
+function ip_long(): void
 {
     // Sample IP addresses
     #$ipaddr = '1.2.3.4/24'; // IPv4 with /24 netmask
@@ -1240,9 +1258,10 @@ function ip_long()
 
     // Let's display it as hexadecimal format
     #$long = '';
-    foreach (str_split($addr) as $char)
+    foreach (str_split($addr) as $char) {
         #echo str_pad(dechex(ord($char)), 2, '0', STR_PAD_LEFT);
         $long .= str_pad(dechex(ord($char)), 2, '0', STR_PAD_LEFT);
+    };
     $ip6_long = implode(':', str_split($long, 4));
 
     echo $long."<br />\n";
@@ -1262,7 +1281,7 @@ function ip_long()
             $ip_arr[$net]['cut'] = substr($ip_arr[$net]['cut'], 0, -1);
             #var_dump($ip_arr[$net]['cut']);echo'<br>';
         };
-    }
+    };
     var_dump($ip_arr);echo'<br>';
     #echo inet_ntop($addr)."<br />\n";
 
@@ -1287,12 +1306,12 @@ function ip_long()
 
         // Packed representation of netmask
         $mask = pack('H*', $mask);
-    }
+    };
 
     // Display the netmask as hexadecimal
-    foreach (str_split($mask) as $char)
+    foreach (str_split($mask) as $char) {
         echo str_pad(dechex(ord($char)), 2, '0', STR_PAD_LEFT);
-
+    };
 
 }
 

@@ -7,19 +7,12 @@ require_once __DIR__.'/../siteform/change.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-/***********************
- * Summary of Change
- * Webseite:
- *
- * __public__
- * show()
+/**
+ * Summary of Class Change
  */
 class Change extends Pre
 {
-    /***********************
-     * Anzeige der Webseite
-     */
-    public static function show()
+    public static function show(): void
     {
         self::siteEntryCheck();
         self::dataPreparation();

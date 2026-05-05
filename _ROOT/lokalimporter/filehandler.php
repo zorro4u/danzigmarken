@@ -50,7 +50,7 @@ class FileHandler
      * search_path: Pfad zu 'original' Bilder
      */
     public static function
-    start_correct_filenames(string|null $search_path=null, bool $update=false) :array
+    start_correct_filenames(string|null $search_path=null, bool $update=false): array
     {
         # ---------
         # Ausgabe Infotext
@@ -110,7 +110,7 @@ class FileHandler
     /**
      * Verzeichnisinhalt verarbeiten
      */
-    private static function dir_reading(string $directory) :array
+    private static function dir_reading(string $directory): array
     {
         $sep = self::SEP;
         $cwd = self::$search_path .$sep. $directory;
@@ -134,7 +134,7 @@ class FileHandler
     /**
      * Datei-Verarbeitung
      */
-    private static function file_processing(array $files) :array
+    private static function file_processing(array $files): array
     {
         $pic_list = [];
         $dat_ct = [];
@@ -158,7 +158,7 @@ class FileHandler
     /**
      *  generiert aus datarow[23:28] den fullfilename
      */
-    public static function make_ffn(array $data) :string
+    public static function make_ffn(array $data): string
     {
         $sep = self::SEP;
         return $data[0] .$sep. $data[1] .$sep. $data[2] .$sep. $data[3].$data[4];
@@ -171,7 +171,7 @@ class FileHandler
     /**
      * durch Tippfehler falsch gespeicherte Dateinamen korrigieren
      */
-    public static function correct_filenames(string $full_filename) :array
+    public static function correct_filenames(string $full_filename): array
     {
         $name = pathinfo($full_filename, PATHINFO_FILENAME);
         $suff = '.' . pathinfo($full_filename, PATHINFO_EXTENSION);  # mit führendem '.'
@@ -303,7 +303,7 @@ class FileHandler
     /**
      * ersetze: 'Kopie (1)' -> '(1)'
      */
-    private static function mod_marker_copy(string $name) :string
+    private static function mod_marker_copy(string $name): string
     {
         # 'Kopie (1)', ... -> '(1)', ...
         foreach (array_slice(Init::$search_cat22, 2) as $i) {
@@ -331,7 +331,7 @@ class FileHandler
      * - wenn RS/VS mit Leerzeichen beginnt, dann ersetzen
      * - wenn RS/VS nicht mit Tiefstrich beginnt, Tiefstrich einfügen
      */
-    private static function mod_marker_vs(string $name, array $data) :string
+    private static function mod_marker_vs(string $name, array $data): string
     {
         $chr1   = $data['chr1'];
         $chr2   = $data['chr2'];
@@ -374,7 +374,7 @@ class FileHandler
     /**
      * Endung 'Attest' bearbeiten
      */
-    private static function mod_marker_attest(string $name, array $data) :string
+    private static function mod_marker_attest(string $name, array $data): string
     {
         $chr1   = $data['chr1'];
         $oldpos = $data['oldpos'];
@@ -393,7 +393,7 @@ class FileHandler
      * - wenn K-BEF mit Leerzeichen beginnt, dann ersetzen
      * - wenn K-BEF nicht mit Tiefstrich beginnt, Tiefstrich einfügen
      */
-    private static function mod_marker_short(string $name, array $data) :string
+    private static function mod_marker_short(string $name, array $data): string
     {
         $chr1 = $data['chr1'];         # 'K-BEF'
         $chr2 = $data['chr2'];         # '_'               (-> Tiefstrich = Kat.-Trenner)
@@ -426,7 +426,7 @@ class FileHandler
     /**
      * Datei umbenennen
      */
-    private static function rename_file(string $ffn_old, string $ffn_new) :string
+    private static function rename_file(string $ffn_old, string $ffn_new): string
     {
         $sep   = self::SEP;
         $fn0   = pathinfo($ffn_old, PATHINFO_FILENAME);
@@ -490,7 +490,7 @@ class FileHandler
      * - wenn Marker mit Leerzeichen beginnt, dann ersetzen
      * - wenn Marker nicht mit Tiefstrich beginnt, Tiefstrich einfügen
      */
-    private static function rephelper(string $name, array $data) :string
+    private static function rephelper(string $name, array $data): string
     {
         $old_chr = $data['old_chr'];
         $new_chr = $data['new_chr'];
@@ -522,7 +522,7 @@ class FileHandler
      * ...\\pic + original + Lochung
      * DATA_PATH + [WEB_SUBDIR] + [picture_dir_list]
      */
-    public static function rename_webpic() :void
+    public static function rename_webpic(): void
     {
         $sep = self::SEP;
         $datapath = Init::DATA_PATH;
@@ -555,7 +555,7 @@ class FileHandler
      * @param int $head_count
      * @return array
      */
-    public static function read_excel(string $openFileName = '', bool $backup=false, int $head_count = 1) :array
+    public static function read_excel(string $openFileName = '', bool $backup=false, int $head_count = 1): array
     {
         // Standard Speicherort festlegen, wenn nicht vorhanden
         //
@@ -653,7 +653,7 @@ class FileHandler
     /**
      * read xlsx-file via panda als dataframe
      */
-    public static function OLD_read_excel(bool $backup=false) :array
+    public static function OLD_read_excel(bool $backup=false): array
     {
         $excelfile = Init::$fullpath_excelfile;
         if ($backup) {
@@ -760,7 +760,7 @@ class FileHandler
     /**
      * Prepare to write into Excel file
      */
-    public static function catlist2excel(array $datalist, array $head = [], string $sheet_name = '', string $outFileName = '') :void
+    public static function catlist2excel(array $datalist, array $head = [], string $sheet_name = '', string $outFileName = ''): void
     {
         $outFileName = $outFileName ?: Init::$fullpath_excelfile;
         $header = Init::$db_columns;  # Spaltenbezeichnung
@@ -795,7 +795,7 @@ class FileHandler
      * @param bool $add_date      : Tagesdatum (true)
      * @return bool
      */
-    public static function write2Excel(array $datalist, array $head = [], string $outFileName = '', string $sheet_name = '', bool $add_date = true) :bool
+    public static function write2Excel(array $datalist, array $head = [], string $outFileName = '', string $sheet_name = '', bool $add_date = true): bool
     {
         // Standard Speicherort erstellen, wenn nicht vorhanden
         // akt.Verz./akt.Dateiname_Datum.xlsx
@@ -809,12 +809,12 @@ class FileHandler
             $excel_file_name = $excel_name . '_' . $today . '.xlsx';
             $excel_file = $cwd . $excel_file_name;
             $sheet_name = $excel_name;
-        }
+        };
 
         // Input verarbeiten
         //
         # keine Datenliste zum Schreiben empfangen, Ende
-        if (empty($datalist)) {return false;}
+        if (empty($datalist)) {return false;};
 
         # Leerzeichen vorn/hinten entfernen
         $outFileName = trim($outFileName);
@@ -844,7 +844,7 @@ class FileHandler
             $fn = $ffn_parts['filename'] . '_' . $today;
             $ext = '.' . $ffn_parts['extension'];
             $outFileName = $dir . $fn . $ext;
-        }
+        };
 
         // Excel-Datei-Erzeugung starten
         //
@@ -914,7 +914,7 @@ class FileHandler
     /**
      * open excel /w xlsx_file
      */
-    public static function open_excel(string $filename='') :void
+    public static function open_excel(string $filename=''): void
     {
         $sep = self::SEP;
         $ffn0  = Init::$fullpath_excelfile;
@@ -924,7 +924,7 @@ class FileHandler
 
         #subprocess->run(Init::EXCEL . " " . $ffn, check=false);
     }
-
 }
+
 
 // EOF

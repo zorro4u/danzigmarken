@@ -99,9 +99,9 @@ function xdump(...$data): string {
                 $output .= "<pre style='box-sizing:border-box;background-color:rgba(255,255,255,0.96);color:rgba(0,0,0,0.9);padding:8px;margin:8px 0;max-height:512px;overflow:auto;border:none;border-radius:4px;'>" . htmlentities(print_r($value, true), ENT_QUOTES, "UTF-8") . "</pre>";
             }
             $output .= "<div class='xdump-trace' style='font-family:Consolas,Monospace,\"Courier New\",Calibri, Verdana, Helvetica, Arial, sans-serif !important;text-align:left;box-sizing:border-box;padding:4px;color:rgba(255,255,255,0.4);font-size:10px;font-weight:normal;font-weight:100;'>" . nl2br($print_trace) . "</div></div>";
-        }
+        };
         $counter++;
-    }
+    };
 
     endif;
     return $output;
@@ -137,11 +137,15 @@ class Tools
         $pth_len = count($act_pth)-1;  // Anzahl der Dir-Ebenen
 
         // root_dir-Elemente in den Dir-Ebenen finden
-        for ($i=$pth_len; $i>0; $i--)
-            if (in_array($act_pth[$i], $root_dir)) break;
+        for ($i=$pth_len; $i>0; $i--) {
+            if (in_array($act_pth[$i], $root_dir))
+                break;
+        };
 
         $dir = implode('/', array_slice($act_pth, 0, $i+1));
-        if ($dir==='/' || $dir==='\\') $dir = '';
+        if ($dir==='/' || $dir==='\\') {
+            $dir = '';
+        };
 
         return $dir;
     }
@@ -205,7 +209,7 @@ class Tools
     /***********************
      * Input-Eingabe bereinigen
      */
-    public static function cleanInput($data): string
+    public static function cleanInput(string $data): string
     {
         $data = trim($data);            // Leerzeichen anfang/ende entfernen
         $data = stripslashes($data);    // Blackslash entfernen
@@ -216,7 +220,7 @@ class Tools
     /***********************
      * (Error-) Array zu String wandeln
      */
-    public static function arr2str($array): string
+    public static function arr2str(array $array): string
     {
         return implode("<br>", $array);
     }
@@ -233,19 +237,23 @@ class Tools
         $ausgabe = '';
 
         // id 'status' blendet sich per JS aus -> toolbox.js
-        if(isset($success_msg) && $success_msg !== "") {
+        if (isset($success_msg) && $success_msg !== "") {
             $ausgabe =
                 "<div id='status' class='alert alert-success'>".
                 "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>".
                 $success_msg."</div>";
-
-        } elseif((isset($error_msg) && $error_msg !== "") || !empty($error_msg)) {
-            $exit_info = $exit ? "<br>-- <b>< <a href='logout'>Logout</a> in 5sec ></b> --" : "";
+        }
+        elseif ((isset($error_msg) && $error_msg !== "")
+            || !empty($error_msg))
+        {
+            $exit_info = $exit
+                ? "<br>-- <b>< <a href='logout'>Logout</a> in 5sec ></b> --"
+                : "";
 
             $ausgabe =
                 "<div id='statusX' class='alert alert-danger' style='display:block;'>".
                 $error_msg.$exit_info."</div>";
-        }
+        };
 
         return $ausgabe;
     }
@@ -254,12 +262,15 @@ class Tools
     /***********************
      * Summary of statusOut
      */
-    public static function statusOut($msg_success, $msg_error, $exit_true=false): string
+    public static function
+    statusOut(string $msg_success, string $msg_error, bool $exit_true = false): string
     {
         global $success_msg, $error_msg, $exit;
         $success_msg = $msg_success;
         $error_msg = $msg_error;
-        if($exit_true) {$exit = $exit_true;}
+        if ($exit_true) {
+            $exit = $exit_true;
+        };
         return self::statusmeldungAusgeben();
     }
 
@@ -267,7 +278,7 @@ class Tools
     /***********************
      * Summary of dyndns_updater
      */
-    public static function dyndnsUpdater()
+    public static function dyndnsUpdater(): void
     {
         // Update der IP4 von danzig.goip.de auf den Rainbow-Server von danzigmarken.de
         # ip4: 45.10.26.7
@@ -297,11 +308,11 @@ class Tools
 
             $data = [':notiz' => $current_ip];
             #Database::sendSQL($stmt, $data);
-        }
+        };
     }
 
 
-    public static function move_k14_k23()
+    public static function move_k14_k23(): void
     {
         $stmt =
             "SELECT id, kat14 FROM dzg_group
@@ -312,11 +323,10 @@ class Tools
         $stmt = "UPDATE dzg_file SET kat23=:kat14 WHERE id_group=:id";
         foreach ($result as $data) {
             Database::sendSQL($stmt, $data);
-        }
+        };
         $stmt = "UPDATE dzg_group SET kat14=Null";
         #Database::sendSQL($stmt, []);
     }
-
 }
 
 

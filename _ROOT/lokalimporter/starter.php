@@ -33,11 +33,12 @@ function main(int $switch = 1)
 
     } elseif ($switch == 4) {
         LokalImporter::step4();
-    }
+    };
 
     $time2 = microtime(true) - $time1;
     echo "Gesamtausführungszeit: " . ToolBox::time2str($time2), PHP_EOL;
     echo PHP_EOL, "-- e n d e --", PHP_EOL;
 }
+
 
 // EOF

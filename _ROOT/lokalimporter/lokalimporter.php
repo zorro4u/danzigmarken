@@ -88,7 +88,7 @@ class LokalImporter
         #Database::make_backup();
         Database::make_backup(dirname(Init::$fullpath_excelfile).Init::SEP.'db_backup.xlsx', false);
     }
-
 }
+
 
 // EOF

@@ -11,16 +11,12 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/***********************
- * Summary of Upload
- * Webseite:
- *
- * __public__
- * show()
+/**
+ * Summary of Class Upload
  */
 class Upload extends Pre
 {
-    public static function show()
+    public static function show(): void
     {
         self::dataPreparation();
 

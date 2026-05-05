@@ -9,6 +9,10 @@ require_once __DIR__.'/../tools/tools.php';
 
 class Login
 {
+    protected const MSG = [
+        0 => "Du bist schon angemeldet. Was machst du dann hier? ...",
+    ];
+
     protected static string $success_msg;
 
     protected static function siteEntryCheck(): void
@@ -18,7 +22,7 @@ class Login
 
         // Nutzer schon angemeldet? Dann weg hier ...
         self::$success_msg = (Auth::isCheckedIn())
-            ? "Du bist schon angemeldet. Was machst du dann hier? ..."
+            ? self::MSG[0]
             : "";
     }
 

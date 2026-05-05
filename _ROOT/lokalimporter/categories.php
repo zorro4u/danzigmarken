@@ -52,7 +52,7 @@ class Categories
     /**
      * verschiebt gefundenes Listenelement an angegeb. Platz
      */
-    private static function placing(array $cat_list, int $place, array $search, string $add_str = '', bool $search_equal = true) :array
+    private static function placing(array $cat_list, int $place, array $search, string $add_str = '', bool $search_equal = true): array
     {
         $found = false;
         $ct_cat = count($cat_list);
@@ -96,7 +96,7 @@ class Categories
     /**
      * tauscht einzelne Listenelemente (nochmal umsortieren)
      */
-    private static function resort(array $cat_list) :array
+    private static function resort(array $cat_list): array
     {
         # [1]->[8]: 'Postamt' beginnt mit '(' , kat10 -> kat17
         $plc1 = 1;
@@ -193,7 +193,7 @@ class Categories
      * Kategorie-Liste (datum, kat10...29)
      *
      */
-    private static function make_catlist(string $fullfilename) :array
+    private static function make_catlist(string $fullfilename): array
     {
         # da Dateibenennung nicht konsequent im 20-Kat-Schema,
         # ist die Zuordnung erst später manuell möglich
@@ -271,7 +271,7 @@ class Categories
     /**
      * erzeugt für eine Bilddatei den vollst. Datensatz
      */
-    private static function make_datarow(string $fullfilename) :array
+    private static function make_datarow(string $fullfilename): array
     {
         # [0]: 'thema' / subdir2
         $sep = self::SEP;
@@ -348,7 +348,7 @@ class Categories
     /**
      * Bilddateien der versch. Verzeichnisse lesen
      */
-    private static function dir_reading(array $dir_list) :array
+    private static function dir_reading(array $dir_list): array
     {
         $sep = self::SEP;
         $pic_dirlist = [];
@@ -379,7 +379,7 @@ class Categories
      * aus Dateinamen Datensatz erstellen,
      * Dateiname überprüfen/ändern
      */
-    private static function file_processing(array $dir_list) :array
+    private static function file_processing(array $dir_list): array
     {
         #lastimport = cls._lastimport
         $form     = self::FORM;
@@ -446,7 +446,7 @@ class Categories
      * update=True  // es werden nur Dateien seit dem letzten Update berücksichtigt
      * update=False // es werden alle Bild-Dateien in den Verzeichnissen berücksichtigt
      */
-    public static function make_list(string|null $search_path=null, bool $update=false) :array
+    public static function make_list(string|null $search_path=null, bool $update=false): array
     {
         # ---------
         # Ausgabe Infotext
@@ -542,7 +542,7 @@ class Categories
 
         return $pic_list;
     }
-
 }
+
 
 // EOF

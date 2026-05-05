@@ -10,7 +10,7 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-/****************************
+/**
  * Summary of Settings
  */
 class Settings extends Prep
@@ -19,7 +19,7 @@ class Settings extends Prep
     protected static $status_message;
 
 
-    /****************************
+    /**
      * Summary of siteEntryCheck
      * CheckIn-Test
      * Plausi-Test: userid, identifier, token_hash
@@ -60,7 +60,7 @@ class Settings extends Prep
     }
 
 
-    /****************************
+    /**
      * Summary of dataPreparation
      * set $usr_data, $userliste
      */
@@ -108,7 +108,7 @@ class Settings extends Prep
     }
 
 
-    /****************************
+    /**
      * Summary of formEvaluation
      * Formular-Eingabe verarbeiten
      */

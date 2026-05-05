@@ -13,10 +13,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
  */
 class Admin extends Pre
 {
-    /**
-     * Summary of show
-     */
-    public static function show()
+    public static function show(): void
     {
         self::siteEntryCheck();
         self::dataPreparation();
@@ -256,7 +253,9 @@ class Admin extends Pre
         $autologin = (!empty($login_data['autologin'])) ? "*" : "";
         $out_group = $log_data['ct_group'] ?? "0";
         $out_singl = $log_data['ct_singl'] ?? "0";
-        $returns   = ($out_singl) ? 100 - round($out_group / $out_singl * 100) : '-';
+        $returns   = ($out_singl)
+            ? 100 - round($out_group / $out_singl * 100)
+            : '-';
         $out_black = $log_data['ct_black'] ?? "0";
         $out_block = $log_data['ct_block'] ?? "0";
         $out_nblck = (!empty(self::$new_blocked))

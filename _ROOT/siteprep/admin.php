@@ -9,15 +9,12 @@ require_once __DIR__.'/../tools/tools.php';
 require_once __DIR__.'/../tools/checkip.php';
 
 
-/****************************
+/**
  * Summary of Admin
  * class A extends B implements C
  */
 class Admin
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
     protected static $error_msg;
     protected static $usr_data;
     protected static $user_list;
@@ -31,7 +28,7 @@ class Admin
     protected static $new_blocked;
 
 
-    /****************************
+    /**
      * Summary of siteEntryCheck
      * CheckIn-Test
      * Plausi-Test: userid, identifier, token_hash
@@ -78,7 +75,7 @@ class Admin
     }
 
 
-    /****************************
+    /**
      * Summary of dataPreparation
      */
     protected static function dataPreparation()

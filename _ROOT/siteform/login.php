@@ -12,15 +12,26 @@ require_once __DIR__.'/../tools/tools.php';
 
 class Login extends Prep
 {
-    protected static $show_form;
-    protected static $cookie;
+    protected const MSG = parent::MSG + [
+        10 => "#Login: Passwort muss zwischen 4 und 50 Zeichen lang sein!",
+        11 => "#Login: Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>",
+        12 => "#Login: unzulässige Zeichen im Anmeldenamen",
+        13 => "Du bist angemeldet",
+        14 => "Passwort ist falsch.",
+        15 => "Das Konto existiert nicht.",
+        16 => "Das Konto ist nicht aktiviert.",
+        17 => "Nutzer ist noch nicht registriert.",
+    ];
+
+    protected static bool $show_form;
+    protected static string $cookie;
     protected static string $status_message;
     protected static string $user_value;
     protected static string $input_email1;
     protected static string $input_usr;
 
 
-    /***********************
+    /**
      * Formular-Eingabe verarbeiten
      * und an DB schicken
      */
@@ -45,18 +56,18 @@ class Login extends Prep
 
                 // Passwortlänge prüfen
                 if(strlen($input_pwNEU1) < 4 || strlen($input_pwNEU1) > 50) {
-                    $error_arr []= "#Login: Passwort muss zwischen 4 und 50 Zeichen lang sein!";
+                    $error_arr []= self::MSG[10];
                 }
                 // Passwort-Zeichen prüfen (nur alphanumerisch + ein paar Sonderzeichen (keine sql kritischen), Länge <100 Zeichen
                 $regex = "/^[\w<>()?!,.:_=$%&#+*~^ @€µÄÜÖäüöß]{1,100}$/";  // attention: add a slash at the begin and the end
                 if (!preg_match($regex, $input_pwNEU1))
-                    $error_arr []= "#Login: Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>";
+                    $error_arr []= self::MSG[11];
 
                 // Email / Name prüfen
                 if (!filter_var($input_email1, FILTER_VALIDATE_EMAIL)) {
                     // keine Email -> Eingabe als Benutzername (nur alphanumerisch, 1-50 Zeichen)
                     (!preg_match("/^\w{1,50}$/", $input_email1))
-                        ? $error_arr []= "#Login: unzulässige Zeichen im Anmeldenamen"
+                        ? $error_arr []= self::MSG[12]
                         : $input_usr = strtolower($input_email1);
                 }
             }
@@ -159,7 +170,7 @@ class Login extends Prep
                                 $data = [':userid' => $userid, ':ip' => $ip];
                                 Data::storeLogin($data);
                             }
-                            $success_msg = "Du bist angemeldet";
+                            $success_msg = self::MSG[13];
 
                             // Session-Login-Werte setzen
                             Auth::setLoginSession($usr_data);
@@ -169,18 +180,18 @@ class Login extends Prep
                             exit;
 
                         } else {
-                            $error_arr []= "Passwort ist falsch.";
+                            $error_arr []= self::MSG[14];
                         }
 
                     } elseif ($usr_data['status'] === "deaktiv") {
-                        $error_arr []= "Das Konto existiert nicht.";
+                        $error_arr []= self::MSG[15];
 
                     } else {
-                        $error_arr []= "Das Konto ist nicht aktiviert.";
+                        $error_arr []= self::MSG[16];
                     }
 
                 } elseif ($input_email1 !== "") {
-                    $error_arr []= "Nutzer ist noch nicht registriert.";
+                    $error_arr []= self::MSG[17];
                 }
             }  # Plausi-Check okay .. einloggen
         }      # Ende Auswertung Login-Formular

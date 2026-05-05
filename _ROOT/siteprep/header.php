@@ -10,12 +10,9 @@ require_once __DIR__.'/../tools/checkip.php';
 require_once __DIR__.'/../tools/logger.php';
 
 
-/***********************
+/**
  * Summary of Header
  * Webseiten-Header, Seiten-Navigation
- *
- * __public__
- * show()
  */
 class Header extends SiteConfig
 {
@@ -31,7 +28,7 @@ class Header extends SiteConfig
     public static function ip_denied() {return self::$ip_denied;}
 
 
-    /***********************
+    /**
      * den obersten Teil der Webseite inclusive Seiten-Navigation ausgeben
      */
     public static function show(?string $site_name=null)
@@ -95,7 +92,7 @@ class Header extends SiteConfig
     }
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     private static function dataPreparation()
@@ -272,7 +269,7 @@ class Header extends SiteConfig
     }
 
 
-    /***********************
+    /**
      * auf der Webseite die oberste, nicht sichtbare
      * Html <head> Section mit den meta-Anweisungen ausgeben
      */
@@ -305,7 +302,7 @@ class Header extends SiteConfig
     }
 
 
-    /***********************
+    /**
      * Webseiten-Navigation ausgeben
      */
     private static function showNavigation()

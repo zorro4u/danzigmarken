@@ -7,7 +7,7 @@ require_once __DIR__.'/../tools/database.php';
 
 class Details
 {
-    /***********************
+    /**
      * ermittelt Vorgänger und Nachfolger der akt. Seite
      *
      * !!! in PDO\SQLite funktioniert nicht die sql-Funktion: ROW_NUMBER() OVER (ORDER BY ...)
@@ -19,6 +19,7 @@ class Details
         // Filter/Sortierung
         //
         $filter = $sort = $sort1 = "";
+        $tmp = [];
 
         $filter = (!empty($_SESSION['filter']))
             ? "{$_SESSION['filter']}"
@@ -179,3 +180,5 @@ class Details
     }
 }
 
+
+// EOF

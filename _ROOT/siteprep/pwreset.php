@@ -15,14 +15,11 @@ require_once __DIR__.'/../tools/tools.php';
 
 // TODO: alle Autologins beenden
 
-/***********************
+/**
  * Summary of Pw_reset
  */
 class PWreset
 {
-    /***********************
-     * Klassenvariablen / Eigenschaften
-     */
     protected static bool $show_form;
     protected static string $status_message;
     protected static string $success_msg;
@@ -31,7 +28,7 @@ class PWreset
     protected static array $usr_data;
 
 
-    /***********************
+    /**
      * Summary of dataPreparation
      */
     protected static function dataPreparation(): void
