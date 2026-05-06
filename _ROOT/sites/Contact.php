@@ -88,13 +88,13 @@ if (navigator.userAgent.search('Safari') >= 0 && navigator.userAgent.search('Chr
 <div class='form-group'>
     <label for='inputName'>Dein Name:</label>
     <input type='text' id='inputName' size='40' maxlength='50' name='name'
-    value='".$input_name."' class='form-control' autocomplete='name' autofocus>
+    value='".$input_name."' class='form-control' autocomplete='name' autofocus />
 </div>
 
 <div class='form-group'>
     <label for='inputEmail'>Deine E-Mail-Adresse: <span style='color:red'>*</span></label>
     <input type='email' id='inputEmail' size='40' maxlength='100' name='email'
-    value='".$input_email."' class='form-control' autocomplete='email' required>
+    value='".$input_email."' class='form-control' autocomplete='email' required />
 </div>
 
 <div class='form-group'>
@@ -433,7 +433,7 @@ if (1 == $cfg['Kopie_senden']) {
         $output .= "checked='checked' ";
     }
     $output .= "
-        onclick='setActive(this);' onfocus='setActive(this);' > <div style='padding-top:4px;
+        onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;
         padding-bottom:2px;'><span style='line-height:27px;'>
         Kopie der Nachricht per E-Mail senden</span></div>
         </label>

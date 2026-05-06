@@ -31,8 +31,8 @@ class Login extends Pre
          */
 
         /*
-        <input id="check" type="checkbox" >
-        <input id="pw" type="password" >
+        <input id="check" type="checkbox" />
+        <input id="pw" type="password" />
         <script>
             var check = document.getElementById("check"),
                 pw = document.getElementById("pw");
@@ -66,7 +66,7 @@ class Login extends Pre
         }
         }
 
-        <input type="checkbox" onclick="machText(this.checked,this.form)">
+        <input type="checkbox" onclick="machText(this.checked,this.form)" />
 
         */
 

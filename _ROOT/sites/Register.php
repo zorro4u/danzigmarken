@@ -68,22 +68,22 @@ class Register extends Pre
 
 <div class='form-group'>
     <label for='inputName'>Benutzername: <span style='color:red'>*</span></label>
-    <input type='text' required id='inputName' name='username' autocomplete='name' value='$pre_user' size='40' maxlength='250' class='form-control' >
+    <input type='text' required id='inputName' name='username' autocomplete='name' value='$pre_user' size='40' maxlength='250' class='form-control' />
 </div>
 
 <div class='form-group'>
     <label for='inputEmail'>E-Mail: <span style='color:red'>*</span></label>
-    <input type='email' required id='inputEmail' name='email' autocomplete='email' value='$pre_mail' size='40' maxlength='250' class='form-control' >
+    <input type='email' required id='inputEmail' name='email' autocomplete='email' value='$pre_mail' size='40' maxlength='250' class='form-control' />
 </div>
 
 <div class='form-group'>
     <label for='inputPasswort'>Passwort: <span style='color:red'>*</span></label>
-    <input type='password' required id='inputPasswort' name='passwort' autocomplete='new-password' autofocus size='40'  maxlength='250' class='form-control' spellcheck='false' onfocusin='(this.type='text')' onfocusout='(this.type='password')'>
+    <input type='password' required id='inputPasswort' name='passwort' autocomplete='new-password' autofocus size='40'  maxlength='250' class='form-control' spellcheck='false' onfocusin='(this.type='text')' onfocusout='(this.type='password')' />
 </div>
 
 <div class='form-group'>
     <label for='inputPasswort2'>Passwort wiederholen: <span style='color:red'>*</span></label>
-    <input type='password' required id='inputPasswort2' name='passwort2' autocomplete='off' size='40' maxlength='250' class='form-control' spellcheck='false' onfocusin='(this.type='text')' onfocusout='(this.type='password')'>
+    <input type='password' required id='inputPasswort2' name='passwort2' autocomplete='off' size='40' maxlength='250' class='form-control' spellcheck='false' onfocusin='(this.type='text')' onfocusout='(this.type='password')' />
 </div>
 
     <br>

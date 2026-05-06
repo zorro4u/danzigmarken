@@ -208,7 +208,7 @@ class Change extends Pre
                 $output .= "<td class='detail-val' style='border: 1px solid black;
                             background-color:hsl(54,73%,97%)'>
                             <input type='text' name='{$spalte_db}' value='{$data}' placeholder=''
-                            style='border: none;background-color:transparent'></td></tr>";
+                            style='border:none; background-color:transparent' /></td></tr>";
             }
         }  # foreach $spaltennamen
 

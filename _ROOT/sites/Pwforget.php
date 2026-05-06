@@ -50,9 +50,9 @@ class PWforget extends Pre
 
 <form action='?send' method='POST'>
 <label for='inputEmail'></label>
-<input type='email' required id='inputEmail' name='email' autocomplete='email' placeholder='E-Mail' value='{$pre_email}' class='form-control'>
+<input type='email' required id='inputEmail' name='email' autocomplete='email' placeholder='E-Mail' value='{$pre_email}' class='form-control' />
 <br><br>
-<input  class='btn btn-lg btn-primary btn-block' type='submit' value='Neues Passwort anfordern' autocomplete='off'>
+<input  class='btn btn-lg btn-primary btn-block' type='submit' value='Neues Passwort anfordern' autocomplete='off' />
 </form>";
 
 // positive Statusausgabe ohne Formular

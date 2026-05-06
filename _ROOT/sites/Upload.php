@@ -47,21 +47,21 @@ class Upload extends Pre
         $ausgabe .= "<div class='main-detail-left'>";
 
         $max_size = 3*1024*1024;   // 3 MB
-        $ausgabe .= '
-        <form action="upload.php" method="post" enctype="multipart/form-data">
+        $ausgabe .= <<<EOT
+        <form action='upload.php' method='post' enctype='multipart/form-data'>
 
         <!-- MAX_FILE_SIZE muss vor dem Datei-Eingabefeld stehen -->
-        <input type="hidden" name="MAX_FILE_SIZE" value="'.$max_size.'" />
+        <input type='hidden' name='MAX_FILE_SIZE' value='{$max_size}' />
 
-        <!-- Der Name des Eingabefelds bestimmt den Namen im $_FILES-Array -->
+        <!-- Der Name des Eingabefelds bestimmt den Namen im FILES-Array -->
         <label>Wählen Sie ein Bild (*.jpg, *.png oder *.webp) zum Hochladen aus.
-        <input name="datei" type="file" accept="image/jpeg,image/png,image/webp"><br>
+        <input name='datei' type='file' accept='image/jpeg,image/png,image/webp' /><br>
         </label>
 
-        <input type="submit" value="Hochladen">
+        <input type='submit' value='Hochladen' />
         <button>Datei hochladen</button>
         </form>
-        ';
+        EOT;
 
         $ausgabe .= "</div>";  # ende linke Seite, < /main-detail-left >
 

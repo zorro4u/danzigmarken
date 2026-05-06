@@ -5,48 +5,20 @@ use Dzg\SitePrep\SiteConfig as Init;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
-error_reporting(E_ERROR | E_PARSE);
+#error_reporting(E_ERROR | E_PARSE);
 
 require_once __DIR__.'/siteprep/siteconfig.php';
 
 
 /**
- * zentraler Startpunkt für Seitenausgabe
+ * zentraler Startpunkt für die Seitenausgabe
  */
 class Starter
 {
     /**
-     * setzt anhand der Startdatei globale Werte,
-     * die aus der SiteConfig kommen.
-     *
-     * ggf. Seiten-Übergabe als Parameter
-     * in Form: 'name.extension'
-     */
-    public static function loadSiteConfig(?string $site=null)
-    {
-        # ??= steht für: if(!isset(x)) x=y else x=x;             - existiert nicht
-        # ?:  steht für: if(isset(x) && empty(x)) z=y else z=x;  - existiert, aber leer
-
-        $site ??= basename($_SERVER['PHP_SELF']);
-        if (!pathinfo($site, PATHINFO_EXTENSION)) {
-            $site .= '.php';
-        };
-        $page = Init::PAGE[$site] ?? Init::PAGE['dummy'];
-
-        // globaler Wert für weiteren Seitenaufbau
-        $_SESSION['siteid'] = $id = $page['site_id'];
-
-        // Tabelle: Einzel- oder Gruppenmodus?
-        $_SESSION['idx2'] = ($id === 2) ? true : false;
-
-        return $page['class_file'];
-    }
-
-
-    /**
      * startet die entspr. Seite
      */
-    public static function show($site=null)
+    public static function show(?string $site = null): void
     {
         // lädt die entspr. Klassendatei, wenn vorhanden
         !($classfile = self::loadSiteConfig($site))
@@ -129,14 +101,42 @@ class Starter
 
 
             case "empty":
-                Sites\Dummy::show("no website found... <br>");
+                Sites\Dummy::show("no page founded...");
                 break;
 
             case "download":
             default:
-                exit("exit: no website found... <br>");
+                exit("exit: no page founded...");
 
         endswitch;
+    }
+
+
+    /**
+     * setzt anhand der Startdatei globale Werte,
+     * die aus der SiteConfig kommen.
+     *
+     * ggf. Seiten-Übergabe als Parameter
+     * in Form: 'name.extension'
+     */
+    private static function loadSiteConfig(?string $site = null): string
+    {
+        # ??= steht für: if(!isset(x)) x=y else x=x;             - existiert nicht
+        # ?:  steht für: if(isset(x) && empty(x)) z=y else z=x;  - existiert, aber leer
+
+        $site ??= basename($_SERVER['PHP_SELF']);
+        if (!pathinfo($site, PATHINFO_EXTENSION)) {
+            $site .= '.php';
+        };
+        $page = Init::PAGE[$site] ?? Init::PAGE['dummy'];
+
+        // globaler Wert für weiteren Seitenaufbau
+        $_SESSION['siteid'] = $id = $page['site_id'];
+
+        // Tabelle: Einzel- oder Gruppenmodus?
+        $_SESSION['idx2'] = ($id === 2) ? true : false;
+
+        return $page['class_file'];
     }
 }
 

@@ -55,12 +55,12 @@ class PWreset extends Pre
 <br><br>
 <form action='?send&amp;pwcode=".htmlentities($input_code)."' method='POST'>
     <label for='passwort'>Neues Passwort:</label><br>
-    <input type='password' required id='passwort' name='passwort' autocomplete='new-password' placeholder='' class='form-control' spellcheck='false' onfocusin='(this.type=\"text\")' onfocusout='(this.type=\"password\")'><br>
+    <input type='password' required id='passwort' name='passwort' autocomplete='new-password' placeholder='' class='form-control' spellcheck='false' onfocusin='(this.type=\"text\")' onfocusout='(this.type=\"password\")' /><br>
 
     <label for='passwort2'>Passwort wiederholen:</label><br>
-    <input type='password' required id='passwort2' name='passwort2' autocomplete='off' placeholder='' class='form-control' spellcheck='false' onfocusin='(this.type=\"text\")' onfocusout='(this.type=\"password\")'><br>
+    <input type='password' required id='passwort2' name='passwort2' autocomplete='off' placeholder='' class='form-control' spellcheck='false' onfocusin='(this.type=\"text\")' onfocusout='(this.type=\"password\")' /><br>
     <br>
-    <input type='submit' value='Passwort speichern' class='btn btn-lg btn-primary btn-block'>
+    <input type='submit' value='Passwort speichern' class='btn btn-lg btn-primary btn-block' />
 </form>";
 
 // positive Statusausgabe ohne Formular

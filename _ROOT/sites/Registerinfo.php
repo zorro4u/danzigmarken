@@ -63,12 +63,12 @@ Informiere mich kurz darüber und du erhälst Zugang via deiner Email-Adresse.</
 
 <div class='form-group'>
     <label for='inputName'>Dein Name:</label>
-    <input type='text' id='inputName' name='name' autocomplete='name' value='$pre_usr' class='form-control' size='40' maxlength='50' autofocus>
+    <input type='text' id='inputName' name='name' autocomplete='name' value='$pre_usr' class='form-control' size='40' maxlength='50' autofocus />
 </div>
 
 <div class='form-group'>
     <label for='inputEmail'>Deine E-Mail: <span style='color:red'>*</span></label>
-    <input type='email' required id='inputEmail' name='email' autocomplete='email' value='$pre_email' class='form-control' size='40' maxlength='100'>
+    <input type='email' required id='inputEmail' name='email' autocomplete='email' value='$pre_email' class='form-control' size='40' maxlength='100' />
 </div>
 
 <div class='form-group'>
