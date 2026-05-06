@@ -8,14 +8,7 @@ require_once __DIR__.'/../sitedata/tabledata.php';
 
 
 /**
- * Summary of TableNavi
- * Container für Navigations-Funktionen
- *
- * __public__
- * feldSeitenwahl()
- * feldAnzeigewahl()
- * feldThemenwahl()
- * feldSuchen()
+ * Tabellen-Navigationsfunktionen
  */
 class TableNavi
 {
@@ -476,3 +469,6 @@ class TableNavi
         return $output;
     }
 }
+
+
+// EOF

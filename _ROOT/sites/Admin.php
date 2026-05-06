@@ -22,9 +22,8 @@ class Admin extends Pre
         Header::show();
         self::show_body();
         Footer::show("account");
-        #Footer::show("empty");
 
-        self::lastScriptAusgeben();
+        # self::lastScriptAusgeben();
     }
 
 
@@ -84,86 +83,6 @@ class Admin extends Pre
         // HTML Ausgabe
         //
         echo $output;
-    }
-
-
-
-    /**
-     * Java Script zur Steuerung der Tab-Navigation
-     * --> ans Ende der Webseite hängen
-     */
-    public static function lastScriptAusgeben(): void
-    {
-    echo <<<EOT
-    <script>
-    // href mit ?Parameter und #Sprungmarke
-    // -> class = \"anchor_extended\"
-    //
-    window.addEventListener(\"load\", function () {
-
-    // Falls der Browser nicht automatisch zum gewünschten Element springt
-    // erledigt das Javascript.
-    if (window.location.hash)
-        window.location.href = window.location.hash;
-
-    // Die Steuerelemente, welche den Mechanismus auslösen sollen, werden selektiert,
-    // sie müssen via class=\"anchor_extended\" ausgezeichnet werden.
-    var anchors = document.getElementsByClassName(\"anchor_extended\");
-
-    for (var i = 0; i < anchors.length; i++) {
-        anchors[i].addEventListener(\"click\", function (event) {
-            // Prevent the anchor to perform its href-jump.
-            event.preventDefault();
-
-            // Variablen vordefinieren.
-            var target = {},
-            current = {}
-            path = window.location.origin;
-
-            // URL und Hash des Ziels extrahieren. Unterschieden wird zwischen a-Tag's dessen href
-            // ausgelesen wird und anderen Elementen (wie z.B. div), bei denen auf das data-href=\"\"-Attribut
-            // zugegriffen wird. Für den 2. Fall benötigen wir die eben definierte path-Variable
-            // welche den absoluten Pfad enthält.
-            target.href = this.href
-                ? this.href.split(\"#\")
-                : (path + this.dataset.href).split(\"#\");
-            target.url = target.href.length > 2
-                ? target.href.slice(0, -1).join(\"#\")
-                : target.href[0];
-            target.hash = target.href.length > 1
-                ? target.href[target.href.length - 1]
-                : \"\";
-
-            // URL und Hash der aktuellen Datei.
-            current.url = window.location.href.split(\"#\").slice(0, -1).join(\"#\");
-            current.hash = window.location.hash;
-
-            if (current.url == target.url) {
-                if (current.hash == target.hash) {
-                    // Dateiname und Hash sind identisch, die Seite
-                    // wird lediglich neu geladen.
-                    window.location.reload();
-                }
-                else {
-                    // Der Hash unterscheidet sich, dem location-Objekt
-                    // wird dieser zugeteilt, anschließend wird die Seite
-                    // neu geladen.
-                    window.location.hash = target.hash;
-                    window.location.reload();
-                };
-            }
-            else {
-                // Der Dateiname unterscheidet sich, _GET-Daten wurden geändert
-                // oder eine andere Datei soll aufgerufen werden, es wird lediglich
-                // auf diese Datei verwiesen.
-                window.location.href = this.href;
-            };
-        });
-    }
-
-    });
-    </script>
-    EOT;
     }
 
 
@@ -582,33 +501,33 @@ class Admin extends Pre
 
     <h3>Viewportabmessungen</h3>
     <h4>Breite</h4>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/ClientWidth\">Element.clientWidth</a>:
-        <span id=\"clientW\"></span>px</p>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/InnerWidth\">Window.innerWidth</a>:
-        <span id=\"innerW\"></span>px</p>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/OuterWidth\">Window.outerWidth</a>:
-        <span id=\"outerW\"></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/ClientWidth'>Element.clientWidth</a>:
+        <span id='clientW'></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/InnerWidth'>Window.innerWidth</a>:
+        <span id='innerW'></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/OuterWidth'>Window.outerWidth</a>:
+        <span id='outerW'></span>px</p>
     <h4>Höhe</h4>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/ClientHeight\">Element.clientHeight</a>:
-        <span id=\"clientH\"></span>px</p>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/InnerHeight\">Window.innerHeight</a>:
-        <span id=\"innerH\"></span>px</p>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/OuterHeight\">Window.outerHeight</a>:
-        <span id=\"outerH\"></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/ClientHeight'>Element.clientHeight</a>:
+        <span id='clientH'></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/InnerHeight'>Window.innerHeight</a>:
+        <span id='innerH'></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/OuterHeight'>Window.outerHeight</a>:
+        <span id='outerH'></span>px</p>
     <h3>Geräteabmessungen</h3>
     <h4>Breite</h4>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Screen/width\">Screen.width</a>:
-        <span id=\"screenW\"></span>px</p>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/availWidth\">Screen.availWidth</a>:
-        <span id=\"availW\"></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/JavaScript/Screen/width'>Screen.width</a>:
+        <span id='screenW'></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/availWidth'>Screen.availWidth</a>:
+        <span id='availW'></span>px</p>
     <h4>Höhe</h4>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Screen/height\">Screen.height</a>:
-        <span id=\"screenH\"></span>px</p>
-    <p><a href=\"https://wiki.selfhtml.org/wiki/availHeight\">Screen.availHeight</a>:
-        <span id=\"availH\"></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/JavaScript/Screen/height'>Screen.height</a>:
+        <span id='screenH'></span>px</p>
+    <p><a href='https://wiki.selfhtml.org/wiki/availHeight'>Screen.availHeight</a>:
+        <span id='availH'></span>px</p>
     <!--
-    <p><a href=\"https://wiki.selfhtml.org/wiki/JavaScript/Window/matchMedia\">matchMedia</a>:
-        <span id=\"matcMedia\"></span></p> -->
+    <p><a href='https://wiki.selfhtml.org/wiki/JavaScript/Window/matchMedia'>matchMedia</a>:
+        <span id='matcMedia'></span></p> -->
 
     </div>
     EOT;
@@ -616,7 +535,7 @@ class Admin extends Pre
     $output .= <<<EOT
     <script>
     'use strict';
-    document.addEventListener(\"DOMContentLoaded\", function () {
+    document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('resize', messen);
     messen();
 
@@ -661,7 +580,7 @@ class Admin extends Pre
 
     return <<<EOT
     <div role='tabpanel' class='tab-pane {$active['tools']}' id='tools'>
-    <p><br></p>";
+    <p><br></p>
 
     <form method='POST'>
     <table style='border-collapse: separate; border-spacing: 10px 5px;'>
@@ -719,44 +638,86 @@ class Admin extends Pre
     EOT;
     }
 
+
+
+    /**
+     * Java Script zur Steuerung der Tab-Navigation
+     * --> ans Ende der Webseite hängen
+     */
+    public static function lastScriptAusgeben(): void
+    {
+    echo <<<EOT
+    <script>
+    // href mit ?Parameter und #Sprungmarke
+    // -> class = 'anchor_extended'
+    //
+    window.addEventListener('load', function () {
+
+    // Falls der Browser nicht automatisch zum gewünschten Element springt
+    // erledigt das Javascript.
+    if (window.location.hash)
+        window.location.href = window.location.hash;
+
+    // Die Steuerelemente, welche den Mechanismus auslösen sollen, werden selektiert,
+    // sie müssen via class='anchor_extended' ausgezeichnet werden.
+    var anchors = document.getElementsByClassName('anchor_extended');
+
+    for (var i = 0; i < anchors.length; i++) {
+        anchors[i].addEventListener('click', function (event) {
+            // Prevent the anchor to perform its href-jump.
+            event.preventDefault();
+
+            // Variablen vordefinieren.
+            var target = {},
+            current = {}
+            path = window.location.origin;
+
+            // URL und Hash des Ziels extrahieren. Unterschieden wird zwischen a-Tag's dessen href
+            // ausgelesen wird und anderen Elementen (wie z.B. div), bei denen auf das data-href=''-Attribut
+            // zugegriffen wird. Für den 2. Fall benötigen wir die eben definierte path-Variable
+            // welche den absoluten Pfad enthält.
+            target.href = this.href
+                ? this.href.split('#')
+                : (path + this.dataset.href).split('#');
+            target.url = target.href.length > 2
+                ? target.href.slice(0, -1).join('#')
+                : target.href[0];
+            target.hash = target.href.length > 1
+                ? target.href[target.href.length - 1]
+                : '';
+
+            // URL und Hash der aktuellen Datei.
+            current.url = window.location.href.split('#').slice(0, -1).join('#');
+            current.hash = window.location.hash;
+
+            if (current.url == target.url) {
+                if (current.hash == target.hash) {
+                    // Dateiname und Hash sind identisch, die Seite
+                    // wird lediglich neu geladen.
+                    window.location.reload();
+                }
+                else {
+                    // Der Hash unterscheidet sich, dem location-Objekt
+                    // wird dieser zugeteilt, anschließend wird die Seite
+                    // neu geladen.
+                    window.location.hash = target.hash;
+                    window.location.reload();
+                };
+            }
+            else {
+                // Der Dateiname unterscheidet sich, _GET-Daten wurden geändert
+                // oder eine andere Datei soll aufgerufen werden, es wird lediglich
+                // auf diese Datei verwiesen.
+                window.location.href = this.href;
+            };
+        });
+    }
+
+    });
+    </script>
+    EOT;
+    }
 }
-
-
-
-#foreach ($_COOKIE AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_SESSION AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-/*
-foreach ($_SESSION AS $k=>$v) {
-    $typ=["integer", "boolean"];
-    $typ1=["string"];
-    if (in_array(gettype($v), $typ)) {
-        echo gettype($v), "_", $k, ": ", $v, "<br>";}};echo"<br>";*/
-#var_dump($_SESSION);
-/*
-ident: xxxx
-autologin: -
-userid: zz
-loggedin: -
-su: z
-status: --v
-
-rootdir:
-main: /index.php
-lastsite: /index.php#674
-siteid: 3
-
-sort: the.id DESC, sta.kat10, sta.datum
-dir: ASC
-col: sta.kat10
-filter: the.id IS NOT NULL AND sta.deakt=0 AND dat.deakt=0 AND ort.deakt=0
-version: 250617
-proseite: 10
-start: 0
-groupid: 500
-fileid: 674
-prev: 674
-next: 673
-*/
 
 
 // EOF

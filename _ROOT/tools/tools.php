@@ -153,12 +153,19 @@ class Tools
 
     /**
      * Herkunftsseite speichern
+     *
+     * Standard-Rücksprung: "index", "index2", "details"
+     * @param array $return2 : zusätzl. Rücksprungseiten
      * - @return string $_SESSION['main']
      * - @return string $_SESSION['lastsite']
      */
     public static function lastSite(array $return2 = []): void
     {
-        $return2 = ($return2) ?: ["index", "index2", "details"];
+        $return = ["index", "index2", "details"];
+        $return2 =  (!empty($return2))
+            ? array_merge($return, $return2)
+            : $return;
+
         #$_SESSION['main'] ??= $_SESSION['rootdir'].'/index.php';
         $_SESSION['main'] ??= "/";
 

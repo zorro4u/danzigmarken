@@ -34,8 +34,7 @@ class Settings
         if (empty($_SESSION['main']))
             $_SESSION['main'] = "/";
 
-        $return2 = ["index", "index2", "details"];
-        Tools::lastSite($return2);
+        Tools::lastSite();
 
         [$usr_data, $securitytoken_row, $error_msg] = Auth::checkUser();
 

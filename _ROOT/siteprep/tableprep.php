@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SiteData\TableData as Data;
+use Dzg\SiteData\TableData;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/tabledata.php';
@@ -9,19 +9,7 @@ require_once __DIR__.'/../tools/tools.php';
 
 
 /**
- * Summary of Table
- * Webseite:
  * Tabellenausgabe der Datenbank
- *
- * __public__
- * show()
- * spaltennamen()
- * getSession()
- * setSession()
- * DBspalten
- * $maxID
- * $stamps_db
- * $_session
  */
 class TablePrep
 {
@@ -130,13 +118,13 @@ class TablePrep
         $keys_arr = ['jump'];
 
         foreach ($keys_str as $k) {
-            self::$_session[$k] = (isset($_SESSION[$k])) ? $_SESSION[$k] : "";
+            self::$_session[$k] = ($_SESSION[$k]) ?? "";
         };
         foreach ($keys_int as $k) {
-            self::$_session[$k] = (isset($_SESSION[$k])) ? (int)$_SESSION[$k] : 0;
+            self::$_session[$k] = ($_SESSION[$k]) ?? 0;
         };
         foreach ($keys_arr as $k) {
-            self::$_session[$k] = (isset($_SESSION[$k])) ? (array)$_SESSION[$k] : [];
+            self::$_session[$k] = ($_SESSION[$k]) ?? [];
         };
     }
 
@@ -147,14 +135,18 @@ class TablePrep
 
         foreach ($key AS $k)
         {
-            if (isset($_SESSION[$k]) && $_SESSION[$k] != self::$_session[$k]) {
+            if (isset($_SESSION[$k])
+                && $_SESSION[$k] != self::$_session[$k])
+            {
                 $_SESSION[$k] = self::$_session[$k];
 
-            } elseif (!isset($_SESSION[$k]) && !empty(self::$_session[$k])) {
+            } elseif (!isset($_SESSION[$k])
+                && !empty(self::$_session[$k]))
+            {
                 $_SESSION[$k] = self::$_session[$k];
             };
         };
-        $_SESSION['version'] = Data::getVersion();
+        $_SESSION['version'] = TableData::getVersion();
     }
 
 
@@ -192,7 +184,7 @@ class TablePrep
         self::setSearch($filter);
 
         // mit neuem Filter Elemente zählen
-        self::$maxID = Data::getMaxID($filter);
+        self::$maxID = TableData::getMaxID($filter);
 
 
         // globale $_SESSION Werte mit den Klassenwerten aktualisieren
@@ -304,7 +296,7 @@ class TablePrep
     }
 
 
-    private static function setSearch(&$filter): void
+    private static function setSearch(string &$filter): void
     {
         $search    = self::$_session['search'];
         $DBspalten = self::DBspalten;
@@ -409,3 +401,7 @@ class TablePrep
 #print_r('token: '.$_COOKIE['securitytoken'].'<br>');
 #print_r('token: '.sha1($_COOKIE['securitytoken']).'<br>');
 #print_r(pathinfo($_SESSION['main']));
+
+
+
+// EOF

@@ -1,6 +1,6 @@
 <?php
 namespace Dzg\Sites;
-use Dzg\SiteData\TableData as Data;
+use Dzg\SiteData\TableData;
 use Dzg\SitePrep\{TablePrep, TableBody, TableNavi};
 use Dzg\SitePrep\{Header, Footer};
 use Dzg\Tools\Auth;
@@ -75,9 +75,10 @@ class Table extends TablePrep
                 TableNavi::feldSuchen().        # Suche
                 "</div>";
 
-            $stamps_db = Data::getMainData();
+            $stamps_db = TableData::getMainData();
+        }
 
-        } else {
+        else {
             // Nutzer nicht angemeldet --> ohne Navi-Möglichkeit
             // und nur zufällige Elemente anzeigen
             if (empty($loggedin)) {
@@ -86,7 +87,7 @@ class Table extends TablePrep
                 self::$_session['start'] = 0;              // random_int(0, $maxID - $proseite);
                 self::setSession();
 
-                $all_data  = Data::getMainData();
+                $all_data  = TableData::getMainData();
                 $rand_idx  = array_rand($all_data, $rand_num);
                 $rand_data = [];
                 foreach ($rand_idx as $idx) {
@@ -94,9 +95,10 @@ class Table extends TablePrep
                 };
                 $stamps_db = $rand_data;
                 self::$_session['proseite'] = $rand_num;
+                self::setSession();
 
                 // wird nicht weiter benötigt
-                unset($all_data, $rand_idx, $rand_data);
+                unset($all_data, $rand_idx, $rand_data, $rand_num);
             };
 
             $navi_tab = '';

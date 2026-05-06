@@ -174,7 +174,7 @@ class Header extends SiteConfig
 
             // impressum.php
             case 6:
-                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["settings", "admin"]);
                 $main = ['site' => $rootdir.'/impressum', 'name' => 'Impressum'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -200,6 +200,7 @@ class Header extends SiteConfig
 
             // registerinfo.php
             case 10:
+                Tools::lastSite(["login"]);
                 $main = ['site' => $rootdir.'/auth/registerinfo.php', 'name' => 'Registrieren'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -218,7 +219,7 @@ class Header extends SiteConfig
 
             // contact.php
             case 13:
-                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["settings", "admin"]);
                 $main = ['site' => $rootdir.'/contact/contact', 'name' => 'Kontakt'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
@@ -238,21 +239,21 @@ class Header extends SiteConfig
 
             // about.php
             case 16:
-                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["settings", "admin"]);
                 $main = ['site' => $rootdir.'/about.php', 'name' => 'About'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // setting.php
             case 100:
-                Tools::lastSite(["index", "index2", "details"]);
+                Tools::lastSite();
                 #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;
 
             // admin.php
             case 101:
-                Tools::lastSite(["index", "index2", "details", "settings", "admin"]);
+                Tools::lastSite(["settings", "admin"]);
                 #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
                 $stepout['site'] = $_SESSION['lastsite'];
                 break;

@@ -41,8 +41,7 @@ class Admin
         if (empty($_SESSION['main']))
             $_SESSION['main'] = "/";
 
-        $return2 = ["index", "index2", "details"];
-        Tools::lastSite($return2);
+        Tools::lastSite();
 
         [$usr_data, $login_data, $error_msg] = Auth::checkUser();
 

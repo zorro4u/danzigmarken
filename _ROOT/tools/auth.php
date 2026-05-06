@@ -110,8 +110,7 @@ class Auth
             if (empty($_SESSION['lastsite'])) {
 
                 // Herkunftsseite speichern
-                $return2 = ['index', 'index2', 'details', 'login', 'email'];
-                tools::lastSite($return2);
+                tools::lastSite(['login', 'email']);
             };
             $target = $_SESSION['lastsite'];
         };
@@ -133,8 +132,9 @@ class Auth
                 || $userid != (int)$userid)
             {
                 $error_arr []= "#logout: unzulässige User-ID ";
+            }
 
-            } else {
+            else {
                 // Cookies löschen --> DB ausloggen
                 if (self::checkAutocookie()) {
                     $identifier = $_COOKIE['auto_identifier'];
@@ -148,8 +148,9 @@ class Auth
                     Database::sendSQL($stmt0, $data);
                     self::deleteAutocookies();
                     $status = true;
+                }
 
-                } else {
+                else {
                     $stmt0 = "UPDATE site_login SET login = NULL
                         WHERE userid = :userid AND identifier IS NULL";  # dadurch Info 'last.seen'
                     $stmt = "DELETE FROM site_login WHERE userid = :userid AND identifier IS NULL";
@@ -446,7 +447,7 @@ class Auth
             'token_endtime' => $token_endtime,
             'ip' => $ip
         ];
-        
+
         $login_data = array_merge($login_data, $new);
     }
 

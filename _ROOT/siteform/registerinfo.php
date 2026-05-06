@@ -32,7 +32,7 @@ class RegisterInfo extends Prep
         20 => "Rufe dazu in den nächsten 4 Wochen (bis zum",
         21 => "den folgenden Link auf",
         22 => "Herzliche Grüße",
-        23 => "Dein Support-Team von www.danzigmarken.de",
+        23 => "Dein Support-Team von www.danzigmarken.de"
     ];
 
     // username: beginnt mit Buchstaben, kann dann auch Zahlen und (._-) enthalten aber nicht damit enden, ist 3-20 Zeichen lang
@@ -76,11 +76,11 @@ class RegisterInfo extends Prep
         // Formularwerte empfangen
         //
         if (isset($_GET['regon'])
-            && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"):
-
+            && strtoupper($_SERVER["REQUEST_METHOD"]) === "POST")
+        {
             // Nutzereingaben $_POST auswerten
             //
-            $error_msg [] = (isset($_POST['email'], $_POST['message']))
+            $error_msg []= (isset($_POST['email'], $_POST['message']))
                 ? self::plausi_check($input)
                 : self::MSG[14];
 
@@ -128,12 +128,12 @@ class RegisterInfo extends Prep
             # Formular nach Verarbeitung wieder löschen
             unset($_POST);
 
-        endif;  // Formularwerte empfangen
+        };  // Formularwerte empfangen
 
 
-        if (!empty($error_msg)) {
-            $error_msg = implode("<br>", $error_msg);  # array -> string
-        };
+        $error_msg = !empty($error_msg)
+            ? implode("<br>", $error_msg)  # array -> string
+            : "";
 
 
         // Wert für das Vorausfüllen des Login-Formulars
@@ -146,7 +146,7 @@ class RegisterInfo extends Prep
         elseif ($input['mail'] != "") {
             $pre_email = $input['mail'];
         }
-        elseif(isset($_GET['usr'])) {
+        elseif (isset($_GET['usr'])) {
             $pre_usr = htmlspecialchars(Tools::cleanInput($_GET['usr']));
         }
         elseif ($input['name'] != "") {
@@ -180,9 +180,9 @@ class RegisterInfo extends Prep
      * - @param string $input['message'] : Nachricht
      * - @param string $input['vor']  : Vorname
      * - @param string $input['nach'] : Nachname
-     * @return array : Fehlermeldung
+     * @return string : Fehlermeldung
      */
-    private static function plausi_check(array &$input): array
+    private static function plausi_check(array &$input): string
     {
         // mysql_real_escape_string(): reservierte Zeichen in (my)SQL durch die entsprechenden Escape-Sequenzen ersetzen.
         // Darüber hinaus sollte man alle Eingaben auf Korrektheit überprüfen und ggfs. unerwünschte Zeichen oder Zeichenketten ausfiltern,
@@ -255,7 +255,7 @@ class RegisterInfo extends Prep
         $input['message'] = htmlspecialchars($input['message']);
         #$input['message'] = htmlentities($input['message'], ENT_QUOTES);  // auch Umlaute werden umgewandelt
 
-        return [$error_msg];
+        return $error_msg;
     }
 
 

@@ -21,8 +21,7 @@ class Logout
         $error_msg = "";
 
         // Herkunftsseite speichern
-        $return2 = ['index', 'index2', 'details', 'login', 'email'];
-        Tools::lastSite($return2);
+        Tools::lastSite(['login', 'email']);
 
         # [$usrdata_X, $logindata_X, $error_msg] = Auth::checkUser();
 

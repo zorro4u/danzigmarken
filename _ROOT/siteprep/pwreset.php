@@ -34,7 +34,7 @@ class PWreset
     protected static function dataPreparation(): void
     {
         // Herkunftsseite speichern
-        Tools::lastSite();
+        Tools::lastSite(['login']);
 
 
         /*

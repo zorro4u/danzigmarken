@@ -10,12 +10,7 @@ require_once __DIR__.'/../tools/auth.php';
 
 
 /**
- * Summary of TableBody
  * Tabellenkopf & Tabellenkörper
- *
- * __public__
- * htmlTabkopf()
- * htmlTabelle()
  */
 class TableBody
 {
@@ -355,3 +350,6 @@ class TableBody
         return $output;
     }
 }
+
+
+// EOF

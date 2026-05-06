@@ -53,7 +53,7 @@ class Contact
         }
 
         # Herkunftsseite speichern
-        Tools::lastSite(['index', 'index2', 'details', 'settings', 'admin']);
+        Tools::lastSite(['settings', 'admin']);
 
         self::$question = $question;
     }

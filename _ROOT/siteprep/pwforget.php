@@ -34,8 +34,7 @@ class PWforget
     protected static function dataPreparation(): void
     {
         // Herkunftsseite speichern
-        $return2 = ['index', 'index2', 'details', 'login'];
-        Tools::lastSite($return2);
+        Tools::lastSite(['login']);
 
         #$error_msg = "Zum Zurücksetzen des Passwortes wende dich an den Seitenbetreiber.";
 
