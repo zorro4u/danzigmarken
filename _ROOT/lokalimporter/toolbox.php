@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Import;
+namespace Dzg\Importer;
 
 date_default_timezone_set('Europe/Berlin');
 

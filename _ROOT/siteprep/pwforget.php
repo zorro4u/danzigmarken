@@ -33,9 +33,6 @@ class PWforget
      */
     protected static function dataPreparation(): void
     {
-        // Herkunftsseite speichern
-        Tools::lastSite(['login']);
-
         #$error_msg = "Zum Zurücksetzen des Passwortes wende dich an den Seitenbetreiber.";
 
         $input_email = "";

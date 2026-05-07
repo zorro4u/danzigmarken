@@ -1,3 +1,3 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT']."/../data/dzg/lokalimporter/lokalimporter.php";
-Dzg\Import\LokalImporter::step1();
+Dzg\Importer\LokalImporter::start(1);

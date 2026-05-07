@@ -1,37 +1,21 @@
 <?php
 namespace Dzg\SitePrep;
-use Dzg\SitePrep\SiteConfig;
-use Dzg\Tools\{Auth, Tools, CheckIP, Logger};
+use Dzg\Tools\Auth;
 
-require_once __DIR__.'/siteconfig.php';
+require_once __DIR__.'/header_prep.php';
 require_once __DIR__.'/../tools/auth.php';
-require_once __DIR__.'/../tools/tools.php';
-require_once __DIR__.'/../tools/checkip.php';
-require_once __DIR__.'/../tools/logger.php';
 
 
 /**
  * Summary of Header
  * Webseiten-Header, Seiten-Navigation
  */
-class Header extends SiteConfig
+class Header extends HeaderPrep
 {
-    private static string $rootdir;
-    private static $main;
-    private static $stepout;
-    private static string $site_name;
-    private static int $site_id;
-    private static bool $ip_denied=false;
-
-    // getter
-    public static function site_id() {return self::$site_id;}
-    public static function ip_denied() {return self::$ip_denied;}
-
-
     /**
      * den obersten Teil der Webseite inclusive Seiten-Navigation ausgeben
      */
-    public static function show(?string $site_name=null)
+    public static function show(?string $site_name = null): void
     {
         self::antiflood();
         self::dataPreparation();
@@ -42,239 +26,10 @@ class Header extends SiteConfig
 
 
     /**
-     * Zeit & Häufigkeit abfangen
-     *
-     * kein Schutz vor DDOS oder HTTP-Flood,
-     * aber bisschen vor permanenter DB-Abfragerei
-     * Was ist bei ständig wechselnder IP?
-     */
-    public static function antiflood()
-    {
-
-        // -4-
-        // Zugriff speichern
-        Logger::log();
-
-        // -1-
-        CheckIP::block_ai_bots_by_rdns();
-
-        // -2-
-        // manipulierten URL-Aufruf blockieren
-        $ip  = CheckIP::getIP();
-        $url = $_SERVER["REQUEST_URI"] ?? '';
-        if (str_contains($url, "%")
-            || str_contains($url, "//"))
-        {
-            $ipc = new CheckIP("clear");
-            $ipc->under_suspicion($ip, true);
-            $ipc = null;
-        };
-
-        // -3-
-        // IP mit Blockliste abgleichen,
-        // wenn mehrfach dann (Bereich) blocken
-        // und wegleiten.
-        self::$ip_denied = CheckIP::antiflood();
-    }
-
-
-    /**
-     * not in use
-     */
-    public static function active(array $site_arr): string
-    {
-        // ist Seite gleich der aktuellen Seiten, css-Klasse 'active' setzen
-        $class = (strpos($_SERVER['PHP_SELF'], basename($site_arr['site'])) !== False)
-        ? 'class="active" style="color:#ccc;">'
-        : $class = 'href="'.$site_arr['site'].'">';
-
-        return $class;
-    }
-
-
-    /**
-     * Summary of dataPreparation
-     */
-    private static function dataPreparation()
-    {
-        Auth::isCheckedIn();
-
-        // Site-ID wird in starter.php gesetzt
-        $site_id = $_SESSION['siteid'] ?? 404;
-
-        // Stammverzeichnis festlegen, bei Aufruf aus Unterverzeichnis (wie auth/login.php)
-        // sonst Probleme zB. mit css Aufruf
-        // wird in auth.func.php gesetzt
-        self::$rootdir = $rootdir = $_SESSION['rootdir'];
-
-
-        // Startseite festlegen, $_SESSION['main'], siehe auch: list-func
-        $main_pages = self::MAIN_PAGES;
-        if (in_array($site_id, array_keys($main_pages))) {
-            $main_page = $rootdir.'/'.$main_pages[$site_id];
-        }
-        elseif (isset($_SESSION['main'])) {
-            $main_page = $_SESSION['main'];
-        }
-        else {
-            $main_page = $rootdir.'/'.$main_pages[1];
-        };
-
-        $_SESSION['main'] = $main_page;
-
-        $main    = ['site' => $main_page, 'name' => 'Übersicht'];
-        $stepout = ['site' => $main_page, 'name' => '<i class="fas fa-home"></i>Übersicht'];
-
-
-        if (empty($_SESSION['lastsite'])) $_SESSION['lastsite'] = $main_page;
-        if (empty($_SESSION['fileid'])) $_SESSION['fileid'] = 0;
-        if (empty($_SESSION['prev']))   $_SESSION['prev']   = -1;
-
-
-        switch ($site_id):
-
-            // index.php
-            case 1:
-                $main = ['site' => $main_page, 'name' => 'Einzelliste'];
-                break;
-
-            // index2.php
-            case 2:
-                $main = ['site' => $main_page, 'name' => 'Markenliste'];
-                break;
-
-            // details.php
-            case 3:
-                $main = [
-                    'site' => $rootdir.'/details.php?id='.$_SESSION['fileid'],
-                    'name' => 'Detailansicht'
-                ];
-                $stepout['site'] = $main_page.'#'.$_SESSION['prev'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // change.php
-            case 4:
-                $main = ['site' => $rootdir.'/change.php', 'name' => 'Bearbeiten'];
-                $stepout = [
-                    'site' => $rootdir.'/details.php?id='.$_SESSION['fileid'],
-                    'name' => '<i class="fas fa-circle-left"></i>Beenden'
-                ];
-                $stepout_X = [
-                    'site' => $_SESSION['lastsite'],
-                    'name' => '<i class="fas fa-circle-left"></i>Beenden'
-                ];
-                break;
-
-            // upload.php
-            case 5:
-                $main = ['site' => $rootdir.'/upload.php', 'name' => 'Upload'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // impressum.php
-            case 6:
-                Tools::lastSite(["settings", "admin"]);
-                $main = ['site' => $rootdir.'/impressum', 'name' => 'Impressum'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // login.php
-            case 7:
-                Tools::lastSite();
-                $main = ['site' => $rootdir.'/auth/login', 'name' => 'Anmelden'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // pwforget.php
-            case 8:
-                $main = ['site' => $rootdir.'/auth/pwforget.php', 'name' => 'Passwort vergessen'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // pwreset.php
-            case 9:
-                $main = ['site' => $rootdir.'/auth/pwreset.php', 'name' => 'Passwort reset'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // registerinfo.php
-            case 10:
-                Tools::lastSite(["login"]);
-                $main = ['site' => $rootdir.'/auth/registerinfo.php', 'name' => 'Registrieren'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // register.php
-            case 11:
-                $main = ['site' => $rootdir.'/auth/register.php', 'name' => 'Registrieren'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // activate.php
-            case 12:
-                $main = ['site' => $rootdir.'/auth/activate.php', 'name' => 'Aktivieren'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // contact.php
-            case 13:
-                Tools::lastSite(["settings", "admin"]);
-                $main = ['site' => $rootdir.'/contact/contact', 'name' => 'Kontakt'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // logout.php
-            case 14:
-                Tools::lastSite();
-                $main = ['site' => $rootdir.'/auth/logout', 'name' => 'Abmelden'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // download.php
-            case 15:
-                $main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // about.php
-            case 16:
-                Tools::lastSite(["settings", "admin"]);
-                $main = ['site' => $rootdir.'/about.php', 'name' => 'About'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // setting.php
-            case 100:
-                Tools::lastSite();
-                #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            // admin.php
-            case 101:
-                Tools::lastSite(["settings", "admin"]);
-                #$main = ['site' => $rootdir.'/download.php', 'name' => 'Download'];
-                $stepout['site'] = $_SESSION['lastsite'];
-                break;
-
-            default:
-                Tools::lastSite();
-                $stepout['site'] = $_SESSION['lastsite'];
-
-        endswitch;
-
-        self::$main = $main;
-        self::$stepout = $stepout;
-        self::$site_id = $site_id;
-    }
-
-
-    /**
      * auf der Webseite die oberste, nicht sichtbare
      * Html <head> Section mit den meta-Anweisungen ausgeben
      */
-    public static function loadHtmlHead()
+    public static function loadHtmlHead(): void
     {
         # https://www.danzig.org/
         # https://arge.danzig.org/
@@ -306,7 +61,7 @@ class Header extends SiteConfig
     /**
      * Webseiten-Navigation ausgeben
      */
-    private static function showNavigation()
+    protected static function showNavigation(): void
     {
         $main_pages = self::MAIN_PAGES;
         $acc_pages  = self::ACC_PAGES;
@@ -347,8 +102,7 @@ class Header extends SiteConfig
 
 
         // -- Menü: nicht angemeldet --
-        if (!Auth::isCheckedIn())
-        {
+        if (!Auth::isCheckedIn()) {
             $output .= "
                 <div id='navbar' class='navbar-collapse collapse'>
                 <ul class='nav navbar-nav navbar-right'>";
@@ -359,8 +113,9 @@ class Header extends SiteConfig
                 $output .= "
                 </i></span></a></li>
                 <li><a class='active'><i class='fas fa-sign-in-alt'></i>Login</a></a></li>";
+            }
 
-            } else {
+            else {
                 switch ($site_id):
 
                 // aktiv: Einzelansicht     < einzel_gruppe_login >
@@ -419,10 +174,11 @@ class Header extends SiteConfig
             };
 
             $output .= "</ul></div>";  # ende -- navbar-collapse --
+        }
 
 
         // -- Menü: angemeldet --
-        } else {
+        else {
 
             $output .= "
             <div id='navbar' class='navbar-collapse collapse'>
@@ -461,8 +217,12 @@ class Header extends SiteConfig
 
                     // Bearbeiten
                     // für Admin und Heinz (id.3) anzeigen, (gelb markiert, class=change)
-                    if (Auth::isCheckedIn() && !empty($_SESSION['fileid'])) {
-                        if ($_SESSION['userid']==3 || isset($_SESSION['su'])) {
+                    if (Auth::isCheckedIn()
+                        && !empty($_SESSION['fileid']))
+                    {
+                        if ($_SESSION['userid'] == 3
+                            || isset($_SESSION['su']))
+                        {
                             /*$output .= "
                             <li><a class='change'>
                             <form method='POST' action='{$rootdir}/change.php' class='change'>
@@ -475,8 +235,8 @@ class Header extends SiteConfig
                             <li><a class='change'
                                 href='{$rootdir}/change.php?id=".$_SESSION['fileid']."'>
                                 <i class='change fas fa-edit'></i>Bearbeiten&emsp;</a></li>";
-                        }
-                    }
+                        };
+                    };
                     break;
 
                 // aktiv: Bearbeiten     < bearbeiten_beenden_Konto >
@@ -581,34 +341,37 @@ class Header extends SiteConfig
                     </ul>
                 </div>";
                 */
+            }
 
 
             // -- Konto-Bereich --
-            } else {
+            else {
 
                 // aktiv: Logout   < logout >
                 if ($site_id === 14) {
                     $output .= "
                     <li><a class='active'><i class='fas fa-sign-out-alt'></i>Logout</a></a></li>";
-
-                } else {
+                }
+                else {
 
                     // aktiv: Einstellungen   < (admin_) setting_logout >
                     if ($site_id === 100) {
                         // wenn als Admin angemeldet, dann Admin-Menü zeigen
-                        if (!empty($_SESSION['su']) &&
-                            (in_array(basename($_SERVER['PHP_SELF']), $acc_pages)))
+                        if (!empty($_SESSION['su'])
+                            && (in_array(basename($_SERVER['PHP_SELF']), $acc_pages)))
                         {
                             $output .= "
                                 <li><a href='{$rootdir}/account/admin' title='Admin'>
                                 <i class='fas fa-user-plus'></i></a></li>";
                         };
+
                         // Setting-Menü
                         $output .= "
                         <li><a class='active'><i class='fas fa-user-circle'></i>Konto</a></li>";
+                    }
 
                     // aktiv: Admin     < admin_setting_logout >
-                    } elseif ($site_id === 101) {
+                    elseif ($site_id === 101) {
                         $output .= "
                             <li><a class='active'><i class='fas fa-user-plus'>
                                 </i>Admin</a></a></li>
@@ -634,5 +397,7 @@ class Header extends SiteConfig
 
         echo $output;
     }
-
 }
+
+
+// EOF

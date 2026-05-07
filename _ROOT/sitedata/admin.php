@@ -24,7 +24,7 @@ class Admin
     /**
      * Summary of getDBuserList
      */
-    public static function getDBuserList($userid, $identifier): array
+    public static function getDBuserList(int $userid, string $identifier): array
     {
         // --- TAB: Nutzer/Autologin (/Info) ---
         //
@@ -288,7 +288,7 @@ class Admin
     /**
      * 11, alle meine anderen aktiven Anmeldungen
      */
-    public static function deleteMyActive($userid, $identifier)
+    public static function deleteMyActive(int $userid, string $identifier): void
     {
         $data = [':userid' => $userid, ':ident' => $identifier];
         $stmt = "UPDATE site_login
@@ -304,7 +304,7 @@ class Admin
     /**
      * 10, alle meine ausgeloggten Anmeldungen
      */
-    public static function deleteMyNoActive($userid, $identifier)
+    public static function deleteMyNoActive(int $userid, string $identifier): void
     {
         $data = [':userid' => $userid, ':ident' => $identifier];
         $stmt = "UPDATE site_login
@@ -319,7 +319,7 @@ class Admin
     /**
      * 12, alle meine beendeten Anmeldungen (tot)
      */
-    public static function deleteMyClosed($userid)
+    public static function deleteMyClosed(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "DELETE FROM site_login
@@ -332,7 +332,7 @@ class Admin
     /**
      * 13, alle meine abgelaufenen Anmeldungen (tot)
      */
-    public static function deleteMyOld($userid)
+    public static function deleteMyOld(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "DELETE FROM site_login
@@ -345,7 +345,7 @@ class Admin
     /**
      * 21, alle anderen aktiven
      */
-    public static function deleteActive($userid)
+    public static function deleteActive(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "UPDATE site_login
@@ -359,7 +359,7 @@ class Admin
     /**
      * 20, alle anderen ausgeloggten Anmeldung
      */
-    public static function deleteNoActive($userid)
+    public static function deleteNoActive(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "UPDATE site_login
@@ -373,7 +373,7 @@ class Admin
     /**
      * 22, alle anderen beendeten Anmeldung (tot)
      */
-    public static function deleteClosed($userid)
+    public static function deleteClosed(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "DELETE FROM site_login
@@ -387,7 +387,7 @@ class Admin
     /**
      * 23, alle anderen abgelaufenen (tot)
      */
-    public static function deleteOld($userid)
+    public static function deleteOld(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "DELETE FROM site_login
@@ -400,7 +400,7 @@ class Admin
     /**
      * 24/25, alle anderen Nutzer
      */
-    public static function deleteOtherAutologin($userid)
+    public static function deleteOtherAutologin(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "UPDATE site_login
@@ -411,7 +411,7 @@ class Admin
     }
 
 
-    public static function storeRegCode($data)
+    public static function storeRegCode(array $data): void
     {
         $stmt =
             "INSERT INTO site_users
@@ -422,7 +422,7 @@ class Admin
     }
 
 
-    public static function deleteRegLink($userid)
+    public static function deleteRegLink(int $userid): void
     {
         $data = [':userid' => $userid];     # int
         $stmt = "DELETE FROM site_users WHERE userid=:userid";
@@ -430,7 +430,7 @@ class Admin
     }
 
 
-    public static function deleteAllRegLink()
+    public static function deleteAllRegLink(): void
     {
         // DB aufräumen, VACUUM;
         // DB Integritätsprüfung: PRAGMA integrity_check;
@@ -441,7 +441,7 @@ class Admin
     }
 
 
-    public static function deleteUser($userid)
+    public static function deleteUser(int $userid): void
     {
         $data = [':userid' => $userid];        # int
         $stmt = "UPDATE site_users
@@ -455,7 +455,7 @@ class Admin
     }
 
 
-    public static function deleteUserLogin($userid)
+    public static function deleteUserLogin(int $userid): void
     {
         $data = [':userid' => $userid];        # int
         $stmt = "DELETE FROM site_login WHERE userid = :userid";

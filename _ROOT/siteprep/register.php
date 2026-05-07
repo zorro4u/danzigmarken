@@ -30,8 +30,6 @@ class Register
      */
     protected static function dataPreparation(): void
     {
-        Tools::lastSite(['login']);
-
         // Registrierungscode überprüfen
         //
         $usr_data = [];

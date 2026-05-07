@@ -48,16 +48,16 @@ class Logout extends Pre
 
 <?php endif;   // autologin ?>
 
-<button class='btn btn-lg btn-primary btn-block' style='margin-top: 20px;' type='submit'>
-    Logout</button>
+<button class='btn btn-lg btn-primary btn-block'
+    style='margin-top: 20px;' type='submit'>Logout</button>
 </form>
 
 <?php else: ?>
 
 <br><br><hr><br>
 <div><form action={$root_site} method='POST'>
-<button class='btn btn-lg btn-primary btn-block' type='submit'>
-    Startseite</button>
+<button class='btn btn-lg btn-primary btn-block'
+    type='submit'>Startseite</button>
 </form></div>
 
 <?php endif;   // Seite anzeigen ?>

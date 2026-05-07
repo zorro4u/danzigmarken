@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Import;
+namespace Dzg\Importer;
 
 require_once __DIR__.'/lokalimporter.php';
 require_once __DIR__.'/toolbox.php';
@@ -11,14 +11,14 @@ main(4);
 
 
 /**
- * zentraler Startpunkt
+ * zentraler Startpunkt für Stand-alone
  *
  * -1- (neue) Dateien in Excel-Liste speichern
  * -2- (neue) Daten aus Excel-Liste in DB speichern
  * -3- von (neuen) Excel-Daten webpics erstellen
  * -4- DB in Excel speichern / Backup
  */
-function main(int $switch = 1)
+function main(int $switch = 1): void
 {
     $time1 = microtime(true);
 

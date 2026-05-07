@@ -47,11 +47,11 @@ class Change extends Pre
 
         $output .= $status_message;
         $output .= "<div class='center-detail'>";
-        $output .= "<div class='main-detail'>";
+        #$output .= "<div class='main-detail'>";
 
         // Formular-Eingabe-Beginn
-        $output .= "<form class='detail-kat-grid' method='POST' onsubmit=''>";
-        #$output .= "<form class='main-detail' method='POST' onsubmit=''>";
+        #$output .= "<form class='detail-kat-grid' method='POST' onsubmit=''>";
+        $output .= "<form class='main-detail' method='POST' onsubmit=''>";
 
 
         // LINKE SEITE
@@ -412,7 +412,7 @@ class Change extends Pre
 
         $output .= "</div>";  # ende rechte Seite
         $output .= "</form>";
-        $output .= "</div>";  # ende main-detail
+        #$output .= "</div>";  # ende main-detail
 
 
 

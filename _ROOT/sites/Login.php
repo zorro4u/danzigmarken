@@ -76,7 +76,6 @@ class Login extends Pre
         $input_email1 = self::$input_email1;
         $input_usr    = self::$input_usr;
         $show_form = self::$show_form;
-        $cookie    = self::$cookie;
 
         if ($user_value != "") {
             $af1 = "";
@@ -104,8 +103,8 @@ class Login extends Pre
 <?= $status_message ?>
 
 <?php
-if (!empty($cookie))
-    echo $cookie;
+# nur ein Test
+#if (!empty(self::$cookie)) echo self::$cookie;
 
 // Seite anzeigen
 if ($show_form):

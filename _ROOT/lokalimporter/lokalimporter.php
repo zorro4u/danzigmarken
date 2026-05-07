@@ -1,12 +1,16 @@
 <?php
-namespace Dzg\Import;
+namespace Dzg\Importer;
 
 require_once __DIR__.'/database.php';
 require_once __DIR__.'/categories.php';
 require_once __DIR__.'/filehandler.php';
 
+require_once __DIR__.'/../tools/auth.php';
+use Dzg\Tools\Auth;
+
 session_start();
 date_default_timezone_set('Europe/Berlin');
+
 
 /*
 TODO:
@@ -33,11 +37,6 @@ war ursprünglich in python, jetzt nach php transferiert und in Webseite integri
 
 /**
  * zentrale Klasse für den Lokalimport
- *
- * -1- (neue) Dateien in Excel-Liste speichern
- * -2- (neue) Daten aus Excel-Liste in DB speichern
- * -3- von (neuen) Excel-Daten webpics erstellen
- * -4- DB in Excel speichern / Backup
  */
 class LokalImporter
 {
@@ -87,6 +86,41 @@ class LokalImporter
     {
         #Database::make_backup();
         Database::make_backup(dirname(Init::$fullpath_excelfile).Init::SEP.'db_backup.xlsx', false);
+    }
+
+
+
+    /**
+     * Startpunkt für Aufruf von einer Webseite aus,
+     * mit Authent-Check
+     *
+     * - 1: (neue) Dateien in Excel-Liste speichern
+     * - 2: (neue) Daten aus Excel-Liste in DB speichern
+     * - 3: von (neuen) Excel-Daten webpics erstellen
+     * - 4: DB in Excel speichern / Backup
+    */
+    public static function start(?int $switch = 1): void
+    {
+        // Nutzer nicht angemeldet oder kein Admin, dann weg hier ...
+        if (!Auth::isCheckedIn() || $_SESSION['su'] != 1) {
+            #header("location: /auth/login.php"); exit;
+            header('HTTP/1.0 403 Forbidden');
+            echo "Forbidden";
+            exit();
+        };
+
+        if ($switch == 1) {
+            self::step1();
+
+        } elseif ($switch == 2) {
+            self::step2();
+
+        } elseif ($switch == 3) {
+            self::step3();
+
+        } elseif ($switch == 4) {
+            self::step4();
+        };
     }
 }
 

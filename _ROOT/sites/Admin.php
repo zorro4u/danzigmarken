@@ -376,8 +376,8 @@ class Admin extends Pre
         $output .= <<<EOT
         <div class='col-sm-offset-2 col-sm-10'>
         <div><br>
-        <button formaction='?save=autologin&tab=autologin' class='btn btn-primary' type='submit'>
-            Beenden</button>
+        <button formaction='?save=autologin&tab=autologin'
+            class='btn btn-primary' type='submit'>Beenden</button>
         </div></div>
         </form>
         EOT;
@@ -401,8 +401,8 @@ class Admin extends Pre
         $output = <<<EOT
         <div role='tabpanel' class='tab-pane {$active['regis']}' id='regis'>
         <form method='POST' style='margin-top: 30px;'>
-        <button formaction='?save=make_reglink&tab=regis' type='submit' class='btn btn-primary btn-lg'>
-            Link erzeugen</button>
+        <button formaction='?save=make_reglink&tab=regis' type='submit'
+            class='btn btn-primary btn-lg'>Link erzeugen</button>
         </form>
         EOT;
 
@@ -466,16 +466,17 @@ class Admin extends Pre
             if ($reglinks_vorhanden):
 
         $output .= <<<EOT
-        <button formaction='?save=show_mail&tab=regis' class='btn btn-primary' type='' value='' name=''>
-        als Email anzeigen</button>&nbsp;&emsp;&emsp;
+        <button formaction='?save=show_mail&tab=regis' class='btn btn-primary'
+            type='' value='' name=''>als Email anzeigen</button>&nbsp;&emsp;&emsp;
 
-        <button type='submit' class='btn btn-primary'>
-        Link löschen</button>&nbsp;&emsp;&emsp;
+        <button class='btn btn-primary'
+            type='submit'>Link löschen</button>&nbsp;&emsp;&emsp;
         EOT;
 
                 if ($ct_reg > 1):
         $output .= <<<EOT
-        <button formaction='?save=delete_allregs&tab=regis' class='btn Xbtn-primary' type='' value='' name=''>alle Links löschen</button>
+        <button formaction='?save=delete_allregs&tab=regis'
+            class='btn Xbtn-primary' type='' value='' name=''>alle Links löschen</button>
         EOT;
                 endif;  // $ct_reg > 1
 

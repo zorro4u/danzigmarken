@@ -17,9 +17,6 @@ class Login
 
     protected static function siteEntryCheck(): void
     {
-        // Herkunftsseite speichern
-        Tools::lastSite();
-
         // Nutzer schon angemeldet? Dann weg hier ...
         self::$success_msg = (Auth::isCheckedIn())
             ? self::MSG[0]

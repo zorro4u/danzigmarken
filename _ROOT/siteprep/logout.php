@@ -20,9 +20,6 @@ class Logout
         $success_msg = "";
         $error_msg = "";
 
-        // Herkunftsseite speichern
-        Tools::lastSite(['login', 'email']);
-
         # [$usrdata_X, $logindata_X, $error_msg] = Auth::checkUser();
 
         // Nutzer nicht angemeldet? Dann weg hier ...

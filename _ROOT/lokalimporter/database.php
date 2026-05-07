@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Import;
+namespace Dzg\Importer;
 
 use Dzg\Tools\Database as DB;
 

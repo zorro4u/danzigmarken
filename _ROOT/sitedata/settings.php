@@ -7,7 +7,7 @@ require_once __DIR__.'/../tools/database.php';
 
 class Settings
 {
-    public static function getCounter($userid, $identifier)
+    public static function getCounter(int $userid, string $identifier): array
     {
         // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
         // alle aktiven Anmeldungen
@@ -30,28 +30,7 @@ class Settings
     }
 
 
-    public static function getUserCounts($data)
-    {
-        // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
-        // alle aktiven Anmeldungen
-        $stmt = "WITH
-        cte1 AS (
-            SELECT userid, COUNT(*) AS count3
-            FROM site_login
-            WHERE userid = :userid
-                AND (`login`=1 && autologin=1)
-                AND identifier != :ident)
-
-        SELECT site_users.userid, username, email, vorname, nachname, pw_hash, count3
-        FROM site_users
-        LEFT JOIN cte1 ON cte1.userid=site_users.userid
-        ";
-
-        return Database::sendSQL($stmt, $data, 'fetchall');
-    }
-
-
-    public static function changeUser($data)
+    public static function changeUser(array $data): void
     {
         $stmt = "UPDATE site_users
             SET email=:email, username=:username
@@ -60,7 +39,7 @@ class Settings
     }
 
 
-    public static function changeUserMail($data)
+    public static function changeUserMail(array $data): void
     {
         $stmt = "UPDATE site_users
             SET email=:email
@@ -69,7 +48,7 @@ class Settings
     }
 
 
-    public static function changeUserName($data)
+    public static function changeUserName(array $data): void
     {
         $stmt = "UPDATE site_users
             SET username=:username
@@ -78,7 +57,7 @@ class Settings
     }
 
 
-    public static function storePW($data)
+    public static function storePW(array $data): void
     {
         $stmt = "UPDATE site_users
             SET pw_hash=:pw_hash
@@ -87,7 +66,7 @@ class Settings
     }
 
 
-    public static function changeUserData($data)
+    public static function changeUserData(array $data): void
     {
         $stmt = "UPDATE site_users
             SET vorname=:vorname, nachname=:nachname
@@ -96,7 +75,7 @@ class Settings
     }
 
 
-    public static function deleteMyAutologin($data)
+    public static function deleteMyAutologin(array $data): void
     {
         // Autologins abmelden, log=0
         $stmt = "UPDATE site_login
@@ -109,7 +88,7 @@ class Settings
     }
 
 
-    public static function deleteUser($userid)
+    public static function deleteUser(int $userid): void
     {
         // Konto löschen
         $data = [':userid' => $userid];     # int
@@ -122,7 +101,7 @@ class Settings
     }
 
 
-    public static function deleteUsersAutologins($userid)
+    public static function deleteUsersAutologins(int $userid): void
     {
         // wenn auf 'deaktiv' gesetzt, dann auch alle Anmeldungen löschen/beenden, (sonst bei DELETE automatisch per Verknüpfung gelöscht).
         #$stmt = "DELETE FROM site_login WHERE userid = :userid";
@@ -132,7 +111,6 @@ class Settings
                 AND (`login`=1 || autologin=1)";
         Database::sendSQL($stmt, $data);
     }
-
 }
 
 

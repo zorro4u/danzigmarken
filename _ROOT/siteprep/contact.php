@@ -52,12 +52,8 @@ class Contact
             unset($_SESSION['captcha_code'], $_SESSION['captcha'], $_SESSION['phrase']);
         }
 
-        # Herkunftsseite speichern
-        Tools::lastSite(['settings', 'admin']);
-
         self::$question = $question;
     }
-
 }
 
 

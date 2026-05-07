@@ -15,96 +15,8 @@ require_once __DIR__.'/../tools/tools.php';
  */
 class Settings extends Prep
 {
-    protected static $active;
-    protected static $status_message;
-
-
-    /**
-     * Summary of siteEntryCheck
-     * CheckIn-Test
-     * Plausi-Test: userid, identifier, token_hash
-     * set identifier
-     * set last_site
-     * set showForm
-     */
-    protected static function siteEntryCheck()
-    {
-        if (empty($_SESSION['main']))
-            $_SESSION['main'] = "/";
-
-        Tools::lastSite();
-
-        [$usr_data, $securitytoken_row, $error_msg] = Auth::checkUser();
-
-        // unberechtigter Seitenaufruf
-        $status = (empty($error_msg)) ? true : false;
-
-        // Nutzer nicht angemeldet? Dann weg hier ...
-        if (!Auth::isCheckedIn()) {
-            #header("location: /auth/login.php");
-            #exit;
-
-            header('HTTP/1.0 403 Forbidden');
-            echo "Forbidden";
-            exit();
-        }
-
-        // globale Variablen setzen
-        if ($status) {
-            self::$identifier = $securitytoken_row['identifier'];
-            self::$userid = $usr_data['userid'];
-        }
-        self::$error_msg = $error_msg;
-        self::$show_form = $status;
-    }
-
-
-    /**
-     * Summary of dataPreparation
-     * set $usr_data, $userliste
-     */
-    protected static function dataPreparation()
-    {
-        // TODO:
-        // Konto löschen per PW legitimieren
-        // Konto löschen: logout nicht über die logout-Seite sondern per Funktion und Rücksprung zur Hauptseite
-        //
-
-        // globale Variablen holen
-        $userid = self::$userid;
-        $identifier = self::$identifier;
-        $show_form  = self::$show_form;
-        $usr_data   = [];
-        $userliste  = [];
-
-        // Seiten-Check okay, Seite starten
-        if ($show_form):
-
-        // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
-        // alle aktiven Anmeldungen
-        $data = [':userid' => $userid, ':ident' => $identifier];
-        $results = Data::getUserCounts($data);
-
-        // Daten separieren
-        foreach ($results as $user) {
-
-            // aktueller Nutzer (für Formular-Vorbelegung)
-            if ($user['userid'] == $userid) $usr_data = $user;
-
-            // die anderen (für Abgleich nach Änderung von name/email)
-            else {
-                $userliste []= [
-                    'username' => $user['username'],
-                    'email'    => $user['email']
-                ];
-            }
-        }
-        endif;      # Seiten-Check okay
-
-        // globale Variablen setzen
-        self::$usr_data  = $usr_data;
-        self::$userliste = $userliste;
-    }
+    protected static array $active;
+    protected static string $status_message;
 
 
     /**
@@ -445,3 +357,6 @@ document.addEventListener("DOMContentLoaded", function () {
 resizeObserver
 Window.matchMedia()
 */
+
+
+// EOF

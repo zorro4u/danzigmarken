@@ -8,9 +8,7 @@ require_once __DIR__.'/../tools/tools.php';
 class RegisterInfo
 {
     protected static function dataPreparation(): void
-    {
-        Tools::lastSite(["login"]);
-    }
+    {}
 }
 
 

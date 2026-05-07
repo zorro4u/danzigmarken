@@ -13,12 +13,12 @@ require_once __DIR__.'/../tools/tools.php';
  */
 class Settings
 {
-    protected static $userid;
-    protected static $usr_data;
-    protected static $userliste;
-    protected static $identifier;
-    protected static $error_msg;
-    protected static $show_form;
+    protected static int $userid;
+    protected static array $usr_data;
+    protected static array $userliste;
+    protected static string $identifier;
+    protected static string $error_msg;
+    protected static bool $show_form;
 
 
     /**
@@ -31,10 +31,7 @@ class Settings
      */
     protected static function siteEntryCheck()
     {
-        if (empty($_SESSION['main']))
-            $_SESSION['main'] = "/";
-
-        Tools::lastSite();
+        #if (empty($_SESSION['main'])) $_SESSION['main'] = "/";
 
         [$usr_data, $securitytoken_row, $error_msg] = Auth::checkUser();
 
@@ -75,8 +72,8 @@ class Settings
         // globale Variablen holen
         $userid = self::$userid;
         $identifier = self::$identifier;
-        $show_form = self::$show_form;
-        $usr_data = [];
+        $show_form  = self::$show_form;
+        $usr_data  = [];
         $userliste = [];
 
         // Seiten-Check okay, Seite starten
@@ -96,10 +93,10 @@ class Settings
             else {
                 $userliste []= [
                     'username' => $user['username'],
-                    'email' => $user['email']
+                    'email'    => $user['email']
                 ];
-            }
-        }
+            };
+        };
         endif;      # Seiten-Check okay
 
         // globale Variablen setzen
@@ -185,3 +182,6 @@ document.addEventListener("DOMContentLoaded", function () {
 resizeObserver
 Window.matchMedia()
 */
+
+
+// EOF

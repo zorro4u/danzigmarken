@@ -25,8 +25,6 @@ class Activate
      */
     protected static function dataPreparation()
     {
-        Tools::lastSite();
-
         $input_code  = "";
         $success_msg = "";
         $error_msg = "";
