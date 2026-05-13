@@ -18,7 +18,7 @@ require_once __DIR__.'/../mail/AntiSpam.php';
  */
 class ContactPrep
 {
-    protected static $question;
+    protected static array $question;
 
     protected static function siteClose()
     {

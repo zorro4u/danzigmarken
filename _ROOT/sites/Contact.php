@@ -83,22 +83,22 @@ if (navigator.userAgent.search('Safari') >= 0 && navigator.userAgent.search('Chr
 
 
 <div class='form-group'>
-    <label for='inputName'>{$msg[311]}:</label>
-    <input type='text' id='inputName' size='40' maxlength='50' name='name'
-    value='".$input_name."' class='form-control' autocomplete='name' autofocus />
+<label for='inputName'>{$msg[311]}:</label>
+<input type='text' id='inputName' size='40' maxlength='50' name='name'
+    value='{$input_name}' class='form-control' autocomplete='name' autofocus />
 </div>
 
 <div class='form-group'>
-    <label for='inputEmail'>{$msg[312]}: <span style='color:red'>*</span></label>
-    <input type='email' id='inputEmail' size='40' maxlength='100' name='email'
-    value='".$input_email."' class='form-control' autocomplete='email' required />
+<label for='inputEmail'>{$msg[312]}: <span style='color:red'>*</span></label>
+<input type='email' id='inputEmail' size='40' maxlength='100' name='email'
+    value='{$input_email}' class='form-control' autocomplete='email' required />
 </div>
 
 <div class='form-group'>
-    <label for='inputMessage'>{$msg[313]}: <span style='color:red'>*</span></label>
-    <textarea id='inputMessage' name='message' rows='9' style='width:100%;' maxlength='500'
-    spellcheck='true' class='form-control' autocomplete='off' required>".$input_message_first."
-    </textarea>
+<label for='inputMessage'>{$msg[313]}: <span style='color:red'>*</span></label>
+<textarea id='inputMessage' name='message' rows='9' style='width:100%;' maxlength='500'
+    spellcheck='true' class='form-control' autocomplete='off'
+    required>{$input_message_first}</textarea>
 </div>
 <!-- ..................... -->
 EOT;
@@ -310,6 +310,7 @@ if ($cfg['Klick-Check']) {
     $output .= "
     <input type='hidden' name='chkspmkc' value='chkspmbt' />";
 };
+
 if ($cfg['Sicherheitscode']) {
     $output .= "
         <div class='row captcha-row ";
@@ -342,7 +343,6 @@ if ($cfg['Sicherheitscode']) {
     } else {
         $output .= " onchange='checkField(this)'";
     };
-    # placeholder='Sicherheitscode *'
     $output .= " aria-label='Eingabe' id='answer2' placeholder='{$msg[316]} *'
         type='text' maxlength='150'  class='field ";
     if (!empty($fehler['captcha'])) {
@@ -475,7 +475,7 @@ if ($cfg['Datenschutz_Erklaerung']) {
     };
     $output .= "
         onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;
-        padding-bottom:2px;line-height:27px;'> <a href='".$datenschutzerklaerung."'
+        padding-bottom:2px;line-height:27px;'> <a href='{$datenschutzerklaerung}'
         target='_blank'>{$msg[319]}</a> *</div>
         </label>";
     if (!empty($fehler['datenschutz'])) {
@@ -495,7 +495,7 @@ $output .= "
 <div class=\"col-sm-4\"><br>
     <span style=\"line-height:26px;font-size:17px;\"><b>Hinweis:</b> Felder mit <span class=\"pflichtfeld\">*</span> müssen ausgefüllt werden.</span>
     <br><br><br>
-    <button type=\"submit\" class=\"senden ".$buttonClass."\" name=\"kf-km\" id=\"submitButton\">
+    <button type=\"submit\" class=\"senden {$buttonClass}\" name=\"kf-km\" id=\"submitButton\">
         <span class=\"label\">Nachricht senden</span>
         <svg class=\"loading-spinner\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\">
             <circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle>
@@ -728,7 +728,7 @@ elseif ($success_msg !== ""):  // positive Statusausgabe ohne Formular
     /*
     $output .= "
     <!-- <hr><br>
-    <div><form action=".$root_site." method=\"POST\">
+    <div><form action={$root_site} method=\"POST\">
     <button class=\"btn btn-lg btn-primary btn-block\" type=\"submit\">
     Startseite</button>
     </form></div> -->";

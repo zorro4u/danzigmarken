@@ -4,9 +4,7 @@ namespace Dzg;
 class ContactMsg
 {
     // prep
-    public const MSG1 = [
-
-    ];
+    public const MSG1 = [];
 
     // form
     public const MSG2 = [
@@ -40,7 +38,7 @@ class ContactMsg
         313 => "Deine Nachricht",
         314 => "Das nachfolgende Feld muss leer bleiben, damit die Nachricht gesendet wird!",
         315 => "Sicherheitscode",
-        316 => "Ergebnis Sicherheitsfrage",
+        316 => "Ergebnis Sicherheitsfrage",     // 'Sicherheitscode *'
         317 => "Sicherheitsfrage",
         318 => "Kopie der Nachricht per E-Mail senden",
         319 => "Ich stimme der Datenschutz&shy;erklärung zu.",

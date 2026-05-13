@@ -1,13 +1,6 @@
 <?php
 namespace Dzg;
 
-
-/*
-<?= self::MSG[10] ?>
-".self::MSG[10]."
-    */
-
-
 class AdminMsg
 {
     // prep

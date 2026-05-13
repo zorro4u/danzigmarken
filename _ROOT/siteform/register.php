@@ -7,8 +7,8 @@ require_once __DIR__.'/../siteprep/register.php';
 require_once __DIR__.'/../sitedata/register.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
-require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
+require_once __DIR__.'/../mail/Mail.php';
 
 
 /**
@@ -36,6 +36,7 @@ class RegisterForm extends RegisterPrep
     {
         $usr_data  = self::$usr_data;
         $error_msg = self::$error_msg;
+        $success_msg = '';
         $input = [
             'usr'  => "",
             'mail' => "",

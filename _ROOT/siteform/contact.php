@@ -1,13 +1,13 @@
 <?php
 namespace Dzg;
 use Dzg\Tools\Tools;
-use Dzg\Mail\{MailConfig, AntiSpam};
+use Dzg\Mail\{MailConfig, Mail, AntiSpam};
 
 require_once __DIR__.'/../siteprep/contact.php';
 require_once __DIR__.'/../sitemsg/contact.php';
 require_once __DIR__.'/../tools/tools.php';
-#require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
+require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/AntiSpam.php';
 #require_once __DIR__.'/../mail/RateLimiting.php';
 #require_once __DIR__.'/../mail/Captcha.php';
@@ -167,11 +167,11 @@ class ContactForm extends ContactPrep
                 // mit CAPTCHA Bibliothek (sicherer, teilsweise aber schwer zu lesen)
                 // muss in Captcha.php auch aktiviert sein
                 #$compare = (PhraseBuilder::comparePhrases($_SESSION['phrase'], $_POST['sicherheitscode'])) ? true : false;
-                $compare = ($_SESSION['phrase'] == $_POST['sicherheitscode']) ? true : false;
+                $compare = ($_SESSION['phrase'] == $_POST['sicherheitscode']);
 
                 // Session wurde in AntiSpam::loadCaptchaPic() gesetzt
                 if (!isset($_POST['sicherheitscode'], $_SESSION['phrase'])
-                    || $compare)
+                    || !$compare)
                 {
                     $fehler['captcha'] = "<span class='errormsg'>{$msg[214]}</span>";
                     unset($_SESSION['phrase']);
@@ -298,36 +298,36 @@ class ContactForm extends ContactPrep
 
                 // === EMAIL ===
                 //
-                $email_send = true;
+                $email_okay = false;
                 $remote_ip  = getenv("REMOTE_ADDR");
                 $ip   = $_SERVER['REMOTE_ADDR'];
                 $host = getHostByAddr($ip);
-                $UserAgent = $_SERVER['HTTP_USER_AGENT'];
                 $date = date("d.m.Y | H:i");
+                $UserAgent = $_SERVER['HTTP_USER_AGENT'];
 
                 // ---- create mail for admin (from admin to admin with user message)
                 $mailto  = $smtp['from_addr'];
                 $subject = "[EMAIL:] Kontaktformular auf www.danzigmarken.de";
-                $mailcontent = "Folgendes wurde am ". $date ." Uhr per Formular empfangen:\n".
+                $mailcontent = "Folgendes wurde am {$date} Uhr per Formular empfangen:\n".
                     "-------------------------------------------------------------------------\n\n".
-                    "E-Mail: ".$input_email."\n".
-                    "Name: ".$input_name."\n\n".
+                    "E-Mail: {$input_email}\n".
+                    "Name: {$input_name}\n\n".
 
                     "Nachricht:\n\n".preg_replace("/\r\r|\r\n|\n\r|\n\n/","\n",$input_message)."\n\n\n".
-                    "IP Adresse: ".$ip." - ".$host." - ".$UserAgent."\n";
-/*
+                    "IP Adresse: {$ip} - {$host} - {$UserAgent}\n";
+
                 // mail it to admin
-                $email_send = Mail::sendMyMail(
+                $email_okay = Mail::sendMyMail(
                     $smtp['from_addr'],
                     $smtp['from_name'],
                     $mailto,
                     $subject,
                     $mailcontent
                 );
-*/
+
                 // === ENDE EMAIL-Abschnitt ===
 
-                if ($email_send) {
+                if ($email_okay) {
                     $success_msg = $msg[228];
                     #$show_form = False;
                 } else {
@@ -356,16 +356,16 @@ class ContactForm extends ContactPrep
         $status_message = Tools::statusOut($success_msg, $error_msg);
 
         unset($_POST, $_GET, $_REQUEST, $_SESSION['captcha'], $_SESSION['captcha_code']);
-        self::$show_form = $show_form;
-        self::$status_message = $status_message;
-        self::$success_msg = $success_msg;
+
+        #self::$fehler = $fehler;
+        self::$cfg = $cfg;
+        self::$show_form  = $show_form;
         self::$input_name = $input_name;
         self::$input_email = $input_email;
+        self::$success_msg = $success_msg;
+        self::$status_message = $status_message;
         self::$input_message_first = $input_message_first;
-        self::$cfg = $cfg;
-        #self::$fehler = $fehler;
         self::$datenschutzerklaerung = $datenschutzerklaerung;
-
     }
 }
 

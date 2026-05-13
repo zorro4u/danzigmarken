@@ -4,9 +4,7 @@ namespace Dzg;
 class RegisterInfoMsg
 {
     // prep
-    public const MSG1 = [
-
-    ];
+    public const MSG1 = [];
 
     // form
     public const MSG2 = [

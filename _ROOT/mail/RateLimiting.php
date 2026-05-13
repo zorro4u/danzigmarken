@@ -14,8 +14,8 @@ class RateLimiting
         $cfg = MailConfig::$cfg;
 
         // Datei zum Speichern der IP-Adressen
-        #$logfile = __DIR__.'/log/ip_log.txt';
-        $logfile = MailConfig::$mail_logfile;
+        #$mail_logfile = __DIR__.'/log/ip_log.txt';
+        $mail_logfile = MailConfig::$mail_logfile;
 
         if ($cfg['Aufrufe_limitieren']):
 
@@ -23,7 +23,7 @@ class RateLimiting
         $visitor_ip = $_SERVER['REMOTE_ADDR'];
 
         // Lese die Logdatei, um die bisherigen IP-Einträge zu zählen
-        $log_data = file_exists($logfile) ? file_get_contents($logfile) : '';
+        $log_data = file_exists($mail_logfile) ? file_get_contents($mail_logfile) : '';
         $ip_list = explode("\n", trim($log_data));
 
         // Zähle, wie oft die IP-Adresse bereits eingetragen ist
@@ -82,7 +82,7 @@ class RateLimiting
 
         else {
             // Füge die IP-Adresse in die Logdatei ein
-            file_put_contents($logfile, $visitor_ip . " - " . date('Y-m-d h:i:s', time()) . "\n", FILE_APPEND | LOCK_EX);
+            file_put_contents($mail_logfile, $visitor_ip . " > " . date('Y-m-d H:i:s', time()) . "\n", FILE_APPEND | LOCK_EX);
         }
 
         endif;

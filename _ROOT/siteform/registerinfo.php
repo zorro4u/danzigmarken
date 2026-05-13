@@ -8,8 +8,8 @@ require_once __DIR__.'/../sitedata/registerinfo.php';
 require_once __DIR__.'/../sitemsg/registerinfo.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
-require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
+require_once __DIR__.'/../mail/Mail.php';
 
 
 /**
@@ -269,13 +269,13 @@ class RegisterInfoForm extends RegisterInfoPrep
         # create mail for admin(steffen)
         $mailto2  = $smtp['from_addr'];
         $subject2 = "[Info] Anfrage zur Registrierung auf www.danzigmarken.de";
-        $mailcontent2 = "Folgendes wurde am ". $date ." Uhr per Formular empfangen:\n".
+        $mailcontent2 = "Folgendes wurde am {$date} Uhr per Formular empfangen:\n".
             "-------------------------------------------------------------------------\n\n".
-            "E-Mail: ".$input['mail']."\n".
-            "Name: ".$input['name']."\n\n".
+            "E-Mail: {$input['mail']}\n".
+            "Name: {$input['name']}\n\n".
 
             "Nachricht:\n\n".preg_replace("/\r\r|\r\n|\n\r|\n\n/", "\n", $input['message'])."\n\n\n".
-            "IP Adresse: ".$ip." - ".$host." - ".$UserAgent."\n".
+            "IP Adresse: {$ip} - {$host} - {$UserAgent}\n".
             "-------------------------------------------------------------------------\n\n".
             "Eine Email an den Anfragenden wurde gesendet.\n\n".
             "Von: ".$smtp['from_name']." <".$mailto2.">\n".

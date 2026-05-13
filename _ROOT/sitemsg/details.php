@@ -11,9 +11,7 @@ class DetailsMsg
     ];
 
     // form
-    public const MSG2 = [
-
-    ];
+    public const MSG2 = [];
 
     // sites
     public const MSG3 = [
