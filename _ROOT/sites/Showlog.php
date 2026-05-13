@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\Sites;
+namespace Dzg;
 use Dzg\Tools\{Database, CheckIP, Logger};
 
 require_once __DIR__."/../tools/database.php";
@@ -16,7 +16,12 @@ class ShowLog
      */
     public static function show(): void
     {
-       // Nutzer nicht angemeldet? Dann weg hier ...
+        $msg = [
+            10 => "nichts...",
+            11 => "Du hast den 'rechten' Pfad verlassen und wirst hier nix sehen.",
+        ];
+
+        // Nutzer nicht angemeldet? Dann weg hier ...
         if (!isset($_SESSION['userid'])) {
             header("location: /auth/login.php");
             exit;
@@ -144,11 +149,11 @@ class ShowLog
                 Logger::delete_logs();
 
             else:
-                $out .= "nichts...";
+                $out .= $msg[10];
             endif;
 
         else:
-            $out .= "Du hast den 'rechten' Pfad verlassen und wirst hier nix sehen.";
+            $out .= $msg[11];
         endif;
 
         // wird schon im Header/antiflood gemacht
@@ -182,20 +187,20 @@ class ShowLog
         SELECT count(*) FROM (SELECT ip FROM site_log WHERE ip NOT IN (SELECT log.ip FROM site_log AS log JOIN site_login AS login ON login.ip=log.ip GROUP BY log.ip)) as ct
         */
 
-        $output = "
+        $output = <<<EOT
         <!DOCTYPE html>
-        <html lang=\"de\">
+        <html lang='de'>
         <head>
-            <meta charset=\"utf-8\">
-            <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
-            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+            <meta charset='utf-8'>
+            <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+            <meta name='viewport' content='width=device-width, initial-scale=1'>
 
-            <meta http-equiv=\"cache-control\" content=\"must-revalidate, no-store\" >
-            <meta http-equiv=\"expires\" content=\"0\" >
-            <meta http-equiv=\"language\" content=\"DE\">
+            <meta http-equiv='cache-control' content='must-revalidate, no-store' >
+            <meta http-equiv='expires' content='0' >
+            <meta http-equiv='language' content='DE'>
 
-            <meta name=\"robots\" content=\"noindex, nofollow, noimageindex, max-snippet:200, max-image-preview:standard, unavailable_after:2040-12-31\">
-            <meta name=\"google\" content=\"nopagereadaloud\" >
+            <meta name='robots' content='noindex, nofollow, noimageindex, max-snippet:200, max-image-preview:standard, unavailable_after:2040-12-31'>
+            <meta name='google' content='nopagereadaloud' >
 
             <title>log-File</title>
 
@@ -209,7 +214,7 @@ class ShowLog
 
         </body>
         </html>
-        ";
+        EOT;
 
 
         // HTML Ausgabe

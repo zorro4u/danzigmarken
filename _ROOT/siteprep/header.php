@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
+namespace Dzg;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/header_prep.php';
@@ -23,6 +23,16 @@ class Header extends HeaderPrep
         self::showNavigation();
     }
 
+
+
+    /*
+    <?= self::MSG[10] ?>
+    ".self::MSG[10]."
+     */
+    protected const MSG = [
+        10 => "",
+        11 => "",
+    ];
 
 
     /**

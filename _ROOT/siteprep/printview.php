@@ -1,6 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SiteData\PrintView as Data;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 
 date_default_timezone_set('Europe/Berlin');
@@ -15,7 +14,7 @@ require_once __DIR__.'/../tools/tools.php';
  * die gesamte Datenbank als Druckversion anzeigen
  * dadurch die Möglichkeit, die Ausgaben als PDF-drucken zu speichern
  */
-class PrintView
+class PrintviewPrep
 {
     protected static array $theme_list;
     protected static int $akt_file_id;
@@ -57,9 +56,10 @@ class PrintView
     }
     protected static function themeListeHolen(): array
     {
-        $theme_array = Data::getTheme();
+        $theme_array = PrintviewData::getTheme();
 
         // [[x],[y],...] -> [x,y,...]
+        $list = [];
         foreach ($theme_array as $entry_array) {
             $list []= $entry_array[0];
         }
@@ -73,7 +73,7 @@ class PrintView
 
     protected static function idListeHolen(string $theme=''): array
     {
-        $result = Data::getIDlist($theme);
+        $result = PrintviewData::getIDlist($theme);
 
         // [[x],[y],...] -> [x,y,...]
         $idlist = [];
@@ -131,7 +131,7 @@ class PrintView
         ];
 
         // Kateg.bezeichnung (kat10-kat29) aus DB holen
-        $result = Data::getKat();
+        $result = PrintviewData::getKat();
 
         foreach ($result AS $entry)
             $nameof_col_db[$entry[1]] = $entry[2];
@@ -162,7 +162,7 @@ class PrintView
         // Hauptdatenabfrage
         // alle Dateien der angegebenen Gruppen.ID holen
         //
-        $results = Data::getMainData($akt_file_id);
+        $results = PrintviewData::getMainData($akt_file_id);
 
         // Abfrage verarbeiten
         //
@@ -175,6 +175,7 @@ class PrintView
 
             $i = $j = 0;
             $ffn = [];
+            $stamps = [];
 
             foreach ($results as $k=>$v) {
 

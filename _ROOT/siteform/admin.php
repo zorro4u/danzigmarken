@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\SiteForm;
-use Dzg\SitePrep\Admin as Prep;
-use Dzg\SiteData\Admin as Data;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../siteprep/admin.php';
@@ -14,7 +12,7 @@ require_once __DIR__.'/../tools/tools.php';
  * Summary of Admin
  * class A extends B implements C
  */
-class Admin extends Prep
+class AdminForm extends AdminPrep
 {
     protected static string $status_message;
     protected static array $active;
@@ -26,6 +24,7 @@ class Admin extends Prep
      */
     protected static function formEvaluation(): void
     {
+        $msg = self::MSG;
         $identifier  = self::$identifier;
         $reglinks    = self::$reglinks;
         $user_list   = self::$user_list;
@@ -63,8 +62,8 @@ class Admin extends Prep
 
                     case "delete_allregs":
                         if (count($reglinks)) {
-                            Data::deleteAllRegLink();
-                            $success_msg = "alle Registrierungslinks gelöscht.";
+                            AdminData::deleteAllRegLink();
+                            $success_msg = self::MSG[210];
                         };
                         break;
 
@@ -129,50 +128,50 @@ class Admin extends Prep
         $success_msg = "";
         switch ((int)$_POST['logout']) {
             case 11:     // alle meine anderen aktiven Anmeldungen
-                Data::deleteMyActive($userid, $identifier);
-                $success_msg = "Alle meine anderen aktiven Autologins beendet.";
+                AdminData::deleteMyActive($userid, $identifier);
+                $success_msg = self::MSG[211];
                 break;
 
             case 10:     // alle meine ausgeloggten Anmeldungen
-                Data::deleteMyNoActive($userid, $identifier);
-                $success_msg = "Alle meine ausgeloggten Logins beendet.";
+                AdminData::deleteMyNoActive($userid, $identifier);
+                $success_msg = self::MSG[212];
                 break;
 
             case 12:     // alle meine beendeten Anmeldungen (tot)
-                Data::deleteMyClosed($userid);
-                $success_msg = "Alle meine beendeten Logins gelöscht.";
+                AdminData::deleteMyClosed($userid);
+                $success_msg = self::MSG[213];
                 break;
 
             case 13:     // alle meine abgelaufenen Anmeldungen (tot)
-                Data::deleteMyOld($userid);
-                $success_msg = "Alle meine abgelaufenen Logins gelöscht.";
+                AdminData::deleteMyOld($userid);
+                $success_msg = self::MSG[214];
                 break;
 
 
             case 21:     // alle anderen aktiven
-                Data::deleteActive($userid);
-                $success_msg = "Alle aktiven Autologins der anderen Nutzer beendet.";
+                AdminData::deleteActive($userid);
+                $success_msg = self::MSG[215];
                 break;
 
             case 20:     // alle anderen ausgeloggten Anmeldung
-                Data::deleteNoActive($userid);
-                $success_msg = "Alle ausgeloggten Autologins der anderen Nutzer beendet.";
+                AdminData::deleteNoActive($userid);
+                $success_msg = self::MSG[216];
                 break;
 
             case 22:     // alle anderen beendeten Anmeldung (tot)
-                Data::deleteClosed($userid);
-                $success_msg = "Alle anderen toten Logins gelöscht.";
+                AdminData::deleteClosed($userid);
+                $success_msg = self::MSG[217];
                 break;
 
             case 23:     // alle anderen abgelaufenen (tot)
-                Data::deleteOld($userid);
-                $success_msg = "Alle anderen abgelaufenen Logins gelöscht.";
+                AdminData::deleteOld($userid);
+                $success_msg = self::MSG[218];
                 break;
 
             case 24:     // alle Anmeldungen der anderen Nutzer ('break' weggelassen)
             case 25:     // alle anderen Nutzer
-                Data::deleteOtherAutologin($userid);
-                $success_msg = "Alle Autologins der anderen Nutzer beendet.";
+                AdminData::deleteOtherAutologin($userid);
+                $success_msg = self::MSG[218];
                 break;
         };  // $_POST['logout']
 
@@ -202,8 +201,8 @@ class Admin extends Prep
             ':status'   => $status,
             ':pwcode_endtime' => $pwcode_endtime,
             ':notiz'    => $notiz ];
-        Data::storeRegCode($data);
-        $success_msg = "Registrierungs-Link erzeugt.";
+        AdminData::storeRegCode($data);
+        $success_msg = self::MSG[220];
 
         return $success_msg;
     }
@@ -237,8 +236,8 @@ class Admin extends Prep
         $success_msg = "";
         if (isset($_POST['regchoise'])) {
             $i = (int)$_POST['regchoise'] - 1;
-            Data::deleteRegLink($reglinks[$i]['userid']);
-            $success_msg = "Registrierungslink gelöscht.";
+            AdminData::deleteRegLink($reglinks[$i]['userid']);
+            $success_msg = self::MSG[221];
         };
         return $success_msg;
     }
@@ -251,11 +250,11 @@ class Admin extends Prep
         if (isset($_POST['usrchoise'])) {
             $i = (int)$_POST['usrchoise'] - 1;
             if ($user_list[$i]['userid'] !== $_SESSION['userid']) {
-                Data::deleteUser($user_list[$i]['userid']);
-                $success_msg = "Nutzer gelöscht.";
+                AdminData::deleteUser($user_list[$i]['userid']);
+                $success_msg = self::MSG[222];
             }
             else {
-                $error_msg = "Kann mich nicht selbst löschen.";
+                $error_msg = self::MSG[223];
             };
         };
         return [$success_msg, $error_msg];

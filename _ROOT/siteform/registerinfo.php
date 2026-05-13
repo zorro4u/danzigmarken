@@ -1,12 +1,11 @@
 <?php
-namespace Dzg\SiteForm;
-use Dzg\SitePrep\RegisterInfo as Prep;
-use Dzg\SiteData\RegisterInfo as Database;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
 
 require_once __DIR__.'/../siteprep/registerinfo.php';
 require_once __DIR__.'/../sitedata/registerinfo.php';
+require_once __DIR__.'/../sitemsg/registerinfo.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 require_once __DIR__.'/../mail/Mail.php';
@@ -16,24 +15,9 @@ require_once __DIR__.'/../mail/MailConfig.php';
 /**
  * Summary of Class RegisterInfo
  */
-class RegisterInfo extends Prep
+class RegisterInfoForm extends RegisterInfoPrep
 {
-    protected const MSG = [
-        10 => "nur Buchstaben im Namen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen)",
-        11 => "Email angeben.",
-        12 => "Keine gültige Email-Adresse.",
-        13 => "Die Nachricht verwendet unzulässige Zeichen",
-        14 => "keine Email und Nachricht angegeben.",
-        15 => "Eine Email mit deiner Anfrage wurde versandt. Du erhälst in Kürze eine Antwort.",
-        16 => "Oh, die Email konnte <b>NICHT</b> gesendet werden :-(",
-        17 => "Registrierungs-Link für www.danzigmarken.de",
-        18 => "Hallo",
-        19 => "du kannst dich jetzt auf www.danzigmarken.de registrieren.",
-        20 => "Rufe dazu in den nächsten 4 Wochen (bis zum",
-        21 => "den folgenden Link auf",
-        22 => "Herzliche Grüße",
-        23 => "Dein Support-Team von www.danzigmarken.de"
-    ];
+    protected const MSG = RegisterInfoMsg::MSG;
 
     // username: beginnt mit Buchstaben, kann dann auch Zahlen und (._-) enthalten aber nicht damit enden, ist 3-20 Zeichen lang
     private const REGEX_USR = "/^[a-zA-Z]((\.|_|-)?[a-zA-Z0-9äüößÄÜÖ]+){3,20}$/D";
@@ -82,7 +66,7 @@ class RegisterInfo extends Prep
             //
             $error_msg []= (isset($_POST['email'], $_POST['message']))
                 ? self::plausi_check($input)
-                : self::MSG[14];
+                : self::MSG[214];
 
 
             // Eingaben okay, Mail vorbereiten und versenden
@@ -111,14 +95,14 @@ class RegisterInfo extends Prep
                     ':notiz'          => $notiz,
                     ':vorname'        => $input['vor'],
                     ':nachname'       => $input['nach'] ];
-                Database::storeUser($data);
+                RegisterInfoData::storeUser($data);
 
                 # Email senden
                 if (self::send_email($input, $pwcode_endtime, $reg_url)) {
-                    $success_msg = self::MSG[15];
+                    $success_msg = self::MSG[215];
                     $show_form = False;
                 } else {
-                    $error_msg []= self::MSG[16];
+                    $error_msg []= self::MSG[216];
                 };
             }
 
@@ -205,7 +189,7 @@ class RegisterInfo extends Prep
         if ($input['name'] !== ""
             && preg_match_all(self::REGEX_NAME_NO, $input['name'], $match))
         {
-            $error_msg = self::MSG[10].': "'.htmlentities(implode(" ", $match[0])).'"';
+            $error_msg = self::MSG[210].': "'.htmlentities(implode(" ", $match[0])).'"';
         }
         else {
             $name_arr = explode(' ', $input['name'], 20);
@@ -230,10 +214,10 @@ class RegisterInfo extends Prep
             : "";
 
         if ($input['mail'] === "") {
-            $error_msg = self::MSG[11];
+            $error_msg = self::MSG[211];
         }
         elseif (!filter_var($input['mail'], FILTER_VALIDATE_EMAIL)) {
-            $error_msg = self::MSG[12];
+            $error_msg = self::MSG[212];
         };
 
 
@@ -248,7 +232,7 @@ class RegisterInfo extends Prep
         if ($input['mail'] !== ""
             && preg_match_all(self::REGEX_MESS_NO, $input['message'], $match))
         {
-            $error_msg = self::MSG[13] . ': "' . htmlentities(implode(" ", $match[0])).'"';
+            $error_msg = self::MSG[213] . ': "' . htmlentities(implode(" ", $match[0])).'"';
         };
 
 
@@ -274,13 +258,13 @@ class RegisterInfo extends Prep
 
         # create mail for customer
         $mailto1  = $input['mail'];
-        $subject1 = self::MSG[17];
-        $mailcontent1 = self::MSG[18].' '.$input['name'].",\n\n".
-            self::MSG[19].' '.
-            self::MSG[20].date(' d.m.y ', $pwcode_endtime).") ".
-            self::MSG[21].": \n\n".$reg_url ."\n\n".
-            self::MSG[22]."\n".
-            self::MSG[23]."\n";
+        $subject1 = self::MSG[217];
+        $mailcontent1 = self::MSG[218].' '.$input['name'].",\n\n".
+            self::MSG[219].' '.
+            self::MSG[220].date(' d.m.y ', $pwcode_endtime).") ".
+            self::MSG[221].": \n\n".$reg_url ."\n\n".
+            self::MSG[222]."\n".
+            self::MSG[223]."\n";
 
         # create mail for admin(steffen)
         $mailto2  = $smtp['from_addr'];

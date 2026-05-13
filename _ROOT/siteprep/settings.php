@@ -1,18 +1,18 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SiteData\Settings as Data;
-use Dzg\Tools\{Auth, Tools};
+namespace Dzg;
+use Dzg\Tools\Auth;
 
 require_once __DIR__.'/../sitedata/settings.php';
+require_once __DIR__.'/../sitemsg/settings.php';
 require_once __DIR__.'/../tools/auth.php';
-require_once __DIR__.'/../tools/tools.php';
 
 
 /**
  * Summary of Settings
  */
-class Settings
+class SettingsPrep
 {
+    protected const MSG = SettingsMsg::MSG;
     protected static int $userid;
     protected static array $usr_data;
     protected static array $userliste;
@@ -81,7 +81,7 @@ class Settings
 
         // Zählerangaben für Autologin-Anzeige des aktuellen Nutzers holen
         // alle aktiven Anmeldungen
-        $results = Data::getCounter($userid, $identifier);
+        $results = SettingsData::getCounter($userid, $identifier);
 
         // Daten separieren
         foreach ($results as $user) {

@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\SiteData;
+namespace Dzg;
 use Dzg\Tools\Database;
 
 require_once __DIR__.'/../tools/database.php';
@@ -8,7 +8,7 @@ require_once __DIR__.'/../tools/database.php';
 /**
  * Summary of Class Register
  */
-class Register
+class RegisterData
 {
     public static function getUser(string $input_code)
     {

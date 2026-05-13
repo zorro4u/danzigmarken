@@ -1,25 +1,22 @@
 <?php
-namespace Dzg\SitePrep;
+namespace Dzg;
 use Dzg\Tools\Auth;
-use Dzg\Tools\Tools;
 
+require_once __DIR__.'/../sitemsg/login.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-class Login
+class LoginPrep
 {
-    protected const MSG = [
-        0 => "Du bist schon angemeldet. Was machst du dann hier? ...",
-    ];
-
+    protected const MSG = LoginMsg::MSG;
     protected static string $success_msg;
 
     protected static function siteEntryCheck(): void
     {
         // Nutzer schon angemeldet? Dann weg hier ...
         self::$success_msg = (Auth::isCheckedIn())
-            ? self::MSG[0]
+            ? self::MSG[110]
             : "";
     }
 

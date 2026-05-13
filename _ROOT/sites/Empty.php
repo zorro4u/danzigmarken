@@ -1,6 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteprep/loader_default.php';
 

@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\SiteForm;
-use Dzg\SitePrep\Register as Prep;
-use Dzg\SiteData\Register as Database;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 use Dzg\Mail\{MailConfig, Mail};
 
@@ -16,29 +14,8 @@ require_once __DIR__.'/../mail/MailConfig.php';
 /**
  * Summary of Class Register
  */
-class Register extends Prep
+class RegisterForm extends RegisterPrep
 {
-    protected const MSG = parent::MSG + [
-        50 => "Name und Email angeben.",
-        51 => "nur Kleinbuchstaben/Zahlen im Anmeldenamen zulässig",
-        52 => "Keine gültige Email-Adresse.",
-        53 => "Der Benutzername ist schon vergeben.",
-        54 => "Die E-Mail-Adresse ist bereits registriert.",
-        55 => "Bitte identische Passwörter eingeben",
-        56 => "Passwort muss zwischen 4 und 50 Zeichen lang sein!",
-        57 => "Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>",
-        58 => "Name, Email und Passwort angeben.",
-        59 => "Eine Email wurde dir soeben zur Bestätigung zugesandt, in der die Registrierung abschließend noch aktiviert werden muss. Danach kannst du dich anmelden.",
-        60 => "Oh, die Email konnte <b>NICHT</b> gesendet werden :-(",
-        61 => "Du wurdest erfolgreich registriert und kannst dich jetzt anmelden",
-        62 => "Kontoaktivierung auf www.danzigmarken.de",
-        63 => "Hallo",
-        64 => "dein Konto auf www.danzigmarken.de muss noch bis zum",
-        65 => "aktiviert werden.",
-        66 => "Rufe dazu folgenden Link auf",
-        67 => "Herzliche Grüße",
-        68 => "Dein Support-Team von www.danzigmarken.de",
-    ];
     private const REGEX_USR = "/^[\wäüößÄÜÖ\-]{3,50}$/";
     private const REGEX_EMAIL = "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
     private const REGEX_PW = "/^[\w<>()?!,.:_=$%&#+*~^ @€µäüößÄÜÖ]{1,100}$/";
@@ -100,7 +77,7 @@ class Register extends Prep
 
             # $_POST Auswertung, Nutzereingaben unvollständig
             else {
-                $error_msg = self::MSG[58];
+                $error_msg = self::MSG[218];
             };
 
 
@@ -117,7 +94,7 @@ class Register extends Prep
                     $status = 'activated';
                     $notiz = NULL;
 
-                    $success_msg = self::MSG[61].': <a href="login.php?usr='.$input['usr'].'">Login</a>.';
+                    $success_msg = self::MSG[221].': <a href="login.php?usr='.$input['usr'].'">Login</a>.';
                     $show_form = False;
                 }
 
@@ -139,11 +116,11 @@ class Register extends Prep
 
                     # Email senden
                     if (self::send_email($input['mail'], $pwcode_endtime, $activate_url)) {
-                        $success_msg = self::MSG[59];
+                        $success_msg = self::MSG[219];
                         $show_form = False;
                     }
                     else {
-                        $error_msg = self::MSG[60];
+                        $error_msg = self::MSG[220];
                     };
                 };
 
@@ -160,7 +137,7 @@ class Register extends Prep
                     ':status'         => $status,
                     ':notiz'          => $notiz
                     ];
-                Database::storeUser($data);
+                RegisterData::storeUser($data);
 
             };  // Eingabewerte in Datenbank schreiben
         };      // Formularwerte empfangen
@@ -192,19 +169,19 @@ class Register extends Prep
 
         # kein Name oder Email angegeben
         if ($input['usr'] === "" || $input['mail'] === "") {
-            $error_msg = self::MSG[50];
+            $error_msg = self::MSG[210];
         }
 
         # Username-Check nicht alphanumerisch
         elseif ($input['usr'] !== ""
             && preg_match("/\W/", $input['usr'], $matches))
         {
-            $error_msg = self::MSG[51].': '.htmlspecialchars($matches[0]);
+            $error_msg = self::MSG[211].': '.htmlspecialchars($matches[0]);
         };
 
         # angegebene Email nicht okay
         if ($input['mail'] !== "" && (!filter_var($input['mail'], FILTER_VALIDATE_EMAIL))) {
-            $error_msg = self::MSG[52];
+            $error_msg = self::MSG[212];
         };
 
         # Eingabe usernamen/email mit DB abgleichen
@@ -230,7 +207,7 @@ class Register extends Prep
 
         # usernamen/email im Bestand suchen
         $data = [':username' => $input_usr, ':email' => $input_email];
-        $userliste = Database::searchActivatedUser($data);
+        $userliste = RegisterData::searchActivatedUser($data);
 
         # Benutzername vergeben
         if ($input_usr !== "") {
@@ -241,7 +218,7 @@ class Register extends Prep
                 };
             };
             $exist
-                ? $error_msg = self::MSG[53]
+                ? $error_msg = self::MSG[213]
                 : $update_username = True;
         };
 
@@ -254,7 +231,7 @@ class Register extends Prep
                 };
             };
             $exist
-                ? $error_msg = self::MSG[54]
+                ? $error_msg = self::MSG[214]
                 : $update_email = True;
         };
 
@@ -270,19 +247,19 @@ class Register extends Prep
 
         # Kontrollpasswort unterscheidet sich
         if ($input_pw1 !== $input_pw2) {
-            $error_msg = self::MSG[55];
+            $error_msg = self::MSG[215];
         }
 
         # Passwortlänge (4..50 Zeichen) stimmt nicht
         elseif (strlen($input_pw1) < self::PW_MIN
             || strlen($input_pw1) > self::PW_MAX)
         {
-            $error_msg = self::MSG[56];
+            $error_msg = self::MSG[216];
         }
 
         # ungültige Zeichen verwendet
         elseif (!preg_match(self::REGEX_PW, $input_pw1)) {
-            $error_msg = self::MSG[57];
+            $error_msg = self::MSG[217];
         };
 
         return $error_msg;
@@ -304,13 +281,13 @@ class Register extends Prep
 
         # create mail for customer
         $mailto1  = $input_email;
-        $subject1 = self::MSG[62];
-        $mailcontent1 = self::MSG[63].' '.$mailto1.",\n\n".
-            self::MSG[64].date(" d.m.y ", $pwcode_endtime).
-            self::MSG[65].' '.
-            self::MSG[66].": \n\n".$activate_url."\n\n".
-            self::MSG[67]."\n".
-            self::MSG[68]."\n";
+        $subject1 = self::MSG[222];
+        $mailcontent1 = self::MSG[223].' '.$mailto1.",\n\n".
+            self::MSG[224].date(" d.m.y ", $pwcode_endtime).
+            self::MSG[225].' '.
+            self::MSG[226].": \n\n".$activate_url."\n\n".
+            self::MSG[227]."\n".
+            self::MSG[228]."\n";
 
         # create mail for admin
         $mailto2  = $smtp['from_addr'];

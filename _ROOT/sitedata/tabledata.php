@@ -1,9 +1,8 @@
 <?php
-namespace Dzg\SiteData;
-use Dzg\SitePrep\TablePrep;
+namespace Dzg;
 use Dzg\Tools\Database;
 
-require_once __DIR__.'/../siteprep/tableprep.php';
+#require_once __DIR__.'/../siteprep/tableprep.php';
 require_once __DIR__.'/../tools/database.php';
 
 
@@ -180,7 +179,7 @@ class TableData
     public static function getThumbPath(int $gid): array
     {
         $thb_ffn = [];
-        
+
         $sort = "sta.kat10, sta.datum, sta.kat11, sta.kat12, sta.kat13, sta.kat14, sta.kat15,
                 sta.kat16, sta.kat17, dat.kat20 DESC, dat.kat21, dat.kat22, dat.kat23,
                 sta.id, dat.id";

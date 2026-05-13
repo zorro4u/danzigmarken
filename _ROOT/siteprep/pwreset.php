@@ -1,8 +1,7 @@
 <?php
 /* Prozess: ForgetSeite-->email(Admin)/email(Code)-->dieseSeite:ResetSeite-->Login */
 
-namespace Dzg\SitePrep;
-use Dzg\SiteData\PWreset as Data;
+namespace Dzg;
 use Dzg\Tools\Tools;
 
 date_default_timezone_set('Europe/Berlin');
@@ -10,6 +9,7 @@ error_reporting(E_ERROR | E_PARSE);
 session_start();
 
 require_once __DIR__.'/../sitedata/pwreset.php';
+require_once __DIR__.'/../sitemsg/pwreset.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
@@ -18,8 +18,10 @@ require_once __DIR__.'/../tools/tools.php';
 /**
  * Summary of Pw_reset
  */
-class PWreset
+class PWresetPrep
 {
+    protected const MSG = PWresetMsg::MSG;
+
     protected static bool $show_form;
     protected static string $status_message;
     protected static string $success_msg;
@@ -40,6 +42,7 @@ class PWreset
         /*
         * Seitenaufruf mit passwortcode
         */
+        $msg = self::MSG;
         $usr_data  = [];
         $error_msg = "";
         $success_msg = "";
@@ -48,54 +51,61 @@ class PWreset
         $name = "";
 
         if (!isset($_GET['pwcode'])) {
-            $error_msg = "Ohne Legitimations-Code kann das Passwort nicht zurückgesetzt werden.";
+            $error_msg = $msg[110];
+        }
 
         // Passcode prüfen
-        } else {
+        else {
             $input_code = htmlspecialchars(Tools::cleanInput($_GET['pwcode']));
 
             // Werte auf Plausibilität prüfen
             if ($input_code === "")
-                $error_msg = 'Es wurde kein Legitimations-Code zum Zurücksetzen des Passworts übermittelt.';
+                $error_msg = $msg[111];
             elseif (!preg_match('/^[a-zA-Z0-9]{1,1000}/', $input_code))
                 $error_msg = 'Der Passcode enhält ungültige Zeichen.';
-        }
+        };
 
         // Link mit DB abgleichen
         if ($error_msg === "") {
 
             // Passcode auf Gültigkeit prüfen
             $pwcode_hash = sha1($input_code);
-            $usr_data = Data::getPassCode($pwcode_hash);
+            $usr_data = PWresetData::getPassCode($pwcode_hash);
 
-            if (!$usr_data)
-                $error_msg = "Der Benutzer wurde nicht gefunden oder hat kein neues Passwort angefordert bzw. der übergebene Code war ungültig. ".
-                    "<hr>Stell sicher, dass du den genauen Link in der URL aufgerufen hast. ".
-                    "Solltest du mehrmals die Passwortvergessen-Funktion genutzt haben, so ruf den Link in der neuesten E-Mail auf.";
+            if (!$usr_data) {
+                $error_msg = $msg[112].' <hr>'.$msg[113];
+            }
 
-            elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {  // +1 Std. Karenz
+            // +1 Std. Karenz
+            elseif (($usr_data['pwcode_endtime'] + 3600*1) < time()) {
                 // Passcode abgelaufen, veralteten Eintrag löschen
-                Data::deletePassCode($usr_data['userid']);
+                PWresetData::deletePassCode($usr_data['userid']);
 
-                $error_msg = "Dein Code ist leider am ".date('d.m.y H:i', $usr_data['pwcode_endtime']).
-                    " abgelaufen. Benutze die <a href='pwforget'>Passwortvergessen-Funktion</a> erneut.";
+                $error_msg = $msg[114] . date(' d.m.y H:i ', $usr_data['pwcode_endtime']).
+                    $msg[115] . " <a href='pwforget'>" . $msg[116] . "</a>".
+                    $msg[117];
             }
             else {
                 // Anrede
-                if (!empty($usr_data['vorname']))
+                if (!empty($usr_data['vorname'])) {
                     $name = $usr_data['vorname'];
-                elseif ($usr_data['username'])
+                }
+                elseif ($usr_data['username']) {
                     $name = $usr_data['username'];
-                else
+                }
+                else {
                     $name = $usr_data['email'];
-            }
-        }
+                };
+            };
+        };
 
         // Passcode okay, Seite starten
         if ($error_msg === ""):
 
             // Formularwerte empfangen
-            if (isset($_GET['send']) && (strtoupper($_SERVER["REQUEST_METHOD"]) === "POST")) {
+            if (isset($_GET['send'])
+                && (strtoupper($_SERVER["REQUEST_METHOD"]) === "POST"))
+            {
                 // Eingabewerte auf Plausibilität prüfen
                 if (isset($_POST['passwort'], $_POST['passwort2'])) {
                     $input_pwNEU1 = $_POST['passwort'];
@@ -103,32 +113,40 @@ class PWreset
                     $regex_pw = "/^[\w<>()?!,.:_=$%&#+*~^ @€µÄÜÖäüöß]{1,100}$/";  // attention: add a slash at the begin and the end
 
                     // Passwortlänge prüfen
-                    if (strlen($input_pwNEU1) < 4 || strlen($input_pwNEU1) > 50)
-                        $error_msg = 'Passwort muss zwischen 4 und 50 Zeichen lang sein!';
+                    if (strlen($input_pwNEU1) < 4
+                        || strlen($input_pwNEU1) > 50)
+                    {
+                        $error_msg = $msg[123];
+                    }
 
                     // Passwort-Zeichen prüfen (nur alphanumerisch + ein paar Sonderzeichen (keine sql kritischen), Länge <100 Zeichen
-                    elseif (!preg_match($regex_pw, $input_pwNEU1))
-                        $error_msg = 'Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>';
+                    elseif (!preg_match($regex_pw, $input_pwNEU1)) {
+                        $error_msg = $msg[118] . '!?,.:_=$%&#+*~^(@€µÄÜÖäüöß)' . $msg[119];
+                    }
 
                     // Doublette prüfen
-                    elseif ($input_pwNEU1 !== $input_pw2)
-                        $error_msg = "Bitte identische Passwörter eingeben";
+                    elseif ($input_pwNEU1 !== $input_pw2) {
+                        $error_msg = $msg[120];
+                    }
 
-                    else {}
-                } else
-                    $error_msg = 'Passwort angeben.';
+                    else {};
+                }
+
+                else {
+                    $error_msg = $msg[121];
+                };
 
                 // Plausi-Check okay, speichere neues Passwort und lösche den Code
                 // TODO: alle Autologins beenden
                 if ($error_msg === "") {
                     $passwort_hash = password_hash($input_pwNEU1, PASSWORD_DEFAULT);
-                    Data::storeNewPassword($usr_data['userid'], $passwort_hash);
+                    PWresetData::storeNewPassword($usr_data['userid'], $passwort_hash);
 
-                    $success_msg = "Dein Passwort wurde geändert";
+                    $success_msg = $msg[122];
                     $show_form = False;
 
-                }  // Eingabewerte in Datenbank schreiben
-            }  // Formularwerte empfangen
+                };  // Eingabewerte in Datenbank schreiben
+            };      // Formularwerte empfangen
 
         endif;  // Passcode okay, Seite starten
 

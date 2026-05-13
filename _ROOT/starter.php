@@ -1,7 +1,5 @@
 <?php
 namespace Dzg;
-use Dzg\Sites;
-use Dzg\SitePrep\SiteConfig as Init;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -22,86 +20,86 @@ class Starter
     {
         // lädt die entspr. Klassendatei, wenn vorhanden
         !($classfile = self::loadSiteConfig($site))
-            ?: require_once __DIR__."/sites/".ucfirst($classfile);
+            ?: require_once __DIR__.'/sites/'.ucfirst($classfile);
 
         // startet die Seitenklasse über den zugehörigen Dateinamen
         switch(strtolower(basename($classfile, '.php'))):
 
             case "admin":
-                Sites\Admin::show();
+                Admin::show();
                 break;
 
             case "settings":
-                Sites\Settings::show();
+                Settings::show();
                 break;
 
             case "table":
-                Sites\Table::show();
+                Table::show();
                 break;
 
             case "details":
-                Sites\Details::show();
+                Details::show();
                 break;
 
             case "change":
-                Sites\Change::show();
+                Change::show();
                 break;
 
             case "login":
-                Sites\Login::show();
+                Login::show();
                 break;
 
             case "logout":
-                Sites\Logout::show();
+                Logout::show();
                 break;
 
             case "pwforget":
-                Sites\PWforget::show();
+                PWforget::show();
                 break;
 
             case "pwreset":
-                Sites\PWreset::show();
+                PWreset::show();
                 break;
 
             case "registerinfo":
-                Sites\RegisterInfo::show();
+                RegisterInfo::show();
                 break;
 
             case "register":
-                Sites\Register::show();
+                Register::show();
                 break;
 
             case "activate":
-                Sites\Activate::show();
+                Activate::show();
                 break;
 
             case "contact":
-                Sites\Contact::show();
+                Contact::show();
                 break;
 
             case "upload":
-                Sites\Upload::show();
+                Upload::show();
                 break;
 
             case "showlog":
-                Sites\ShowLog::show();
+                ShowLog::show();
                 break;
 
             case "printview":
-                Sites\Printview::show();
+                Printview::show();
                 break;
 
             case "impressum":
-                Sites\Impressum::show();
+                Impressum::show();
                 break;
 
             case "about":
-                Sites\About::show();
+                About::show();
                 break;
 
 
             case "empty":
-                Sites\Dummy::show("no page founded...");
+                Dummy::show("no page founded...");
                 break;
 
             case "download":
@@ -128,7 +126,7 @@ class Starter
         if (!pathinfo($site, PATHINFO_EXTENSION)) {
             $site .= '.php';
         };
-        $page = Init::PAGE[$site] ?? Init::PAGE['dummy'];
+        $page = SiteConfig::PAGE[$site] ?? SiteConfig::PAGE['dummy'];
 
         // globaler Wert für weiteren Seitenaufbau
         $_SESSION['siteid'] = $id = $page['site_id'];

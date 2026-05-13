@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SiteForm\Contact as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteform/contact.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
@@ -13,7 +11,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /**
  * Kontaktformular
  */
-class Contact extends Pre
+class Contact extends ContactForm
 {
     public static function show(): void
     {
@@ -49,17 +47,18 @@ class Contact extends Pre
         #$root_site = $rootdir.'/'.basename($_SESSION['main']);
 
 
-        $show_form = self::$show_form;
-        $status_message = self::$status_message;
-        $input_name = self::$input_name;
-        $input_email = self::$input_email;
-        $input_message_first = self::$input_message_first;
+        $msg = self::MSG;
         $cfg = self::$cfg;
-        $fehler = self::$fehler;
-        $question = self::$question[1];
-        $datenschutzerklaerung = self::$datenschutzerklaerung;
-        $success_msg = self::$success_msg;
+        $fehler  = self::$fehler;
         $captcha = self::$captcha;
+        $question = self::$question[1];
+        $show_form = self::$show_form;
+        $input_name  = self::$input_name;
+        $input_email = self::$input_email;
+        $success_msg = self::$success_msg;
+        $status_message = self::$status_message;
+        $input_message_first = self::$input_message_first;
+        $datenschutzerklaerung = self::$datenschutzerklaerung;
 
         $output = "<div class='container'>";
         #$output = "<div class='container main-container registration-form'>";
@@ -67,13 +66,11 @@ class Contact extends Pre
         #echo statusmeldungAusgeben();
 
         $output .= "<div class='registration-form'>";
-        $output .= "
-                <h1>Kontakt</h1>
-                <br>";
+        $output .= "<h1>{$msg[310]}</h1><br>";
 
         // Seite anzeigen
         if ($show_form):
-        $output .= "
+        $output .= <<<EOT
 
 <form action='' method='POST' enctype='multipart/form-data' style='margin-top: 30px;'>
 
@@ -86,24 +83,25 @@ if (navigator.userAgent.search('Safari') >= 0 && navigator.userAgent.search('Chr
 
 
 <div class='form-group'>
-    <label for='inputName'>Dein Name:</label>
+    <label for='inputName'>{$msg[311]}:</label>
     <input type='text' id='inputName' size='40' maxlength='50' name='name'
     value='".$input_name."' class='form-control' autocomplete='name' autofocus />
 </div>
 
 <div class='form-group'>
-    <label for='inputEmail'>Deine E-Mail-Adresse: <span style='color:red'>*</span></label>
+    <label for='inputEmail'>{$msg[312]}: <span style='color:red'>*</span></label>
     <input type='email' id='inputEmail' size='40' maxlength='100' name='email'
     value='".$input_email."' class='form-control' autocomplete='email' required />
 </div>
 
 <div class='form-group'>
-    <label for='inputMessage'>Deine Nachricht: <span style='color:red'>*</span></label>
+    <label for='inputMessage'>{$msg[313]}: <span style='color:red'>*</span></label>
     <textarea id='inputMessage' name='message' rows='9' style='width:100%;' maxlength='500'
     spellcheck='true' class='form-control' autocomplete='off' required>".$input_message_first."
     </textarea>
 </div>
-<!-- ..................... -->";
+<!-- ..................... -->
+EOT;
 
 
 /*
@@ -276,107 +274,103 @@ $output .= "
 
 // -------------------- DATEIUPLOAD START ----------------------
 if (0 < $cfg['NUM_ATTACHMENT_FIELDS']) {
-    $output .= "
+    $output .= <<<EOT
         <div class='row upload-row' style='background-position: 2.85rem center;
         -webkit-text-size-adjust:none;background-repeat: no-repeat;'>
         <div class='col-sm-8'>
             <label class='control-label' for='upload_field'><i id='fileupload-icon'
-            class='fa fa-upload'></i></label>";
+            class='fa fa-upload'></i></label>
+        EOT;
     for ($i=0; $i < $cfg['NUM_ATTACHMENT_FIELDS']; $i++) {
-        $output .= "
+        $output .= <<<EOT
             <input aria-label='Dateiupload' type='file' size=12 name='f[]' id='upload_field'
-            style='font-size:17px;' onclick='setActive(this);' onfocus='setActive(this);' />";
-    }
-    $output .= "
-        </div>
-        </div>";
-}
+            style='font-size:17px;' onclick='setActive(this);' onfocus='setActive(this);' />
+            EOT;
+    };
+    $output .= "</div></div>";
+};
 // -------------------- DATEIUPLOAD ENDE ----------------------
 
 
 // -------------------- SPAMPROTECTION START ----------------------
 if ($cfg['Honeypot']) {
-    $output .= "
+    $output .= <<<EOT
     <div style='height: 2px; overflow: hidden;'>
         <label style='margin-top: 10px;'>
-        Das nachfolgende Feld muss leer bleiben, damit die Nachricht gesendet wird!</label>
+        {$msg[314]}</label>
         <div style='margin-top: 10px;'><input type='email' name='mail' value='' /></div>
-    </div>";
-}
-
-
+    </div>
+    EOT;
+};
 if ($cfg['Zeitsperre']) {
     $output .= "
     <input type='hidden' name='chkspmtm' value='".time()."' />";
-}
-
-
+};
 if ($cfg['Klick-Check']) {
     $output .= "
     <input type='hidden' name='chkspmkc' value='chkspmbt' />";
-}
-
-
+};
 if ($cfg['Sicherheitscode']) {
     $output .= "
         <div class='row captcha-row ";
     if (!empty($fehler['captcha'])) {
         $output .= "error_container";
-    }
+    };
     $output .= "
         ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;
         background-repeat: no-repeat;'>
         <div class='col-sm-8 ";
     if (!empty($fehler['captcha'])) {
         $output .= "error";
-    }
-    $output .= "
+    };
+    $output .= <<<EOT
         '>
         <br />
         <label class='control-label' for='answer2'>
         <div>
         <!-- <i id='securitycode-icon' class='fa fa fa-unlock-alt'></i>&nbsp; -->
-        <img aria-label='Captcha' src='/assets/inc/captcha.php' alt='Sicherheitscode'
+        <img aria-label='Captcha' src='/assets/inc/captcha.php' alt='{$msg[315]}'
         title='captcha code' id='captcha' />
-        <a href='javascript:void(0);' title='sicherheitscode' onclick=\"javascript:document.
-        getElementById('captcha').src='/assets/inc/captcha.php?'+Math.random();cursor:pointer;\">
+        <a href='javascript:void(0);' title='{$msg[315]}' onclick="javascript:document.
+        getElementById('captcha').src='/assets/inc/captcha.php?'+Math.random();cursor:pointer;">
         <span class='captchareload'><i style='color:grey;' class='fas fa-sync-alt'></i></span></a>
         </div></label>
-        <input";
+        <input
+        EOT;
     if ($cfg['HTML5_FEHLERMELDUNGEN']) {
         $output .= " required";
     } else {
         $output .= " onchange='checkField(this)'";
-    }
+    };
     # placeholder='Sicherheitscode *'
-    $output .= " aria-label='Eingabe' id='answer2' placeholder='Ergebnis Sicherheitsfrage *'
+    $output .= " aria-label='Eingabe' id='answer2' placeholder='{$msg[316]} *'
         type='text' maxlength='150'  class='field ";
     if (!empty($fehler['captcha'])) {
         $output .= "errordesignfields ";
-    }
+    };
     $output .= "form-control' name='sicherheitscode' onclick='setActive(this);'
         onfocus='setActive(this);' spellcheck='false' />";
     if (!empty($fehler['captcha'])) {
         $output .= $fehler['captcha'];
-    }
+    };
     $output .= "
         </div>
         </div>";
-}
+};
 
 if ($cfg['Sicherheitsfrage']) {
     $output .= "
         <div class='row question-row ";
     if (!empty($fehler['q_id12'])) {
         $output .= "error_container";
-    }
+    };
     $output .= "
         ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;
         background-repeat: no-repeat;'>
         <div class='col-sm-8 ";
     if (!empty($fehler['q_id12'])) {
         $output .= "error";
-    }
+    };
     # <input type='hidden' name='question_id' value='{$question_id}' />
     $output .= "
         ' >
@@ -384,28 +378,28 @@ if ($cfg['Sicherheitsfrage']) {
         <label class='control-label' for='answer'>
         <div aria-label='Sicherheitsfrage'>
         <i id='securityquestion-icon' class='fa fa fa-unlock-alt'></i>&nbsp;
-        Sicherheitsfrage <span style='color:red'>*</span>
+        {$msg[317]} <span style='color:red'>*</span>
         </div></label>
         <input ";
     if ($cfg['HTML5_FEHLERMELDUNGEN']) {
         $output .= " required ";
     } else {
         $output .= " onchange='checkField(this)' ";
-    }
+    };
     $output .= " aria-label='Antwort' id='answer' placeholder='{$question}'
         type='text' maxlength='150' class='field ";
     if (!empty($fehler['q_id12'])) {
         $output .= "errordesignfields ";
-    }
+    };
     $output .= "form-control' name='answer' onclick='setActive(this);'
         onfocus='setActive(this);' spellcheck='false' />";
     if (!empty($fehler['q_id12'])) {
         $output .= $fehler['q_id12'];
-    }
+    };
     $output .= "
         </div>
         </div>";
-}
+};
 // -------------------- SPAMPROTECTION ENDE ----------------------
 
 
@@ -420,7 +414,7 @@ if (1 == $cfg['Kopie_senden']) {
         $output .= " not-empty-field";
     } else {
         $output .= "";
-    }
+    };
     $output .= "
         '>
         <label for='inlineCheckbox11' class='control-label'><i id='mailcopy-icon'
@@ -431,15 +425,15 @@ if (1 == $cfg['Kopie_senden']) {
 
     if (isset($_POST['mail-copy']) && $_POST['mail-copy']=='1') {
         $output .= "checked='checked' ";
-    }
+    };
     $output .= "
         onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;
         padding-bottom:2px;'><span style='line-height:27px;'>
-        Kopie der Nachricht per E-Mail senden</span></div>
+        {$msg[318]}</span></div>
         </label>
         </div>
         </div";
-}
+};
 // -------------------- MAIL-COPY ENDE ----------------------
 
 
@@ -449,19 +443,19 @@ if ($cfg['Datenschutz_Erklaerung']) {
         <div class='row checkbox-row ";
     if (!empty($fehler['datenschutz'])) {
         $output .= "error_container";
-    }
+    };
     $output .= "
         ' style='background-position: 2.85rem center;-webkit-text-size-adjust:none;
         background-repeat: no-repeat;'>
         <div class='col-sm-8 ";
     if (!empty($fehler['datenschutz'])) {
         $output .= "error";
-    }
+    };
     if (isset($_POST['datenschutz']) && '' != $_POST['datenschutz']) {
         $output .= "not-empty-field ";
     } else {
         $output .= "";
-    }
+    };
     $output .= "
         '>
         <label for='inlineCheckbox12' class='control-label'><i id='dataprotection-icon'
@@ -472,25 +466,25 @@ if ($cfg['Datenschutz_Erklaerung']) {
         $output .= " required ";
     } else {
         $output .= " onchange='checkField(this)' ";
-    }
+    };
     $output .= "
         aria-label='Datenschutz' type='checkbox' id='inlineCheckbox12'
         name='datenschutz' value='akzeptiert' ";
     if ($_POST['datenschutz']=='akzeptiert') {
         $output .= " checked='checked' ";
-    }
+    };
     $output .= "
         onclick='setActive(this);' onfocus='setActive(this);' /> <div style='padding-top:4px;
         padding-bottom:2px;line-height:27px;'> <a href='".$datenschutzerklaerung."'
-        target='_blank'>Ich stimme der Datenschutz&shy;erklärung zu.</a> *</div>
+        target='_blank'>{$msg[319]}</a> *</div>
         </label>";
     if (!empty($fehler['datenschutz'])) {
         $output .= $fehler['datenschutz'];
-    }
+    };
     $output .= "
     </div>
     </div>";
-}
+};
 // -------------------- DATAPROTECTION ENDE ----------------------
 
 /*
@@ -516,13 +510,13 @@ $output .= "
 $output .= "
 <br><br>
     <button type='submit' class='btn btn-lg btn-primary btn-block'
-    name='kf-km'>Nachricht senden</button>
+    name='kf-km'>{$msg[320]}</button>
 </form>
 
 <br><br><hr>
 
 <ul>
-    <span style='color:red'>*</span> Felder bitte ausfüllen.
+    <span style='color:red'>*</span> {$msg[321]}
 </ul>
 
 
@@ -574,8 +568,7 @@ if ($cfg['Loading_Spinner']):
     ";
 endif;
 if ($cfg['Erfolgsmeldung']):
-    $output .= "
-
+    $output .= <<<EOT
     <script>
         // Überprüfe, ob die Klasse 'finished' aktiv ist
         var isFinished = document.querySelector('.senden').classList.contains('finished');
@@ -583,11 +576,10 @@ if ($cfg['Erfolgsmeldung']):
         // Ändere die Beschriftung entsprechend
         if (isFinished) {
             var submitButton = document.getElementById('submitButton');
-            submitButton.innerHTML = '<span class=\"label_finished\">Nachricht gesendet</span>';
+            submitButton.innerHTML = '<span class="label_finished">Nachricht gesendet</span>';
         }
     </script>
-
-    ";
+    EOT;
 endif;
 if ($cfg['Klick-Check']):
     $output .= "
@@ -761,26 +753,6 @@ $output .= "</div>";
         echo $output;
     }
 }
-
-
-
-
-######################################
-#unset($_POST, $_GET, $_REQUEST);
-#var_dump($_POST);
-#foreach ($_POST AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_GET AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_REQUEST AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_COOKIE AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_SERVER AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_SESSION AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-
-#if (!empty($_SESSION['su'])) var_dump($_SESSION['idx2'], $_SESSION['siteid']);
-
-#print_r('ident: '.$_COOKIE['identifier'].'<br>');
-#print_r('token: '.$_COOKIE['securitytoken'].'<br>');
-#print_r('token: '.sha1($_COOKIE['securitytoken']).'<br>');
-#print_r(pathinfo($_SESSION['main']));
 
 
 // EOF

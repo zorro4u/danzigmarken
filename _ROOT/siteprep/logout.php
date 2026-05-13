@@ -1,15 +1,16 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SiteData\Logout as Data;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/logout.php';
+require_once __DIR__.'/../sitemsg/logout.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-class Logout
+class LogoutPrep
 {
+    protected const MSG = LogoutMsg::MSG;
     protected static bool $show_form;
     protected static string $root_site;
     protected static string $status_message;
@@ -42,14 +43,15 @@ class Logout
 
             // alle Logins beenden
             if(isset($_POST['logout_all'])) {
-                Data::setLogout($userid, $identifier);
-                $success_msg = "Alle meine anderen Autologins beendet.";
+                LogoutData::setLogout($userid, $identifier);
+                $success_msg = self::MSG[110];
             }
 
             // aktuelle Anmeldung beenden
-            Auth::logout($_SESSION['lastsite']);
+            Tools::lastSite(['login', 'email']);
+            Auth::logout();
 
-            $success_msg = "Du bist abgemeldet";
+            $success_msg = self::MSG[111];
             $show_form = False;
 
             #header("location: {$_SESSION['lastsite']}");

@@ -1,6 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SitePrep\SiteConfig;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools, CheckIP, Logger};
 
 require_once __DIR__.'/siteconfig.php';
@@ -27,6 +26,17 @@ class HeaderPrep extends SiteConfig
     public static function ip_denied() {return self::$ip_denied;}
 
 
+
+    /*
+    <?= self::MSG[10] ?>
+    ".self::MSG[10]."
+     */
+    protected const MSG = [
+        10 => "",
+        11 => "",
+    ];
+
+
     /**
      * Zeit & Häufigkeit abfangen
      *
@@ -36,7 +46,6 @@ class HeaderPrep extends SiteConfig
      */
     public static function antiflood(): void
     {
-
         // -4-
         // Zugriff speichern
         Logger::log();
@@ -65,14 +74,16 @@ class HeaderPrep extends SiteConfig
 
 
     /**
-     * not in use
+     * ist Seite gleich der aktuellen Seiten,
+     * css-Klasse 'active' setzen
+     *
+     * -- not in use --
      */
     protected static function active(array $site_arr): string
     {
-        // ist Seite gleich der aktuellen Seiten, css-Klasse 'active' setzen
         $class = (strpos($_SERVER['PHP_SELF'], basename($site_arr['site'])) !== False)
-        ? 'class="active" style="color:#ccc;">'
-        : $class = 'href="'.$site_arr['site'].'">';
+            ? 'class="active" style="color:#ccc;">'
+            : 'href="'.$site_arr['site'].'">';
 
         return $class;
     }

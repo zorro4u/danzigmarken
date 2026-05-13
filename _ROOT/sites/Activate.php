@@ -1,9 +1,7 @@
 <?php
 /* Prozess: RegInfoSeite-->email(Admin)-->email(RegCode)-->RegSeite-->email(AktLink)-->dieseSeite:ActivateSeite-->Login */
 
-namespace Dzg\Sites;
-use Dzg\SitePrep\Activate as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 session_start();
 date_default_timezone_set('Europe/Berlin');
@@ -15,7 +13,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /**
  * Summary of Class Activate
  */
-class Activate extends Pre
+class Activate extends ActivatePrep
 {
     public static function show(): void
     {
@@ -32,6 +30,7 @@ class Activate extends Pre
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $status_message = self::$status_message;
         $usr_data = self::$usr_data;
@@ -40,12 +39,12 @@ class Activate extends Pre
 <div class='container'>
 <?= $status_message ?>
 <div class='small-container-330 form-signin'>
-<h2 class='form-signin-heading'>Aktivierung</h2>
+<h2 class='form-signin-heading'><?= $msg[310] ?></h2>
 <br>
 
 <?php if ($show_form): ?>
 <form action='./login.php?usr=<?= $usr_data['username'] ?>' method='POST' style='margin-top: 30px;'>
-<button class='btn btn-lg btn-primary btn-block' type='submit'>Anmelden</button>
+<button class='btn btn-lg btn-primary btn-block' type='submit'><?= $msg[311] ?></button>
 </form>
 <?php endif; ?>
 

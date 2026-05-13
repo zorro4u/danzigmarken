@@ -1,13 +1,11 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SiteForm\Login as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteform/login.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-class Login extends Pre
+class Login extends LoginForm
 {
     public static function show(): void
     {
@@ -70,7 +68,7 @@ class Login extends Pre
 
         */
 
-
+        $msg = self::MSG;
         $status_message = self::$status_message;
         $user_value   = self::$user_value;
         $input_email1 = self::$input_email1;
@@ -99,7 +97,7 @@ class Login extends Pre
 ?>
 
 <div class='container small-container-330 form-signin'>
-<h2 class='form-signin-heading'>Anmelden</h2>
+<h2 class='form-signin-heading'><?= $msg[310] ?></h2>
 <?= $status_message ?>
 
 <?php
@@ -136,26 +134,26 @@ $output .= "
 
 <form action='?login' method='POST'>
 <br>
-<label for='inputEmail' class='sr-only'>E-Mail</label>
+<label for='inputEmail' class='sr-only'><?= $msg[311] ?></label>
 <input id='inputEmail' type='text' name='email' value='<?= $user_value ?>'
-    placeholder='Benutzer / E-Mail'
+    placeholder='<?= $msg[312] ?>'
     class='form-control' autocomplete='email' required <?= $af1 ?> />
 <br>
 
 
 <div class='user-box'>
-<input id='pwd' type='password' name='passwort' placeholder='Passwort'
+<input id='pwd' type='password' name='passwort' placeholder='<?= $msg[313] ?>'
     class='form-control' autocomplete='current-password' spellcheck='false'
     required <?= $af2 ?> />
-<label for='pwd' class='sr-only'>Passwort</label>
-<span class='password-toggle-icon'><i class='fas fa-eye'></i></span>
+<label for='pwd' class='sr-only'><?= $msg[313] ?></label>
+<span class='password-toggle-icon'><i class='fas fa-eye-slash'></i></span>
 </div>
 
 
 <div class='checkbox' style='padding-top: 15px;'>
 <label>
 <input type='checkbox' name='angemeldet_bleiben' value='1'
-    autocomplete='off' checked /> Angemeldet bleiben
+    autocomplete='off' checked /><?= $msg[314] ?>
 </label>
 </div>
 
@@ -164,9 +162,9 @@ $output .= "
 
 <table style='display: block; width: 100%; margin-top: 20px;'><tr>
 <td width='70%' style='padding-right:20px; '>
-    <a href='<?= $forget_link ?>'>Passwort vergessen?</a></td>
+    <a href='<?= $forget_link ?>'><?= $msg[315] ?></a></td>
 <td width='30%' align=right style='padding-left:20px;'>
-    <a href='<?= $reg_link ?>'>Registrieren</a></td>
+    <a href='<?= $reg_link ?>'><?= $msg[316] ?></a></td>
 </tr></table>
 </form>
 
@@ -182,12 +180,12 @@ const togglePassword = document.querySelector('.password-toggle-icon i');
 togglePassword.addEventListener('click', function () {
 if (passwordField.type === 'password') {
     passwordField.type = 'text';
-    togglePassword.classList.remove('fa-eye');
-    togglePassword.classList.add('fa-eye-slash');
-} else {
-    passwordField.type = 'password';
     togglePassword.classList.remove('fa-eye-slash');
     togglePassword.classList.add('fa-eye');
+} else {
+    passwordField.type = 'password';
+    togglePassword.classList.remove('fa-eye');
+    togglePassword.classList.add('fa-eye-slash');
 }
 });
 </script>

@@ -1,8 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SiteData\TableData;
-use Dzg\SitePrep\{TablePrep, TableBody, TableNavi};
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/../siteprep/loader_table.php';
@@ -31,6 +28,7 @@ class Table extends TablePrep
     private static function show_body(): void
     {
         // Klassenvariblen laden
+        $msg = TableMsg::MSG;
         $maxID = self::$maxID;
         $idx2 = self::$_session['idx2'];
         $rootdir = self::$_session['rootdir'];
@@ -133,8 +131,8 @@ class Table extends TablePrep
         if ((Auth::isCheckedIn() && $userid===300) || !empty($su)) {
             // fa-download, fa-arrow-circle-down, fa-arrow-circle-o-down, fa-arrow-down
             $btn_down_link = "<a style='color:gray; background-color: transparent;' ".
-                "href='../tools/printview' title='Druckanzeige'>".
-                "<i class='fas fa-print'>&ensp;</i>Druckanzeige</a>";
+                "href='../tools/printview' title='{$msg[310]}'>".
+                "<i class='fas fa-print'>&ensp;</i>{$msg[310]}</a>";
         };
 
         if(count($stamps_db) > 5 && Auth::isCheckedIn()) {
@@ -143,8 +141,8 @@ class Table extends TablePrep
                 <div class='links noprint'>".TableNavi::feldSeitenwahl()."</div>
                 <div class='mitte noprint'>
                     <form action='#top' style='display:inline'>
-                    <button class='btn Xbtn-primary' type='submit' title='zum Seitenanfang'>
-                    Seitenanfang</button></form>
+                    <button class='btn Xbtn-primary' type='submit' title='{$msg[311]}'>
+                    {$msg[312]}</button></form>
                 </div>
                 <div class='rechts noprint'>{$btn_down_link}</div>
                 </div>";    # ende < /FUSS >
@@ -152,20 +150,22 @@ class Table extends TablePrep
         } elseif (!Auth::isCheckedIn()) {
             // nicht angemeldet --> ohne Navi-Möglichkeit
             $navi_tab = '';
-            $txt = number_format($maxID, 0, ',', '.');
-            $txt .= $idx2 ? " Marken" : " Einträgen";
+            $txt = number_format($maxID, 0, ',', '.') . ' ';
+            $txt .= $idx2 ? $msg[313] : $msg[314];
 
             $output .= "
                 <div class='fuss'>
                 <div class='linksX'>
-                    <p><br>
-                    Hier nur eine zufällige ".self::$_session['proseite']."er Auswahl aus ".$txt.".<br>
-                    Voller Zugang mit Filter- und Suchfunktion nach dem  &gg;&nbsp;
-                    <a href='/auth/login' title='Anmelden'><b>Anmelden</b></a>&nbsp;&ll;<br>&nbsp;</p>
+                    <p><br>{$msg[315]} ".self::$_session['proseite'].
+                    $msg[316].$txt.".<br>".$msg[317].
+                    "&ensp;&gg;&nbsp;<a href='/auth/login' title='".
+                    $msg[318]."'><b>".$msg[318].
+                    "</b></a>&nbsp;&ll;<br>&nbsp;</p>
                 </div>
                 <div class='mitte'></div>
                 <div class='rechts noprint'></div>
-                </div>";    # ende < /FUSS >
+                </div>
+                ";    # ende < /FUSS >
 
         } else {
             $output .= "

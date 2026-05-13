@@ -1,9 +1,9 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SiteData\Details as Data;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/details.php';
+require_once __DIR__.'/../sitemsg/details.php';
 require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
@@ -11,8 +11,10 @@ require_once __DIR__.'/../tools/tools.php';
 /**
  * Summary of Details
  */
-class Details
+class DetailsPrep
 {
+    protected const MSG = DetailsMsg::MSG;
+
     protected static int $akt_file_id;
     protected static int $akt_file_idx;
     protected static array $spaltennamen;
@@ -43,7 +45,7 @@ class Details
         $akt_file_id = 0;
 
         if (!isset($_GET['id'])) {
-            $error_msg = 'Seite ohne ID-Angabe funktioniert nicht.';
+            $error_msg = self::MSG[110];
 
         } else {
             $get_id = $_GET['id'];
@@ -72,7 +74,7 @@ class Details
             if (!preg_match($regex_digi, $get_id)
                 || $get_id != (int)$get_id)
             {
-                $error_arr []= "uups, a wrong ID ... u'r out";
+                $error_arr []= self::MSG[111];
                 $status = false;
 
             } else {
@@ -124,11 +126,6 @@ class Details
      */
     protected static function siteJump(int $gid): array
     {
-        // $_SESSION['start'],$_SESSION['proseite'], $_SESSION['filter'], $_SESSION['sort'],
-        // $_SESSION['idx2'], $_SESSION['fileid']
-
-        #$fids = [-1,-1];
-
         if (isset($_SESSION['start'], $_SESSION['proseite'])) {
             $start = $_SESSION['start'];
             $proseite = $_SESSION['proseite'];
@@ -137,7 +134,7 @@ class Details
             $proseite = 5;
         }
 
-        $results = Data::getJumpData($gid);
+        $results = DetailsData::getJumpData($gid);
 
         // results = [ Bild_VOR=>[fid,sid], Bild_AKT=>[fid,sid], Bild_NACH=>[fid,sid]]
         switch (count($results)) {
@@ -183,6 +180,8 @@ class Details
 
         // Ergebnisse in Einzel-Arrays speichern
         // results = [ Bild_VOR=>[fid,sid], Bild_NACH=>[fid,sid]]
+        $fids = [];
+        $gids = [];
         foreach ($results AS $k=>$v) {
             $fids []= $v[0];    # file_id's     [$prev, $next]
             $gids []= $v[1];    # group_id's
@@ -211,6 +210,8 @@ class Details
         $show_form = self::$show_form;
         $error_arr = self::$error_arr;
         $success_msg = "";
+        $stamps = [];
+        $akt_file_idx = 0;
 
         // Seiten-Check okay, Seite starten
         if ($show_form):
@@ -270,7 +271,7 @@ class Details
             #'kat23' => 'Michel',
         ];
 
-        $result = Data::getKatData();
+        $result = DetailsData::getKatData();
 
         foreach ($result AS $entry) {
             $nameof_col_db[$entry[1]] = $entry[2];
@@ -308,12 +309,12 @@ class Details
 
         self::$spaltennamen = $col_array;
 
-        $results = Data::getMainData($akt_file_id);
+        $results = DetailsData::getMainData($akt_file_id);
 
         // Abfrage verarbeiten
         //
         if (empty($results)) {
-            $error_arr []= "ID not found ... #{$akt_file_id}";
+            $error_arr []= self::MSG[112] . " ... #{$akt_file_id}";
             self::$error_arr = $error_arr;
 
         } else {

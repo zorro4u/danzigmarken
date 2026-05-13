@@ -1,11 +1,11 @@
 <?php
-namespace Dzg\SiteData;
+namespace Dzg;
 use Dzg\Tools\Database;
 
 require_once __DIR__.'/../tools/database.php';
 
 
-class Logout
+class LogoutData
 {
     public static function setLogout(int $userid, string $identifier): void
     {

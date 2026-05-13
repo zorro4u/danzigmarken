@@ -1,6 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SiteData\TableData;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../sitedata/tabledata.php';

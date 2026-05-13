@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SiteForm\Admin as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteform/admin.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
@@ -11,7 +9,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
  * Summary of Class Admin
  * class A extends B implements C
  */
-class Admin extends Pre
+class Admin extends AdminForm
 {
     public static function show(): void
     {
@@ -32,6 +30,7 @@ class Admin extends Pre
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $status_message = self::$status_message;
 
@@ -42,7 +41,7 @@ class Admin extends Pre
 
         # Seiten-Check okay, Seite anzeigen
         else:
-            $output .= "<h2>erweiterte Einstellungen</h2><br>";
+            $output .= "<h2>{$msg[310]}</h2><br>";
             $output .= $status_message;
 
             $output .= "<div>";    // START
@@ -89,33 +88,34 @@ class Admin extends Pre
 
     private static function tab_selection(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
 
         return <<<EOT
         <ul class='nav nav-tabs' role='tablist'>
         <li role='presentation' class='{$active['info']}'>
         <a href='#info' aria-controls='info' role='tab' data-toggle='tab'>
-        Info</a></l>
+        {$msg[311]}</a></l>
 
         <li role='presentation' class='{$active['user']}'>
         <a href='#user' aria-controls='user' role='tab' data-toggle='tab'>
-        Nutzer</a></l>
+        {$msg[312]}</a></l>
 
         <li role='presentation' class='{$active['autologin']}'>
         <a href='#autologin' aria-controls='autologin' role='tab' data-toggle='tab'>
-        Autologin</a></li>
+        {$msg[313]}</a></li>
 
         <li role='presentation' class='{$active['regis']}'>
         <a href='#regis' aria-controls='regis' role='tab' data-toggle='tab'>
-        Reg-Links</a></li>
+        {$msg[314]}</a></li>
 
         <li role='presentation' class='{$active['sonst']}'>
         <a href='#sonst' aria-controls='sonst' role='tab' data-toggle='tab'>
-        Sonstiges</a></li>
+        {$msg[315]}</a></li>
 
         <li role='presentation' class='{$active['tools']}'>
         <a href='#tools' aria-controls='tools' role='tab' data-toggle='tab'>
-        Tools</a></li>
+        {$msg[316]}</a></li>
         </ul>
         EOT;
     }
@@ -123,6 +123,7 @@ class Admin extends Pre
 
     private static function tab_info(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $usr_data = self::$usr_data;
         $login_data = self::$login_data;
@@ -138,9 +139,9 @@ class Admin extends Pre
         #htmlspecialchars($usr_data['status'], ENT_QUOTES)
         $act = "";
         if ($usr_data['status'] === "activated") {
-            $act = "aktiv";
+            $act = $msg[317];
         } elseif (!empty($usr_data['status'])) {
-            $act = "Aktivierung ausstehend";
+            $act = $msg[318];
         };
 
         $changed = (!empty($usr_data['changed']))
@@ -191,14 +192,14 @@ class Admin extends Pre
         <p><br></p>
 
         <table>
-        <tr><td>Nutzer:&nbsp;</td>
+        <tr><td>{$msg[319]}:&nbsp;</td>
             <td>{$name}</td></tr>
-        <tr><td>Email:&nbsp;</td>
+        <tr><td>{$msg[320]}:&nbsp;</td>
             <td>{$mail}</td></tr>
 
         <!--
-        <tr><td>erstellt:&nbsp;</td><td>{$date}</td></tr>
-        <tr><td>geändert:&nbsp;</td><td>{$changed}</td></tr>
+        <tr><td>{$msg[321]}:&nbsp;</td><td>{$date}</td></tr>
+        <tr><td>{$msg[322]}:&nbsp;</td><td>{$changed}</td></tr>
         -->
 
         <tr><td>Login{$autologin}:&nbsp;</td>
@@ -206,7 +207,7 @@ class Admin extends Pre
         <tr><td>last.ip:&nbsp;</td>
             <td>{$out_ip}</td></tr>
 
-        <!--<tr><td>gültig bis:</td><td>{$endtime}</td></tr>-->
+        <!--<tr><td>{$msg[323]}:</td><td>{$endtime}</td></tr>-->
         <!--<tr><td>AutoIdent:</td><td>{$out_ident}</td></tr>-->
         <!--<tr><td>Token:</td><td>{$out_token}</td></tr>-->
         <!--<tr><td>last.seen:</td><td>{$last_seen}</td></tr>-->
@@ -223,7 +224,7 @@ class Admin extends Pre
 
         <br><hr>
         <form method='POST'>
-            <button formaction='../tools/showlog' class='btn btn-primary' type=''>Log-Protokoll</button>&emsp;&emsp;
+            <button formaction='../tools/showlog' class='btn btn-primary' type=''>{$msg[324]}</button>&emsp;&emsp;
         </form>
 
         </div>
@@ -233,6 +234,7 @@ class Admin extends Pre
 
     private static function tab_user(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $user_list = self::$user_list;
 
@@ -267,8 +269,8 @@ class Admin extends Pre
     <tr>
     <td>{$ct}</td>
     <td>
-        <input type='radio' id='usr{$ct}' name='usrchoise' value='{$ct}' autocomplete='off' />
-        <label for='usr{$ct}'></label></td>
+    <input type='radio' id='usr{$ct}' name='usrchoise' value='{$ct}' autocomplete='off' />
+    <label for='usr{$ct}'></label></td>
     <td>{$user['username']}</td>
     <td>{$user['email']}</td>
     <td>{$user['ct_login']}</td>
@@ -283,7 +285,8 @@ class Admin extends Pre
     $output .= <<<EOT
     </table>
     </div>
-    <button type='submit' class='btn btn-primary' onclick='return confirm('Wirklich den Nutzer  - L Ö S C H E N -  ?')'>Nutzer löschen</button>
+    <button type='submit' class='btn btn-primary'
+        onclick='return confirm("{$msg[325]}")'>{$msg[326]}</button>
     </form>
     </div>
     EOT;
@@ -294,6 +297,7 @@ class Admin extends Pre
 
     private static function tab_autologin(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $ct10 = self::$counter[10];
         $ct11 = self::$counter[11];
@@ -314,10 +318,10 @@ class Admin extends Pre
         if ($ct10 || $ct11 || $ct12 || $ct13
             || $ct20 || $ct21 || $ct22 || $ct23 || $ct25):
 
-        $output .= <<<EOT
-        <p>Die automatische Anmeldung beenden für:</p>
+        $output .= "
+        <p>{$msg[327]}:</p>
         <form method='POST' class='form-horizontal'>
-        EOT;
+        ";
 
             # eigene Logins
             if ($ct10 || $ct11 || $ct12 || $ct13):
@@ -325,19 +329,19 @@ class Admin extends Pre
         $output .= <<<EOT
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log11' name='logout' value='11' autocomplete='off' />
-        <label for='log11'> meine anderen aktiven ({$ct11}x)</label></div>
+        <label for='log11'>{$msg[328]} ({$ct11}x)</label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log10' name='logout' value='10' autocomplete='off' />
-        <label for='log10'> meine ausgeloggten ({$ct10}x)<label></div>
+        <label for='log10'>{$msg[329]} ({$ct10}x)<label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log12' name='logout' value='12' autocomplete='off' />
-        <label for='log12'> meine beendeten (tot) ({$ct12}x)<label></div>
+        <label for='log12'>{$msg[330]} ({$ct12}x)<label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log13' name='logout' value='13' autocomplete='off' />
-        <label for='log13'> meine abgelaufenen (tot) ({$ct13}x)<label></div>
+        <label for='log13'>{$msg[331]} ({$ct13}x)<label></div>
         EOT;
 
             endif;
@@ -348,27 +352,27 @@ class Admin extends Pre
         $output .= <<<EOT
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log21' name='logout' value='21' autocomplete='off' />
-        <label for='log21'><hr>alle anderen aktiven ({$ct21}x)</label></div>
+        <label for='log21'><hr>{$msg[332]} ({$ct21}x)</label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log20' name='logout' value='20' autocomplete='off' />
-        <label for='log20'>alle anderen ausgeloggten ({$ct20}x)</label></div>
+        <label for='log20'>{$msg[333]} ({$ct20}x)</label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log22' name='logout' value='22' autocomplete='off' />
-        <label for='log22'>alle anderen beendeten (tot) ({$ct22}x)</label></div>
+        <label for='log22'>{$msg[334]} ({$ct22}x)</label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log23' name='logout' value='23' autocomplete='off' />
-        <label for='log23'>alle anderen abgelaufenen (tot) ({$ct23}x)</label></div>
+        <label for='log23'>{$msg[335]} ({$ct23}x)</label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log24' name='logout' value='24' autocomplete='off' />
-        <label for='log24'>alle anderen Anmeldungen ({$ct24}x)</label></div>
+        <label for='log24'>{$msg[336]} ({$ct24}x)</label></div>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <input type='radio' id='log25' name='logout' value='25' autocomplete='off' />
-        <label for='log25'>alle anderen Nutzer ({$ct25}x)</label></div>
+        <label for='log25'>{$msg[337]} ({$ct25}x)</label></div>
         EOT;
 
             endif;  // andere Logins
@@ -377,14 +381,14 @@ class Admin extends Pre
         <div class='col-sm-offset-2 col-sm-10'>
         <div><br>
         <button formaction='?save=autologin&tab=autologin'
-            class='btn btn-primary' type='submit'>Beenden</button>
+            class='btn btn-primary' type='submit'>{$msg[338]}</button>
         </div></div>
         </form>
         EOT;
 
         # keine Logins vorhanden
         else:
-            $output .= "<p>Keine Autologins vorhanden.</p>";
+            $output .= "<p>{$msg[339]}</p>";
         endif;
 
         $output .= "</div>";
@@ -395,6 +399,7 @@ class Admin extends Pre
 
     private static function tab_register(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $reglinks = self::$reglinks;
 
@@ -402,7 +407,7 @@ class Admin extends Pre
         <div role='tabpanel' class='tab-pane {$active['regis']}' id='regis'>
         <form method='POST' style='margin-top: 30px;'>
         <button formaction='?save=make_reglink&tab=regis' type='submit'
-            class='btn btn-primary btn-lg'>Link erzeugen</button>
+            class='btn btn-primary btn-lg'>{$msg[340]}</button>
         </form>
         EOT;
 
@@ -417,9 +422,9 @@ class Admin extends Pre
         <tr>
         <th>#</th>
         <th></th>
-        <th>gültig bis</th>
-        <th>Email</th>
-        <th>Registrierungslink</th>
+        <th>{$msg[323]}</th>
+        <th>{$msg[320]}</th>
+        <th>{$msg[341]}</th>
         </tr>
         EOT;
 
@@ -440,7 +445,7 @@ class Admin extends Pre
 
                     $endtime = date('d.m.Y H:i', $link['pwcode_endtime']);
                     $out_mail = str_replace("_dummy_", "", $link['email']);
-                    $out_link = "<<a href='{$link['notiz']}' target='blank'> link öffnen </a>>";
+                    $out_link = "<<a href='{$link['notiz']}' target='blank'> {$msg[342]} </a>>";
                 }
 
                 # keine RegLink vorhanden
@@ -467,16 +472,16 @@ class Admin extends Pre
 
         $output .= <<<EOT
         <button formaction='?save=show_mail&tab=regis' class='btn btn-primary'
-            type='' value='' name=''>als Email anzeigen</button>&nbsp;&emsp;&emsp;
+            type='' value='' name=''>{$msg[343]}</button>&nbsp;&emsp;&emsp;
 
         <button class='btn btn-primary'
-            type='submit'>Link löschen</button>&nbsp;&emsp;&emsp;
+            type='submit'>{$msg[344]}</button>&nbsp;&emsp;&emsp;
         EOT;
 
                 if ($ct_reg > 1):
         $output .= <<<EOT
         <button formaction='?save=delete_allregs&tab=regis'
-            class='btn Xbtn-primary' type='' value='' name=''>alle Links löschen</button>
+            class='btn Xbtn-primary' type='' value='' name=''>{$msg[345]}</button>
         EOT;
                 endif;  // $ct_reg > 1
 
@@ -494,34 +499,35 @@ class Admin extends Pre
 
     private static function tab_sonstiges(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
 
     $output = <<<EOT
     <div role='tabpanel' class='tab-pane {$active['sonst']}' id='sonst'>
     <p></p>
 
-    <h3>Viewportabmessungen</h3>
-    <h4>Breite</h4>
+    <h3>{$msg[346]}</h3>
+    <h4>{$msg[347]}</h4>
     <p><a href='https://wiki.selfhtml.org/wiki/ClientWidth'>Element.clientWidth</a>:
         <span id='clientW'></span>px</p>
     <p><a href='https://wiki.selfhtml.org/wiki/InnerWidth'>Window.innerWidth</a>:
         <span id='innerW'></span>px</p>
     <p><a href='https://wiki.selfhtml.org/wiki/OuterWidth'>Window.outerWidth</a>:
         <span id='outerW'></span>px</p>
-    <h4>Höhe</h4>
+    <h4>{$msg[348]}</h4>
     <p><a href='https://wiki.selfhtml.org/wiki/ClientHeight'>Element.clientHeight</a>:
         <span id='clientH'></span>px</p>
     <p><a href='https://wiki.selfhtml.org/wiki/InnerHeight'>Window.innerHeight</a>:
         <span id='innerH'></span>px</p>
     <p><a href='https://wiki.selfhtml.org/wiki/OuterHeight'>Window.outerHeight</a>:
         <span id='outerH'></span>px</p>
-    <h3>Geräteabmessungen</h3>
-    <h4>Breite</h4>
+    <h3>{$msg[349]}</h3>
+    <h4>{$msg[347]}</h4>
     <p><a href='https://wiki.selfhtml.org/wiki/JavaScript/Screen/width'>Screen.width</a>:
         <span id='screenW'></span>px</p>
     <p><a href='https://wiki.selfhtml.org/wiki/availWidth'>Screen.availWidth</a>:
         <span id='availW'></span>px</p>
-    <h4>Höhe</h4>
+    <h4>{$msg[348]}</h4>
     <p><a href='https://wiki.selfhtml.org/wiki/JavaScript/Screen/height'>Screen.height</a>:
         <span id='screenH'></span>px</p>
     <p><a href='https://wiki.selfhtml.org/wiki/availHeight'>Screen.availHeight</a>:
@@ -577,6 +583,7 @@ class Admin extends Pre
 
     private static function tab_tools(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
 
     return <<<EOT
@@ -586,53 +593,49 @@ class Admin extends Pre
     <form method='POST'>
     <table style='border-collapse: separate; border-spacing: 10px 5px;'>
     <tr><td>
-    <button formaction='../tools/lokal1.php' class='btn btn-primary' type='' value='' name=''>import.1</button>&emsp;&emsp;
-    </td><td>
-    (neue) Dateien in Excel-Liste speichern
-    </td></tr>
+    <button formaction='../tools/lokal1.php' class='btn btn-primary'
+    type='' value='' name=''>{$msg[350]}</button>&emsp;&emsp;
+    </td><td>{$msg[351]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/lokal2.php' class='btn btn-primary' type='' value='' name=''>import.2</button>&emsp;&emsp;
-    </td><td>
-    (neue) Daten aus Excel-Liste in DB speichern
-    </td></tr>
+    <button formaction='../tools/lokal2.php' class='btn btn-primary'
+    type='' value='' name=''>{$msg[352]}</button>&emsp;&emsp;
+    </td><td>{$msg[353]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/lokal3.php' class='btn btn-primary' type='' value='' name=''>import.3</button>&emsp;&emsp;
-    </td><td>
-    von (neuen) Excel-Daten webpics erstellen
-    </td></tr>
+    <button formaction='../tools/lokal3.php' class='btn btn-primary'
+    type='' value='' name=''>{$msg[354]}</button>&emsp;&emsp;
+    </td><td>{$msg[355]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/lokal4.php' class='btn btn-primary' type='' value='' name=''>import.4</button>&emsp;&emsp;
-    </td><td>
-    DB in Excel speichern / Backup
-    </td></tr>
+    <button formaction='../tools/lokal4.php' class='btn btn-primary'
+    type='' value='' name=''>{$msg[356]}</button>&emsp;&emsp;
+    </td><td>{$msg[357]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/maillog_show' class='btn btn-primary' type='' value='' name=''>Mail-Log</button>&emsp;&emsp;
-    </td><td>
-    </td></tr>
+    <button formaction='../tools/maillog_show' class='btn btn-primary'
+    type='' value='' name=''>{$msg[358]}</button>&emsp;&emsp;
+    </td><td>{$msg[359]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/excel_down' class='btn btn-primary' type='' value='' name=''>Excel_Download</button>&emsp;&emsp;
-    </td><td>
-    </td></tr>
+    <button formaction='../tools/excel_down' class='btn btn-primary'
+    type='' value='' name=''>{$msg[360]}</button>&emsp;&emsp;
+    </td><td>{$msg[361]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/pdf_down' class='btn btn-primary' type='' value='' name=''>PDF_Download</button>&emsp;&emsp;
-    </td><td>
-    </td></tr>
+    <button formaction='../tools/pdf_down' class='btn btn-primary'
+    type='' value='' name=''>{$msg[362]}</button>&emsp;&emsp;
+    </td><td>{$msg[363]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/printview.php?thema=100' class='btn btn-primary' type='' value='' name=''>PDF anzeigen</button>&emsp;&emsp;
-    </td><td>
-    </td></tr>
+    <button formaction='../tools/printview.php?thema=100' class='btn btn-primary'
+    type='' value='' name=''>{$msg[364]}</button>&emsp;&emsp;
+    </td><td>{$msg[365]}</td></tr>
 
     <tr><td>
-    <button formaction='../tools/deletes.php' class='btn btn-primary' type='' value='' name=''>DB cleaning</button>&emsp;&emsp;
-    </td><td>
-    </td></tr>
+    <button formaction='../tools/deletes.php' class='btn btn-primary'
+    type='' value='' name=''>{$msg[366]}</button>&emsp;&emsp;
+    </td><td>{$msg[367]}</td></tr>
 
     </table>
     </form>

@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\SiteForm;
-use Dzg\SitePrep\Login as Prep;
-use Dzg\SiteData\Login as Data;
+namespace Dzg;
 use Dzg\Tools\{Auth, Tools};
 
 require_once __DIR__.'/../siteprep/login.php';
@@ -10,21 +8,10 @@ require_once __DIR__.'/../tools/auth.php';
 require_once __DIR__.'/../tools/tools.php';
 
 
-class Login extends Prep
+class LoginForm extends LoginPrep
 {
-    protected const MSG = parent::MSG + [
-        10 => "#Login: Passwort muss zwischen 4 und 50 Zeichen lang sein!",
-        11 => "#Login: Passwort enthält ungültige Zeichen. Nur alphanumerisch und !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>",
-        12 => "#Login: unzulässige Zeichen im Anmeldenamen",
-        13 => "Du bist angemeldet",
-        14 => "Passwort ist falsch.",
-        15 => "Das Konto existiert nicht.",
-        16 => "Das Konto ist nicht aktiviert.",
-        17 => "Nutzer ist noch nicht registriert.",
-    ];
-
     protected static bool $show_form;
-    protected static string $cookie;
+    #protected static string $cookie;
     protected static string $status_message;
     protected static string $user_value;
     protected static string $input_email1;
@@ -37,6 +24,7 @@ class Login extends Prep
      */
     protected static function formEvaluation()
     {
+        $msg = self::MSG;
         $error_arr = [];
         $success_msg = self::$success_msg;
         $input_usr = "";
@@ -56,18 +44,18 @@ class Login extends Prep
 
                 // Passwortlänge prüfen
                 if(strlen($input_pwNEU1) < 4 || strlen($input_pwNEU1) > 50) {
-                    $error_arr []= self::MSG[10];
+                    $error_arr []= $msg[210];
                 }
                 // Passwort-Zeichen prüfen (nur alphanumerisch + ein paar Sonderzeichen (keine sql kritischen), Länge <100 Zeichen
                 $regex = "/^[\w<>()?!,.:_=$%&#+*~^ @€µÄÜÖäüöß]{1,100}$/";  // attention: add a slash at the begin and the end
                 if (!preg_match($regex, $input_pwNEU1))
-                    $error_arr []= self::MSG[11];
+                    $error_arr []= $msg[211];
 
                 // Email / Name prüfen
                 if (!filter_var($input_email1, FILTER_VALIDATE_EMAIL)) {
                     // keine Email -> Eingabe als Benutzername (nur alphanumerisch, 1-50 Zeichen)
                     (!preg_match("/^\w{1,50}$/", $input_email1))
-                        ? $error_arr []= self::MSG[12]
+                        ? $error_arr []= $msg[212]
                         : $input_usr = strtolower($input_email1);
                 }
             }
@@ -80,7 +68,7 @@ class Login extends Prep
 
                 // Nutzerdaten in DB finden & holen
                 $data = [':email' => $input_email1, ':username' => $input_usr];
-                $usr_data = Data::searchUser($data);
+                $usr_data = LoginData::searchUser($data);
 
                 // Nutzer gefunden und Passwort korrekt
                 if($usr_data !== False) {
@@ -103,7 +91,7 @@ class Login extends Prep
                                     ':userid'   => $userid,
                                     ':ip'       => $ip,
                                     ':pw_hash'  => $pw_hash ];
-                                Data::storePWhash($data);
+                                LoginData::storePWhash($data);
                             }
 
                             // Nutzer möchte angemeldet bleiben (1 Jahr)
@@ -120,7 +108,7 @@ class Login extends Prep
                                     ':token_hash'    => $token_hash,
                                     ':token_endtime' => $token_endtime,
                                     ':ip'            => $ip ];
-                                $result = Data::storeToken($data);
+                                $result = LoginData::storeToken($data);
 
                                 is_int($result)
                                 ? $login_id = $result
@@ -168,9 +156,9 @@ class Login extends Prep
 
                                 // Login speichern
                                 $data = [':userid' => $userid, ':ip' => $ip];
-                                Data::storeLogin($data);
+                                LoginData::storeLogin($data);
                             }
-                            $success_msg = self::MSG[13];
+                            $success_msg = $msg[213];
 
                             // Session-Login-Werte setzen
                             Auth::setLoginSession($usr_data);
@@ -180,18 +168,18 @@ class Login extends Prep
                             exit;
 
                         } else {
-                            $error_arr []= self::MSG[14];
+                            $error_arr []= $msg[214];
                         }
 
                     } elseif ($usr_data['status'] === "deaktiv") {
-                        $error_arr []= self::MSG[15];
+                        $error_arr []= $msg[215];
 
                     } else {
-                        $error_arr []= self::MSG[16];
+                        $error_arr []= $msg[216];
                     }
 
                 } elseif ($input_email1 !== "") {
-                    $error_arr []= self::MSG[17];
+                    $error_arr []= $msg[217];
                 }
             }  # Plausi-Check okay .. einloggen
         }      # Ende Auswertung Login-Formular
@@ -219,3 +207,5 @@ class Login extends Prep
     }
 }
 
+
+// EOF

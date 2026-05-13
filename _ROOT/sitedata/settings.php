@@ -1,11 +1,11 @@
 <?php
-namespace Dzg\SiteData;
+namespace Dzg;
 use Dzg\Tools\Database;
 
 require_once __DIR__.'/../tools/database.php';
 
 
-class Settings
+class SettingsData
 {
     public static function getCounter(int $userid, string $identifier): array
     {

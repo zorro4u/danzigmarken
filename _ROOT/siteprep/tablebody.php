@@ -1,11 +1,10 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SitePrep\TablePrep;
-use Dzg\SiteData\TableData as Data;
+namespace Dzg;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/tableprep.php';
 require_once __DIR__.'/../sitedata/tabledata.php';
+require_once __DIR__.'/../sitemsg/table.php';
 require_once __DIR__.'/../tools/auth.php';
 
 
@@ -14,6 +13,9 @@ require_once __DIR__.'/../tools/auth.php';
  */
 class TableBody
 {
+    protected const MSG = TableMsg::MSG;
+
+
     /**
      * Summary of htmlTabkopf
      * Tabellenkopf erstellen
@@ -22,6 +24,7 @@ class TableBody
      */
     public static function htmlTabkopf(): string
     {
+        $msg = self::MSG;
         $DBspalten = TablePrep::DBspalten;
         $spaltennamen = TablePrep::spaltennamen();
         $dir = TablePrep::$_session['dir'];
@@ -32,34 +35,39 @@ class TableBody
         $output = "<thead><tr class='head-row'><th>&nbsp;</th>";
 
         $sort_col = array_values($DBspalten);
-        array_splice($sort_col,21,4);   # delete thema..suffix
-        #array_splice($sort_col,8,1);    # delete kat17 (Notiz.1)
-        // letztes Element (print) entfernen
+        array_splice($sort_col,21,4);   // delete thema..suffix
+        #array_splice($sort_col,8,1);    // delete kat17 (Notiz.1)
+
+        # letztes Element (print) entfernen
         array_pop($sort_col);
+
 
         if (!$is_checked_in) {
             unset($spaltennamen['kat22'], $spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
-        }
+        };
+
 
         # Gruppen.ID nur bei admin ausgeben
         if (empty($_SESSION['su'])) {
             unset($spaltennamen['gid']);
             #unset($spaltennamen['print']);
-        }
+        };
+
 
         // Tabelle-Spaltenreihenfolge entspr. $spaltennamen
+        //
         foreach ($spaltennamen as $spalte_db=>$spalte_web) {
 
-            // Thumbnail
+            # Thumbnail
             if ($spalte_web == 'Pic0') {
                 $output .= "<th class='head-cell thumb'>thumbs</th>";
 
-            // sortierbare Spalten
+            # sortierbare Spalten
             } elseif (in_array($spalte_db, $sort_col)) {
-                if (empty($dir)) {$dir = 'ASC';}
-                if (empty($col)) {$col = 'sta.kat10';}
+                if (empty($dir)) $dir = 'ASC';
+                if (empty($col)) $col = 'sta.kat10';
 
-                // ' sta.datum' -> 'datum'
+                # ' sta.datum' -> 'datum'
                 switch (trim($col)) {
                     case 'sta.id':
                         $col0 = 'gid';
@@ -72,33 +80,39 @@ class TableBody
                         break;
                     default:
                         $col0 = substr(trim($col), 4);
-                }
+                };
 
-                // ' ASC' -> 'ASC', Leerzeichen löschen
+                # ' ASC' -> 'ASC', Leerzeichen löschen
                 $dir0 = trim($dir);
 
-                // IDs + Druck grau formatieren
+                # IDs + Druck grau formatieren
                 $idx = "";
-                if (($spalte_db == 'gid') || ($spalte_db == 'fid') || ($spalte_db == 'print')) {
+                if (($spalte_db == 'gid')
+                    || ($spalte_db == 'fid')
+                    || ($spalte_db == 'print'))
+                {
                     $idx = "idx' style='color:hsl(0,0%,55%); font-style:italic";
-                }
+                };
 
-                // wenn angemeldet, dann Spaltenkopf sortierbar
+                # wenn angemeldet, dann Spaltenkopf sortierbar
                 #if (Auth::isCheckedIn()) {
                 if (1) {
 
-                    // aufsteigend -> absteigend
-                    if (($col0 == $spalte_db) && ($dir0 == 'ASC')) {
+                    # aufsteigend -> absteigend
+                    if (($col0 == $spalte_db)
+                        && ($dir0 == 'ASC'))
+                    {
                         $link_down = "?col={$spalte_db}&dir=DESC";
+
                         if (empty($_SESSION['su'])) {
                         $output .= "<th class='head-cell sort'>
                             <a class='sort upArrow {$idx}' href='{$link_down}'
-                            title='&#9660; absteigend'>{$spalte_web}</a></th>";
+                            title='&#9660; {$msg[210]}'>{$spalte_web}</a></th>";
 
                         } else {
                         $output .= "<th class='head-cell sort'>
                             <a class='sort {$idx}'
-                            title='&#9660; absteigend'>
+                            title='&#9660; {$msg[210]}'>
 
 <form method='POST' action='{$_SERVER['PHP_SELF']}' class='upArrow'>
 <input type='hidden' name='col' value='{$spalte_db}' />
@@ -106,19 +120,25 @@ class TableBody
 <button class='lnk'>{$spalte_web}</button>
 </form>
                             </a></th>";
-                        }
+                        };
+                    }
 
-                    // absteigend -> aufsteigend
-                    } elseif (($col0 == $spalte_db) && ($dir0 == 'DESC')) {
+                    # absteigend -> aufsteigend
+                    elseif (($col0 == $spalte_db)
+                        && ($dir0 == 'DESC'))
+                    {
                         $link_up = "?col={$spalte_db}&dir=ASC";
+
                         if (empty($_SESSION['su'])) {
                         $output .= "<th class='head-cell sort'>
                             <a class='sort dnArrow {$idx}' href='{$link_up}'
-                            title='&#9650; aufsteigend'>{$spalte_web}</a></th>";
-                        } else {
+                            title='&#9650; {$msg[211]}'>{$spalte_web}</a></th>";
+                        }
+
+                        else {
                         $output .= "<th class='head-cell sort'>
                             <a class='sort {$idx}'
-                            title='&#9650; aufsteigend'>
+                            title='&#9650; {$msg[211]}'>
 
 <form method='POST' action='{$_SERVER['PHP_SELF']}' class='dnArrow'>
 <input type='hidden' name='col' value='{$spalte_db}' />
@@ -126,20 +146,23 @@ class TableBody
 <button class='lnk'>{$spalte_web}</button>
 </form>
                             </a></th>";
-                        }
+                        };
+                    }
 
-                    // nicht aktiviert, initial aufsteigend, ohne Symbol
-                    } else {
+                    # nicht aktiviert, initial aufsteigend, ohne Symbol
+                    else {
                         $link_up = "?col={$spalte_db}&dir=ASC";
+
                         if (empty($_SESSION['su'])) {
                         $output .= "<th class='head-cell sort' style='text-align:center;'>
                             <a class='sort dbArrowX {$idx}' href='{$link_up}'
-                            title='&#9650; aufsteigend'>{$spalte_web}</a></th>";
-                        } else {
+                            title='&#9650; {$msg[210]}'>{$spalte_web}</a></th>";
+                        }
 
+                        else {
                         $output .= "<th class='head-cell sort'>
                             <a class='sort dbArrowX {$idx}'
-                            title='&#9650; aufsteigend'>
+                            title='&#9650; {$msg[211]}'>
 
 <form method='POST' action='{$_SERVER['PHP_SELF']}' class=''>
 <input type='hidden' name='col' value='{$spalte_db}' />
@@ -147,23 +170,24 @@ class TableBody
 <button class='lnk'>{$spalte_web}</button>
 </form>
                             </a></th>";
-                        }
-                    }
+                        };
+                    };
 
                 } else {
                     $nolink = "style='cursor:unset; th.sort:hover:background-color:unset;'";
                     $output .= "<th class='head-cell sortx {$idx}'>{$spalte_web}</th>";
-                }
-
-            // restliche Spalten
-            } else {
-                $idx = "";
-                // grau formatieren
-                if (($spalte_db == 'print')) {
-                    $idx = "idx noprint' title='in Druckauswahl aufnehmen' style='color:hsl(0,0%,55%); font-style:italic";
-                }
-                $output .= "<th class='head-cell sortx {$idx}'>{$spalte_web}</th>";
+                };
             }
+
+            # restliche Spalten
+            else {
+                $idx = "";
+                # grau formatieren
+                if (($spalte_db == 'print')) {
+                    $idx = "idx noprint' title='{$msg[212]}' style='color:hsl(0,0%,55%); font-style:italic";
+                };
+                $output .= "<th class='head-cell sortx {$idx}'>{$spalte_web}</th>";
+            };
         }
         $output .= "<th>&nbsp;</th></tr></thead>";
 
@@ -179,6 +203,7 @@ class TableBody
      */
     public static function htmlTabelle(): string
     {
+        $msg = self::MSG;
         $stamps_db = TablePrep::$stamps_db;
         $spaltennamen = TablePrep::spaltennamen();
         $idx2 = $_SESSION['idx2'];
@@ -186,17 +211,17 @@ class TableBody
 
         if (!$is_checked_in) {
             unset($spaltennamen['kat22'], $spaltennamen['print'], $spaltennamen['fid'], $spaltennamen['gid']);
-        }
+        };
 
         # Gruppen.ID nur bei admin ausgeben
         if (empty($_SESSION['su'])) {
             unset($spaltennamen['gid']);
             #unset($spaltennamen['print']);
-        }
+        };
 
         $output = "<tbody>";
 
-        foreach ($stamps_db as $stamp) {
+        foreach ($stamps_db as $stamp):
             $output .= "<tr class='row-body' style='padding:0' title='details'><td></td>";
     /*
         $output .= '<tr class="row-body" style="padding:0" title="details"
@@ -218,7 +243,7 @@ class TableBody
                 $title = "details #".$stamp[$id];
 
                 foreach ($spaltennamen as $spalte_db => $spalte_web) {
-                    // Thumbnail
+                    # Thumbnail
                     if ($spalte_web == 'Pic0') {
                         $output .= "<td class='data-cell' style='text-align: center;'
                             title='{$title}' id='{$stamp[$id]}'>
@@ -230,51 +255,53 @@ class TableBody
                         # base64_encode($stamp['thumb-blob']).
                         # "' width='50' height='50' alt='#{$stamp[$id]}'></div></a></td>";
 
-                    // ID's
-                    } elseif ($spalte_db == 'fid' || $spalte_db == 'gid') {
+                    # ID's
+                    } elseif ($spalte_db == 'fid'
+                        || $spalte_db == 'gid')
+                    {
                         $output .= "<td class='data-cell' title='{$title}'>
                             <a class='akt-link2 box2 idx'
                             href=./details.php?id={$stamp[$id]}>{$stamp[$spalte_db]}</a></td>";
 
-                    // Druckoption, startet JS: prn_toogle()
-                    // Symbol per CSS
+                    # Druckoption, startet JS: prn_toogle()
+                    # Symbol per CSS
                     } elseif ($spalte_db === 'print') {
                         $data = $stamp[$spalte_db];
-                        $fid = $stamp[$id];
-                        $data_rev = ($data == 1) ? 0 : 1;      # switchen
-                        $checked = ($data == 1) ? "checked" : "";
+                        $fid  = $stamp[$id];
+                        $data_rev = ($data == 1) ? 0 : 1;      // switchen
+                        $checked  = ($data == 1) ? "checked" : "";
                         # onclick='return false;' .. disabled='disabled'  onclick='prn_toogle(".$stamp[$id].",".$data_rev.")'
 
                         $output .= "
-                                <td class='data-cell noprint' title='druck ja/nein'
+                                <td class='data-cell noprint' title='{$msg[213]}'
                                     style='text-align:center;'>
                                 <input type='checkbox' name='{$spalte_db}'
                                     id='prn_{$fid}' class='chkbx noprint' {$checked} onclick='prn_toogle({$fid},{$data_rev})' />
                                 <label for='prn_{$fid}'></label></td>";
 
-                    // Ansicht
+                    # Ansicht
                     } elseif ($spalte_db == 'kat20') {
                         $output .= "<td class='data-cell' title='{$title}'>
                             <a class='akt-link2 box2' style='text-align:center;'
                             href=./details.php?id={$stamp[$id]}>{$stamp[$spalte_db]}</a></td>";
 
-                    // alle anderen Spalten
+                    # alle anderen Spalten
                     } else {
-                        // Datum umformatieren
+                        # Datum umformatieren
                         if ($spalte_db == 'datum') {
-                            ($stamp[$spalte_db])
-                                ? $data = date("d.m.Y",strtotime($stamp[$spalte_db]))
-                                : $data = '';
+                            $data = ($stamp[$spalte_db])
+                                ? date("d.m.Y",strtotime($stamp[$spalte_db]))
+                                : '';
                         } else {
                             $data = $stamp[$spalte_db];
-                        }
+                        };
 
                         $output .= "<td class='data-cell' style='text-wrap: nowrap'
                             title='{$title}'><a class='akt-link2 box2'
                             href=./details.php?id={$stamp[$id]}>".$data."</a></td>";
-                    } # else, andere Spalten
-                }   # foreach, spaltennamen
-            }     # if: Einzel-Liste
+                    }; // else, andere Spalten
+                };     // foreach, spaltennamen
+            }          // if: Einzel-Liste
 
 
             // Gruppen-Liste
@@ -283,19 +310,19 @@ class TableBody
                 $id = 'fid';
                 $title = "details";
 
-                // Thumbs der Einzeldateien holen
-                # $thumb_liste = getThumbBlob($stamp['gid']);
-                $thumb_liste = Data::getThumbPath($stamp['gid']);
+                # Thumbs der Einzeldateien holen
+                #$thumb_liste = getThumbBlob($stamp['gid']);
+                $thumb_liste = TableData::getThumbPath($stamp['gid']);
 
-                // Anzahl Dateien (Bilder) pro Gruppe
+                # Anzahl Dateien (Bilder) pro Gruppe
                 $maxfile = count($thumb_liste);
 
                 foreach ($spaltennamen AS $spalte_db => $spalte_web) {
-                    // Thumbnail  ... id='{$stamp['gid']}'
+                    # Thumbnail  ... id='{$stamp['gid']}'
                     if ($spalte_web == 'Pic0' ) {
                         $output .= "
                         <td class='data-cell'>
-                        <div class='thumb-grid'>";   # 3-Elemente-Feld
+                        <div class='thumb-grid'>";   // 3-Elemente-Feld
                         if ($maxfile > 0) {
                             foreach ($thumb_liste AS $idx => $file) {
                                 $output .= "<div class='detail-thumb' title='#{$file[$id]}'
@@ -307,21 +334,22 @@ class TableBody
 
                                 # ."<img src='data:image/jpg;charset=utf8;base64,".
                                 # base64_encode($file['thumb-blob'])
-                            }
-                        }
+                            };
+                        };
                         $output .= "</div></td>";
-                    }
-                    // ID's
-                    elseif ($spalte_db == 'gid') {
+
+                    # ID's
+                    } elseif ($spalte_db == 'gid') {
                         $output .= "<td class='data-cell' title='{$title}'>
                             <a class='akt-link2 box2 idx' href=./details.php?id={$stamp[$id]}>".
                             $stamp[$spalte_db]."</a></td>";
 
-                    // alle anderen Spalten
+                    # alle anderen Spalten
                     } else {
                         $data = $stamp[$spalte_db];
+
+                        # Datum umformatieren
                         if ($spalte_db == 'datum') {
-                            // Datum umformatieren
                             $data = $data
                                 ? date("d.m.Y", strtotime($data))
                                 : '';
@@ -331,21 +359,22 @@ class TableBody
                         else {
                             $output .= "<td class='data-cell' style='text-wrap: nowrap'
                                 title='{$title}'>";
-                        }
+                        };
 
                         $output .= "<a class='akt-link2 box2'
                             href=./details.php?id={$stamp[$id]}>".$data."</a></td>";
-                    }
-                }
-            }   # else: Gruppen-Liste
+                    };
+                };
+            };        // else: Gruppen-Liste
             $output .= "<td></td></tr>";
-        }   # foreach stamp
+        endforeach;   // foreach stamp
 
         $output .= "</tbody>";
 
+        # Leerzeile, wird am Anfang statt Ende eingefügt ???
         if (count($stamps_db) > 10000) {
-            $output .= "&nbsp;";  # Leerzeile, wird am Anfang statt Ende eingefügt ???
-        }
+            $output .= "&nbsp;";
+        };
 
         return $output;
     }

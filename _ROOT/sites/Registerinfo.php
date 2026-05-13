@@ -1,9 +1,7 @@
 <?php
 /* Prozess: dieseSeite:RegInfo-->email(Admin)-->email(RegCode)-->RegSeite-->email(Admin)/email(AktLink)-->ActivateSeite-->Login */
 
-namespace Dzg\Sites;
-use Dzg\SiteForm\RegisterInfo as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteform/registerinfo.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
@@ -12,7 +10,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /**
  * Summary of Class RegisterInfo
  */
-class RegisterInfo extends Pre
+class RegisterInfo extends RegisterInfoForm
 {
     /**
      * zentraler Startpunkt der Seite
@@ -33,6 +31,7 @@ class RegisterInfo extends Pre
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $status_message = self::$status_message;
         $input_message_first = self::$input_message_first;
@@ -46,9 +45,7 @@ class RegisterInfo extends Pre
         $output .= $status_message;
 
         $output .= "<div class='registration-form'>";
-        $output .= "
-            <h2>Registrierung</h2>
-            <br>";
+        $output .= "<h2>{$msg[310]}</h2><br>";
 
 
         // Seite anzeigen
@@ -56,35 +53,35 @@ class RegisterInfo extends Pre
         if ($show_form):
         $output .= "
 
-<p>Du interessierst dich für diese Seiten und willst erweiterten Zugriff auf den Inhalt haben? <br>
-Informiere mich kurz darüber und du erhälst Zugang via deiner Email-Adresse.</p>
+<p>{$msg[311]}<br>
+{$msg[312]}</p>
 
 <form action='?regon' method='POST' style='margin-top: 30px;'>
 
 <div class='form-group'>
-    <label for='inputName'>Dein Name:</label>
+    <label for='inputName'>{$msg[313]}:</label>
     <input type='text' id='inputName' name='name' autocomplete='name' value='$pre_usr' class='form-control' size='40' maxlength='50' autofocus />
 </div>
 
 <div class='form-group'>
-    <label for='inputEmail'>Deine E-Mail: <span style='color:red'>*</span></label>
+    <label for='inputEmail'>{$msg[314]}: <span style='color:red'>*</span></label>
     <input type='email' required id='inputEmail' name='email' autocomplete='email' value='$pre_email' class='form-control' size='40' maxlength='100' />
 </div>
 
 <div class='form-group'>
-    <label for='inputMessage'>Deine Nachricht: <span style='color:red'>*</span></label>
+    <label for='inputMessage'>{$msg[315]}: <span style='color:red'>*</span></label>
     <textarea  required id='inputMessage' name='message' rows='9' style='width:100%;' maxlength='250' spellcheck='true' class='form-control'>$input_message_first</textarea>
 </div>
 
     <br>
-    <button type='submit' class='btn btn-lg btn-primary btn-block'>Anfrage senden</button>
+    <button type='submit' class='btn btn-lg btn-primary btn-block'>{$msg[316]}</button>
 </form>
 
 <br><br><hr>
-<b>Hinweise:</b>
+<b>{$msg[317]}:</b>
 <ul>
-    <li>Alle <span style='color:red'>*</span> Felder bitte ausfüllen.</li>
-    <li>Du wirst als nächstes eine Email mit deinem Registrierungs-Link erhalten.</li>
+    <li>{$msg[318]} <span style='color:red'>*</span> {$msg[319]}.</li>
+    <li>{$msg[320]}.</li>
 </ul>";
 
         // positive Statusausgabe ohne Formularanzeige
@@ -94,7 +91,7 @@ Informiere mich kurz darüber und du erhälst Zugang via deiner Email-Adresse.</
         $output .= "
 <br><br><hr><br>
 <div><form action='".$_SESSION['main']."' method='POST'>
-    <button class='btn btn-lg btn-primary btn-block' type='submit'>Startseite</button>
+    <button class='btn btn-lg btn-primary btn-block' type='submit'>{$msg[321]}</button>
 </form></div>";
 
         endif;  # Seite anzeigen

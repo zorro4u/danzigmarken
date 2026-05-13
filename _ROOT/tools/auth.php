@@ -110,7 +110,7 @@ class Auth
             if (empty($_SESSION['lastsite'])) {
 
                 // Herkunftsseite speichern
-                tools::lastSite(['login', 'email']);
+                Tools::lastSite(['login', 'email']);
             };
             $target = $_SESSION['lastsite'];
         };

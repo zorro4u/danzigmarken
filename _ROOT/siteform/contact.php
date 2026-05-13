@@ -1,10 +1,10 @@
 <?php
-namespace Dzg\SiteForm;
-use Dzg\SitePrep\Contact as Prep;
+namespace Dzg;
 use Dzg\Tools\Tools;
 use Dzg\Mail\{MailConfig, AntiSpam};
 
 require_once __DIR__.'/../siteprep/contact.php';
+require_once __DIR__.'/../sitemsg/contact.php';
 require_once __DIR__.'/../tools/tools.php';
 #require_once __DIR__.'/../mail/Mail.php';
 require_once __DIR__.'/../mail/MailConfig.php';
@@ -19,8 +19,22 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 /**
  * Webseite: Kontaktformular
  */
-class Contact extends Prep
+class ContactForm extends ContactPrep
 {
+    protected const MSG = ContactMsg::MSG;
+
+    // username: beginnt mit Buchstaben, kann dann auch Zahlen und (._-) enthalten aber nicht damit enden, ist 3-20 Zeichen lang
+    protected const REGEX_USR = "/^[a-zA-Z]((\.|_|-)?[a-zA-Z0-9äüößÄÜÖ]+){3,20}$/D";
+
+    // (Doppel-)Name mit Bindestrich/Leerzeichen, ohne damit zu beginnen oder zu enden und ohne doppelte Striche/Leerz., ist 0-50 Zeichen lang
+    protected const REGEX_NAME = "/^[a-zA-ZäüößÄÜÖ]+([0-9a-zA-ZäüößÄÜÖ]|[ -._](?=[0-9a-zA-ZäüößÄÜÖ])){0,50}$/";
+    protected const REGEX_NAME_NO = "/^[^a-zA-ZäüößÄÜÖ]+|[^0-9a-zA-ZäüößÄÜÖ -._]+|[_.- ]{2,}|[^0-9a-zA-ZäüößÄÜÖ]+$/";
+
+    // Nachricht: enthält Buchstaben/Zahlen, Leer, Tab, Zeilenwechsel, Sonderzeichen und special escaped regex-Zeichen; negiert um falsche Zeichen auszugeben
+    protected const REGEX_MESS_NO = "/[^\w\s\t\r\n ×÷=<>:;,!@#€%&§`´~£¥₩₽° •○●□■♤♡◇♧☆▪︎¤《》¡¿♠︎♥︎◆♣︎★±≈≠≡【〔「『】〕」』¡№٪‰–—‽· \\\\\^\$\.\|\?\*\+\-\(\)\[\]\{\}\/\"\']/mu";
+
+    protected const BREAKER = "/\r\r|\r\n|\n\r|\n\n|<br>/";
+
     protected static bool $show_form;
     protected static string $status_message;
     protected static string $success_msg;
@@ -42,6 +56,7 @@ class Contact extends Prep
         #require_once $_SERVER['DOCUMENT_ROOT'].'/contact/mail-setup.php';
         #global $cfg, $smtp;
 
+        $msg = self::MSG;
         $cfg  = MailConfig::$cfg;
         $smtp = MailConfig::$smtp[0];
         $datenschutzerklaerung = MailConfig::$datenschutzerklaerung;
@@ -67,11 +82,12 @@ class Contact extends Prep
             // clean post
             foreach ($_POST as $key => $value) {
                 $_POST[$key] = htmlentities($value, ENT_QUOTES, "UTF-8");
-            }
+            };
 
             // Nutzereingaben auswerten
-            if (isset($_POST['message']) &&
-                (isset($_POST['email']) || isset($_POST['name'])))
+            if (isset($_POST['message'])
+                && (isset($_POST['email'])
+                || isset($_POST['name'])))
             {
                 // mysql_real_escape_string(): reservierte Zeichen in (my)SQL durch die entsprechenden Escape-Sequenzen ersetzen.
                 // Darüber hinaus sollte man alle Eingaben auf Korrektheit überprüfen und ggfs. unerwünschte Zeichen oder Zeichenketten ausfiltern,
@@ -86,72 +102,60 @@ class Contact extends Prep
                 # urlencode()
 
                 // Plausi-Check Input
-
-                // username: beginnt mit Buchstaben, kann dann auch Zahlen und (._-) enthalten aber nicht damit enden, ist 3-20 Zeichen lang
-                $regex_usr = "/^[a-zA-Z]((\.|_|-)?[a-zA-Z0-9äüößÄÜÖ]+){3,20}$/D";
-
-                // (Doppel-)Name mit Bindestrich/Leerzeichen, ohne damit zu beginnen oder zu enden und ohne doppelte Striche/Leerz., ist 0-50 Zeichen lang
-                $regex_name = "/^[a-zA-ZäüößÄÜÖ]+([0-9a-zA-ZäüößÄÜÖ]|[ -._](?=[0-9a-zA-ZäüößÄÜÖ])){0,50}$/";
-                $regex_name_no = "/^[^a-zA-ZäüößÄÜÖ]+|[^0-9a-zA-ZäüößÄÜÖ -._]+|[_.- ]{2,}|[^0-9a-zA-ZäüößÄÜÖ]+$/";
-
                 $input_name = isset($_POST['name'])
                     ? htmlspecialchars(Tools::cleanInput($_POST['name']))
-                    : "";
+                    : '';
 
-                $regex = !preg_match($regex_name, $input_name, $match);
-                #$regex1 = preg_match_all($regex_name_no, $input_name, $match);
+                $regex = !preg_match(self::REGEX_NAME, $input_name, $match);
 
                 if ($input_name !== "" && $regex) {
-                    $error_arr []= 'nur Buchstaben im Namen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen)';
-                    #$error_arr []= 'nur Buchstaben im Namen zulässig (oder Bindestrich/Leerzeichen bei Doppelnamen): "'.htmlentities(implode(" ", $match[0])).'"';
-                } else {
-                    # [$input_vor, $input_nach] = explode(' ',$input_name,2);
+                    $error_arr []= $msg[210];
+                }
+                else {
                     $name_arr = explode(' ', $input_name, 20);
                     if (count($name_arr) < 2) {
                         // nur ein Element = Vorname
                         [$input_vor] = $name_arr;
                         $input_nach = '';
-                    } else {
+                    }
+                    else {
                         // letztes Element = Nachname, davor alles als Vorname
                         $input_nach = array_pop($name_arr);
                         $input_vor = implode(' ', $name_arr);
-                    }
-                }
+                    };
+                };
 
                 // Email
                 $input_email = isset($_POST['email'])
                     ? htmlspecialchars(Tools::cleanInput($_POST['email']))
-                    : "";
-                if ($input_email !== "" &&
-                    !filter_var($input_email, FILTER_VALIDATE_EMAIL))
+                    : '';
+                if ($input_email !== ""
+                    && !filter_var($input_email, FILTER_VALIDATE_EMAIL))
                 {
-                    $error_arr []= 'Keine gültige Email-Adresse.';
-                }
+                    $error_arr []= $msg[211];
+                };
 
-
-                // Nachricht: enthält Buchstaben/Zahlen, Leer, Tab, Zeilenwechsel, Sonderzeichen und special escaped regex-Zeichen; negiert um falsche Zeichen auszugeben
-                $regex_mess_no = "/[^\w\s\t\r\n ×÷=<>:;,!@#€%&§`´~£¥₩₽° •○●□■♤♡◇♧☆▪︎¤《》¡¿♠︎♥︎◆♣︎★±≈≠≡【〔「『】〕」』¡№٪‰–—‽· \\\\\^\$\.\|\?\*\+\-\(\)\[\]\{\}\/\"\']/mu";
-
+                // Nachricht
                 $input_message_first = $_POST['message'];   // wird nicht weiter verwendet
                 $input_message = isset($_POST['message'])
                     ? Tools::cleanInput($_POST['message'])
-                    : "";
-                $input_message = preg_replace("/\r\r|\r\n|\n\r|\n\n|<br>/","\n", $input_message);
-                if ($input_email !== "" &&
-                    preg_match_all($regex_mess_no, $input_message, $match))
-                {
-                    $error_arr []= 'Die Nachricht verwendet unzulässige Zeichen: "'.htmlentities(implode(" ", $match[0])).'"';
-                }
+                    : '';
 
-                #$error_arr []= ' -regex.end-';
+
+                $input_message = preg_replace(self::BREAKER, "\n", $input_message);
+                if ($input_email !== ""
+                    && preg_match_all(self::REGEX_MESS_NO, $input_message, $match))
+                {
+                    $error_arr []= $msg[212].': "'.htmlentities(implode(" ", $match[0])).'"';
+                };
 
                 $input_message = htmlspecialchars($input_message);
                 #echo $input_message = htmlspecialchars($input_message, ENT_QUOTES);
                 #$input_message = htmlentities($input_message, ENT_QUOTES);     // auch Umlaute werden auch umgewandelt
 
             } else {
-                $error_arr []= 'kein Name/Email und Nachricht angeben.';
-            }
+                $error_arr []= $msg[213];
+            };
 
 
             // -------------------- SPAMPROTECTION ERROR MESSAGES START ----------------------
@@ -169,61 +173,70 @@ class Contact extends Prep
                 if (!isset($_POST['sicherheitscode'], $_SESSION['phrase'])
                     || $compare)
                 {
-                    $fehler['captcha'] = "<span class='errormsg'>Der <strong>Sicherheitscode</strong> wurde falsch eingegeben.</span>";
-                    unset($_SESSION['phrase']);
-                } elseif (isset($_POST['sicherheitscode'])) {
+                    $fehler['captcha'] = "<span class='errormsg'>{$msg[214]}</span>";
                     unset($_SESSION['phrase']);
                 }
-            }
+                elseif (isset($_POST['sicherheitscode'])) {
+                    unset($_SESSION['phrase']);
+                };
+            };
 
-            if ($cfg['Sicherheitsfrage'] && isset($_SESSION['Sicherheitsfrage'])) {
+            if ($cfg['Sicherheitsfrage']
+                && isset($_SESSION['Sicherheitsfrage']))
+            {
                 $answer = AntiSpam::getAnswerById($_SESSION['Sicherheitsfrage']);
                 unset($_SESSION['Sicherheitsfrage']);
 
-                if (!isset($_POST['answer']) || $answer != $_POST['answer']) {
-                    $fehler['q_id12'] = "<span class='errormsg'>Bitte die <strong>Sicherheitsfrage</strong> richtig beantworten.</span>";
-                }
-            }
+                if (!isset($_POST['answer'])
+                    || $answer != $_POST['answer'])
+                {
+                    $fehler['q_id12'] = "<span class='errormsg'>{$msg[215]}</span>";
+                };
+            };
 
-            if ($cfg['Honeypot'] &&
-                (!isset($_POST['mail']) || ''!=$_POST['mail']))
+            if ($cfg['Honeypot']
+                && (!isset($_POST['mail'])
+                    || $_POST['mail'] != ''))
             {
-                $fehler['Honeypot'] = "<span class='errormsg-spamprotection' style='display: block;'>Es besteht Spamverdacht. Bitte überprüfen Sie Ihre Angaben.</span>";
-            }
+                $fehler['Honeypot'] = "<span class='errormsg-spamprotection' style='display: block;'>{$msg[216]}</span>";
+            };
 
-            if ($cfg['Zeitsperre'] &&
-                (!isset($_POST['chkspmtm']) || ''==$_POST['chkspmtm'] || '0'==$_POST['chkspmtm'] ||
-                (time() - (int) $_POST['chkspmtm']) < (int) $cfg['Zeitsperre']))
+            if ($cfg['Zeitsperre']
+                && (!isset($_POST['chkspmtm'])
+                    || $_POST['chkspmtm'] == ''
+                    || $_POST['chkspmtm'] == '0'
+                    || (time() - (int) $_POST['chkspmtm']) < (int) $cfg['Zeitsperre']))
             {
-                $fehler['Zeitsperre'] = "<span class='errormsg-spamprotection' style='display: block;'>Bitte warten Sie einige Sekunden, bevor Sie das Formular erneut absenden.</span>";
-            }
+                $fehler['Zeitsperre'] = "<span class='errormsg-spamprotection' style='display: block;'>{$msg[217]}</span>";
+            };
 
-            if ($cfg['Klick-Check'] &&
-                (!isset($_POST['chkspmkc']) || 'chkspmhm'!=$_POST['chkspmkc']))
+            if ($cfg['Klick-Check']
+                && (!isset($_POST['chkspmkc'])
+                    || 'chkspmhm' != $_POST['chkspmkc']))
             {
-                $fehler['Klick-Check'] = "<span class='errormsg-spamprotection' style='display: block;'>Sie müssen den Senden-Button mit der Maus anklicken, um das Formular senden zu können.</span>";
-            }
+                $fehler['Klick-Check'] = "<span class='errormsg-spamprotection' style='display: block;'>{$msg[218]}</span>";
+            };
 
             if ($cfg['Links'] < preg_match_all('#http(s?)\:\/\/#is', $input_message, $irrelevantMatches))
             {
                 $fehler['Links'] = "
-                    <span class='errormsg-spamprotection' style='display: block;'>Ihre Nachricht darf ".
+                    <span class='errormsg-spamprotection' style='display: block;'>{$msg[219]} ".
                     (0==$cfg['Links']
-                        ? 'keine Links'
+                        ? $msg[220]
                         : (1==$cfg['Links']
-                            ? 'nur einen Link'
-                            : 'maximal '.$cfg['Links'].' Links'
+                            ? $msg[221]
+                            : $msg[222].' '.$cfg['Links'].' '.$msg[223]
                             )
-                    )." enthalten.</span>";
-            }
+                    )." {$msg[223]}.</span>";
+            };
 
-            if (''!=$cfg['Badwordfilter'] &&
-                0!==$cfg['Badwordfilter'] &&
-                '0'!=$cfg['Badwordfilter'])
+            if ($cfg['Badwordfilter'] != ''
+                && $cfg['Badwordfilter'] !== 0
+                && $cfg['Badwordfilter'] != '0')
             {
                 $badwords = explode(',', $cfg['Badwordfilter']);            // the configured badwords
                 $badwordFields = explode(',', $cfg['Badwordfields']);        // the configured fields to check for badwords
-                $badwordMatches = array();                                    // the badwords that have been found in the fields
+                $badwordMatches = [];                                    // the badwords that have been found in the fields
 
                 if (0 < count($badwordFields)) {
                     foreach ($badwords as $badword) {
@@ -232,27 +245,27 @@ class Contact extends Prep
                         $badword = addcslashes($badword, '.:/');                                // make ., : and / preg_match-valid
                         if ('%'!=substr($badword, 0, 1)) {
                             $badword = '\\b'.$badword;
-                        }            // if word mustn't have chars before > add word boundary at the beginning of the word
+                        };           // if word mustn't have chars before > add word boundary at the beginning of the word
                         if ('%'!=substr($badword, -1, 1)) {
                             $badword = $badword.'\\b';
-                         }            // if word mustn't have chars after > add word boundary at the end of the word
+                        };            // if word mustn't have chars after > add word boundary at the end of the word
                         $badword = str_replace('%', '', $badword);                                // if word is allowed in the middle > remove all % so it is also allowed in the middle in preg_match
                         foreach ($badwordFields as $badwordField) {
-                            if (preg_match('#'.$badword.'#is', $_POST[trim($badwordField)]) &&
-                                !in_array($badwordMatch, $badwordMatches))
+                            if (preg_match('#'.$badword.'#is', $_POST[trim($badwordField)])
+                                && !in_array($badwordMatch, $badwordMatches))
                             {
                                 $badwordMatches[] = $badwordMatch;
-                            }
-                        }
-                    }
+                            };
+                        };
+                    };
 
                     if (0 < count($badwordMatches)) {
                         $fehler['Badwordfilter'] = "
-                            <span class='errormsg-spamprotection' style='display: block;'>Folgende Begriffe sind nicht erlaubt: ".
+                            <span class='errormsg-spamprotection' style='display: block;'>{$msg[225]}: ".
                             implode(', ', $badwordMatches)."</span>";
-                    }
-                }
-            }
+                    };
+                };
+            };
             // -------------------- SPAMPROTECTION ERROR MESSAGES ENDE ----------------------
 
 
@@ -261,25 +274,23 @@ class Contact extends Prep
 
                 if (isset($datenschutz) && $datenschutz == "") {
                     $fehler['datenschutz'] = "
-                        <span class='errormsg'>
-                        Sie müssen die <strong>Datenschutz&shy;erklärung</strong> akzeptieren.
-                        </span>";
-                }
-            }
+                        <span class='errormsg'>{$msg[226]}</span>";
+                };
+            };
 
             $buttonClass = 'failed';
-            $formMessage = '
-                <img src="img/failed.png" style="width:25px;height:25px;vertical-align: middle;">
-                <span class="error_in_email_sending">Bitte überprüfen und korrigieren Sie Ihre Eingaben.</span>';
+            $formMessage = "
+                <img src='img/failed.png' style='width:25px;height:25px;vertical-align: middle;'>
+                <span class='error_in_email_sending'>{$msg[227]}</span>";
 
 
             // there are NO errors > upload-check
-            if (!isset($fehler) || count($fehler) == 0) {}
+            if (!isset($fehler) || count($fehler) == 0) {};
 
 
             if (!empty($fehler)) {
                 $error_arr []= implode("<br>", $fehler);
-            }
+            };
 
 
             // Eingaben okay, Mail vorbereiten und versenden
@@ -317,22 +328,11 @@ class Contact extends Prep
                 // === ENDE EMAIL-Abschnitt ===
 
                 if ($email_send) {
-                    $success_msg = 'Deine Nachricht wurde versandt. Du erhälst in Kürze eine Antwort.';
+                    $success_msg = $msg[228];
                     #$show_form = False;
                 } else {
-                    $error_arr []= 'Oh, die Nachricht konnte <b>NICHT</b> gesendet werden :-(';
-                }
-
-                /*
-                if (!empty($fehler['Sendmail'])) {
-                    $buttonClass = '<span style=display:none;>failed</span>';
-                    $formMessage = '<span style=display:none;>Ihre Nachricht wurde NICHT gesendet.</span>';
-                }
-                else {
-                    $buttonClass = 'finished';
-                    $formMessage = '<img src="img/finished.png" style="width:29px;height:29px;vertical-align: middle;"> <span class="successfully_sent">Ihre Nachricht wurde gesendet.</span>';
-                }
-                */
+                    $error_arr []= $msg[229];
+                };
 
                 // Formular nach Verarbeitung wieder löschen
                 #$input_name = "";
@@ -340,15 +340,15 @@ class Contact extends Prep
                 $input_message_first = "";
 
             // Eingabewerte nicht okay, kein Mailversand
-            } else {}
+            } else {};
 
 
 
-        }  # Formularwerte empfangen
+        };  # Formularwerte empfangen
 
         if (!empty($error_arr)) {
             $error_arr = [implode("<br>", $error_arr)];
-        }
+        };
         $error_msg = implode("", $error_arr);
 
 
@@ -370,21 +370,4 @@ class Contact extends Prep
 }
 
 
-
-
-######################################
-#unset($_POST, $_GET, $_REQUEST);
-#var_dump($_POST);
-#foreach ($_POST AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_GET AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_REQUEST AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_COOKIE AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_SERVER AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-#foreach ($_SESSION AS $k=>$v) {echo $k, ": ", $v, "<br>";};echo"<br>";
-
-#if (!empty($_SESSION['su'])) var_dump($_SESSION['idx2'], $_SESSION['siteid']);
-
-#print_r('ident: '.$_COOKIE['identifier'].'<br>');
-#print_r('token: '.$_COOKIE['securitytoken'].'<br>');
-#print_r('token: '.sha1($_COOKIE['securitytoken']).'<br>');
-#print_r(pathinfo($_SESSION['main']));
+// EOF

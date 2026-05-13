@@ -1,7 +1,6 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SitePrep\Details;
-use Dzg\SiteData\Change as Data;
+namespace Dzg;
+use Dzg\DetailsPrep;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/details.php';
@@ -12,7 +11,7 @@ require_once __DIR__.'/../tools/auth.php';
 /**
  * Summary of Class Change
  */
-class Change extends Details
+class ChangePrep extends DetailsPrep
 {
     protected static array $abfrage_db;
 
@@ -49,7 +48,7 @@ class Change extends Details
 
         # noch zusätzliche Spalte (im Vgl. zur Detail-Seite) zur Ausgabe anhängen
         #$spaltennamen += ['kat23' => 'Bildursprung'];
-        $spaltennamen += ['print' => 'druckbar'];
+        $spaltennamen += ['print' => self::MSG[410]];
 
         # die Spalte(n) am Schluss ausgeben
         $tmp_prn['print'] = $spaltennamen['print'];
@@ -67,7 +66,7 @@ class Change extends Details
         //
         # DropDown-Bezeichnungen holen
         # für Thema, Frankatur, Ansicht, Attest
-        $results = Data::getDropEntry();
+        $results = ChangeData::getDropEntry();
 
         # abfrage_array nach Spalten (select Statement) aufsplitten
         $qry_arr = [];

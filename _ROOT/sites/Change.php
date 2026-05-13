@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SiteForm\Change as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteform/change.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
@@ -10,7 +8,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /**
  * Summary of Class Change
  */
-class Change extends Pre
+class Change extends ChangeForm
 {
     public static function show(): void
     {
@@ -29,6 +27,7 @@ class Change extends Pre
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $status_message = self::$status_message;
         $output = "<div class='container'>";
@@ -232,7 +231,7 @@ class Change extends Pre
             $output .= "<table class=detail-pic>";
             $output .= "<tbody><tr><td><div class='detail-pic'><a href='/".
                 htmlspecialchars($stamps[$akt_file_idx]['original']).
-                "' title='große Ansicht'><img src='/".
+                "' title='{$msg[312]}'><img src='/".
                 htmlspecialchars($stamps[$akt_file_idx]['small'])."' width='300' height=''
                 alt='/".htmlspecialchars($stamps[$akt_file_idx]['name'])."'>
                 </a></div></td></tr></tbody>";
@@ -300,8 +299,8 @@ class Change extends Pre
                 #class='button btn_chg_delete' "&emsp;&emsp;&emsp;
                 ? "<formX method='POST' style='display:inline'>".
                   "<button class='btn Xbtn-primary' type='' name='split' value='Split'
-                    onclick='return confirm(\"Wirklich von der Bildgruppe  - L Ö S E N -  ?\")'>
-                    aus Gruppe lösen</button></formX>"
+                    onclick='return confirm(\"{$msg[620]}\")'>
+                    {$msg[621]}</button></formX>"
                 : "";
 
             // - Löschen -
@@ -312,8 +311,8 @@ class Change extends Pre
             $akt_file_id = self::$akt_file_id;
             $btn_delete = "
                 <button class='btn' type='' name='delete' value='Delete'
-                onclick='return confirm(\"Wirklich das Bild  - L Ö S C H E N -  ?\")'>
-                aus Bestand <b>löschen</b></button>";
+                onclick='return confirm(\"{$msg[622]}\")'>
+                {$msg[623]}</button>";
         }
         $output .= "<div class='fuss'>";
 
@@ -346,14 +345,14 @@ class Change extends Pre
 
         $btn_restore = "<formX method='POST'>
             <button class='btn btn-primary' type='' name='restore' value='Restore'>
-                Wiederherstellen</button></formX>";
+                {$msg[624]}</button></formX>";
         $btn_cancel = "<formX method='POST'>
             <button class='btn Xbtn-primary' type='' name='cancel' value='Cancel'>
-                Abbrechen</button></formX>";
+                {$msg[625]}</button></formX>";
         $btn_okay ="
             <button class='btn btn-primary' type='submit'name='change' value='Change'
-                onclick_X='return confirm(\"Wirklich Eintrag  - Ä N D E R N -  ?\")'>
-                Ändern</button>";
+                onclick_X='return confirm(\"{$msg[626]}\")'>
+                {$msg[627]}</button>";
         $btn_okayX = "";
 
         // - Abbrechen / Ändern -
@@ -385,7 +384,7 @@ class Change extends Pre
             ? $output .= "
                 <div>
                 <a class='noprint' style='color:hsl(0, 0%, 45%); background-color:transparent;'>
-                <button formaction='{$_SERVER['PHP_SELF']}?id={$prev}' class='lnk' title='{$label} zurück: #{$prev}'>
+                <button formaction='{$_SERVER['PHP_SELF']}?id={$prev}' class='lnk' title='{$label} {$msg[314]}: #{$prev}'>
                 <i class='fas fa-long-arrow-left' style='font-size:16px;'></i></button>
                 </a></div>"
 
@@ -397,7 +396,7 @@ class Change extends Pre
             ? $output .= "
                 <div>
                 <a class='noprint' style='color:hsl(0, 0%, 45%); background-color:transparent;'>
-                <button formaction='{$_SERVER['PHP_SELF']}?id={$next}' class='lnk' title='{$label} vor: #{$next}'>
+                <button formaction='{$_SERVER['PHP_SELF']}?id={$next}' class='lnk' title='{$label} {$msg[315]}: #{$next}'>
                 <i class='fas fa-long-arrow-right' style='font-size:16px;'></i></button>
                 </a></div>"
 

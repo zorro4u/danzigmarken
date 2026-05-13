@@ -1,10 +1,9 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SitePrep\TablePrep;
-use Dzg\SiteData\TableData as Data;
+namespace Dzg;
 
 require_once __DIR__.'/tableprep.php';
 require_once __DIR__.'/../sitedata/tabledata.php';
+require_once __DIR__.'/../sitemsg/table.php';
 
 
 /**
@@ -12,6 +11,8 @@ require_once __DIR__.'/../sitedata/tabledata.php';
  */
 class TableNavi
 {
+    protected const MSG = TableMsg::MSG;
+
     /**
      * Summary of datenbereich
      * setzt den Startwert und die Schrittweite der Tabellenausgabe
@@ -26,37 +27,48 @@ class TableNavi
         $start = TablePrep::$_session['start'];
         $proseite = TablePrep::$_session['proseite'];
 
-        // Start setzen
-        if (empty($start)) $start = 0;
+        # Start setzen
+        #if (empty($start)) $start = 0;
+        $start = ($start) ?: 0;
 
-        // Datensätze pro Ausgabeseite / Standard: 10
-        if (empty($proseite)) $proseite = 10;
+        # Datensätze pro Ausgabeseite / Standard: 10
+        #if (empty($proseite)) $proseite = 10;
+        $proseite = ($proseite) ?: 10;
 
+        # wenn 'range' leer
         if (empty($_POST['range'])) {
-            // wenn 'range' leer
+            # und 'new_range' leer, dann auf Standardwert setzen
             if (empty($_POST['new_range'])) {
-                // und 'new_range' leer, dann auf Standardwert setzen
                 $_POST['new_range'] = $proseite;
-            } else {} // aber 'new_range' existiert
-        } else {
-            // wenn 'range' vorhanden
+            }
+            # aber 'new_range' existiert
+            else {};
+        }
+
+        # wenn 'range' vorhanden
+        else {
+            # und 'new_range' leer,
+            # dann Wert zur weiteren Verwendung setzen
             if (empty($_POST['new_range'])) {
-                // und 'new_range' leer,
-                // dann Wert zur weiteren Verwendung setzen
                 # todo: $_POST['range'] nicht direkt übernehmen!
                 $_POST['new_range'] = $_POST['range'];
-            } else {
-                // und 'new_range' vorhanden
+            }
+
+            # und 'new_range' vorhanden
+            else {
+                # wenn 'range' <> 'new_range'
+                # dann bei neuer Schrittweite Datenbank
+                # vom ersten Element an ausgeben
                 if ($_POST['range'] != $_POST['new_range']) {
-                    // wenn 'range' <> 'new_range'
-                    // dann bei neuer Schrittweite Datenbank vom ersten Element an ausgeben
                     # todo: $_POST['new_range'] nicht direkt übernehmen!
                     $_POST['range'] = $_POST['new_range'];
                     $_POST['start'] = 0;
-                } else {} // 'range' = 'new_range'
-            }
-        }
-        // Schrittweite auf (geänderten) Dropdown-Wert setzen
+                }
+                # 'range' = 'new_range'
+                else {};
+            };
+        };
+        # Schrittweite auf (geänderten) Dropdown-Wert setzen
         $proseite = (int)$_POST['new_range'];
 
 
@@ -86,6 +98,7 @@ class TableNavi
      */
     public static function feldSeitenwahl(): string
     {
+        $msg = self::MSG;
         $maxID = TablePrep::$maxID;
         $start = TablePrep::$_session['start'];
 
@@ -112,29 +125,29 @@ class TableNavi
 
         //-------------------------------------------------
         // max. Seitenzahl
-        $seitenanzahl = (!($maxID % $proseite))
-            // wenn alle Seiten gleichmäßig aufgeteilt sind (Div.Rest=0)
+        $seitenanzahl = !($maxID % $proseite)
+            # wenn alle Seiten gleichmäßig aufgeteilt sind (Div.Rest=0)
             ? intdiv($maxID, $proseite)
 
-            // ansonsten +1 Seite für die Restelemente
+            # ansonsten +1 Seite für die Restelemente
             : intdiv($maxID, $proseite) + 1;
 
         //-------------------------------------------------
         // mit $startNr den Anfang der jeweiligen Listenausgabe festsetzen
         //
-        // wenn noch keine Navi-Sprungmarke jemals gesetzt wurde
+        # wenn noch keine Navi-Sprungmarke jemals gesetzt wurde
         if (empty($_POST['start']) && empty($start)) {
             $startNr = 0;
 
-        // wenn keine Navi-Sprungmarke aktuell, aber davor schon mal gesetzt wurde
+        # wenn keine Navi-Sprungmarke aktuell, aber davor schon mal gesetzt wurde
         } elseif (!isset($_POST['start']) && !empty($start)) {
             $startNr = $start;
 
-        // wenn Navi-Seitensprungmarke gesetzt wurde
+        # wenn Navi-Seitensprungmarke gesetzt wurde
         } else {
             # todo: Plausi-Check! $_POST['start'] nicht direkt übernehmen!
             $startNr = abs((int)$_POST['start']);  # String in Zahl wandeln
-        }
+        };
 
         // ggf. $startNr korrigieren (falls Parameter in der URL manipuliert wurde)
         // und auf Bereichsbeginn setzen und es gibt nicht mehr Seiten als anzuzeigende Elemente
@@ -151,7 +164,9 @@ class TableNavi
 
         //-------------------------------------------------
         // 'zurück'
-        $newStart_back = ($startNr - $proseite < 0) ? 0 : ($startNr-$proseite);
+        $newStart_back = ($startNr - $proseite < 0)
+            ? 0
+            : ($startNr-$proseite);
         $rewind = ($akt_seite - 2*$cut + $jump) * $proseite;
 
         //-------------------------------------------------
@@ -178,7 +193,7 @@ class TableNavi
                 title='eine Seite rückwärts'>&lt;</a>*/
         $output .= ($startNr !== 0)
             // akt.Seite nicht erste Seite -> mit Symbol und Link beginnen
-            ? "<td class='back' title='eine Seite rückwärts'>
+            ? "<td class='back' title='{$msg[110]}'>
                 <a class='site'>
                 <form method='POST' action='' class='site'>
                 <input type='hidden' name='start' value='{$newStart_back}' />
@@ -186,7 +201,7 @@ class TableNavi
                 </form></a></td>
                 <td>&nbsp;</td>
 
-                <td class='site' title='erste Seite'>
+                <td class='site' title='{$msg[111]}'>
                 <a class='site'>
                 <form method='POST' action='' class='site'>
                 <input type='hidden' name='start' value='0' />
@@ -194,7 +209,8 @@ class TableNavi
                 </form></a></td>"
 
             // akt.Seite = erste Seite -> ohne Symbol/Link beginnen
-            : "<td class='active rund-links'><a class='active' title='aktuelle Seite 1'>1</a></td>";
+            : "<td class='active rund-links'><a class='active'
+                title='{$msg[112]} 1'>1</a></td>";
 
         //-------------------------------------------------
         //  Anzeige "Seitennummern"
@@ -202,12 +218,12 @@ class TableNavi
         for ($i = 1; $i < $seitenanzahl-1; $i++) {
 
             $str_active = "
-            <td class='active' title='aktuelle Seite ".($i+1)."'>
+            <td class='active' title='{$msg[112]} ".($i+1)."'>
             <a class='active'>".($i+1)."
             </a></td>";
 
             $str_step = "
-            <td class='site' title='Seite ".($i+1)."'>
+            <td class='site' title='{$msg[113]} ".($i+1)."'>
             <a class='site'>
             <form method='POST' action='' class='site'>
             <input type='hidden' name='start' value='".($i*$proseite)."' />
@@ -215,7 +231,7 @@ class TableNavi
             </form></a></td>";
 
             $str_jump_backward = "
-            <td class='site' title='td1_Seite {$i}'>
+            <td class='site' title='{$msg[113]} {$i}'>
             <a class='site' style='padding:1px 8px;'>
             <form method='POST' action='' class='site'>
             <input type='hidden' name='start' value='{$rewind}' />
@@ -223,7 +239,7 @@ class TableNavi
             </form></a></td>";
 
             $str_jump_forward = "
-            <td class='site' title='td2_Seite ".($i+2)."'>
+            <td class='site' title='{$msg[113]} ".($i+2)."'>
             <a class='site' style='padding:1px 8px;'>
             <form method='POST' action='' class='site'>
             <input type='hidden' name='start' value='{$fastforward}' />
@@ -231,45 +247,45 @@ class TableNavi
             </form></a></td>";
 
 
-            // unterhalb Cut: nix anzeigen
+            # unterhalb Cut: nix anzeigen
             if ($i < ($akt_seite - $cut)) {
                 if ($rewind <= 0) {
                     $output .= $str_step;
-                }
+                };
+            }
 
-            // unterer Cut: "..." anzeigen
-            } elseif ($i === ($akt_seite - $cut)) {
-                if ($rewind > 0) {
-                    $output .= $str_jump_backward;
-                } else {
-                    $output .= $str_step;
-                }
+            # unterer Cut: "..." anzeigen
+            elseif ($i === ($akt_seite - $cut)) {
+                $output .= ($rewind > 0)
+                    ? $str_jump_backward
+                    : $str_step;
+            }
 
-            // innerhalb Cut-Bereich: Seitennummer anzeigen
-            } elseif ($i > ($akt_seite - $cut) && $i < ($akt_seite + $cut)) {
-                if ($i !== $akt_seite) {
-                    // wenn nicht aktuelle Seite, dann einen Link erstellen
-                    $output .= $str_step;
-                } else {
-                    // ansonsten (aktuelle Seite) ohne Link
-                    $output .= $str_active;
-                }
+            # innerhalb Cut-Bereich: Seitennummer anzeigen
+            elseif ($i > ($akt_seite - $cut)
+                && $i < ($akt_seite + $cut))
+            {
+                # wenn nicht aktuelle Seite, dann einen Link erstellen
+                # ansonsten (aktuelle Seite) ohne Link
+                $output .= ($i !== $akt_seite)
+                    ? $str_step
+                    : $str_active;
+            }
 
-            // oberer Cut: "..." anzeigen
-            } elseif ($i === ($akt_seite + $cut)) {
-                if ($fastforward < $last_site) {
-                    $output .= $str_jump_forward;
-                } else {
-                    $output .= $str_step;
-                }
+            # oberer Cut: "..." anzeigen
+            elseif ($i === ($akt_seite + $cut)) {
+                $output .= ($fastforward < $last_site)
+                    ? $str_jump_forward
+                    : $str_step;
+            }
 
-            // oberhalb Cut: nix anzeigen
-            } elseif ($i > ($akt_seite + $cut)) {
+            # oberhalb Cut: nix anzeigen
+            elseif ($i > ($akt_seite + $cut)) {
                 if ($fastforward >= $last_site) {
                     $output .= $str_step;
-                }
-            }
-        }
+                };
+            };
+        };
 
         //-------------------------------------------------
         //  Anzeige "vor"
@@ -277,40 +293,40 @@ class TableNavi
         // >: &gt; >>: &gg; >>>: &ggg;
         // &GreaterGreater; &raquo; &RightTriangle; &rangle; &rang; &Rang; &blacktriangleright;
         //
+        # akt.Seite nicht letzte Seite -> letzte Seitenzahl mit Link + Symbol
         if ($startNr !== $last_site) {
-            // akt.Seite nicht letzte Seite -> letzte Seitenzahl mit Link + Symbol
             if ($seitenanzahl > 1) {
                 $output .= "
-                    <td class='site' title='letzte Seite {$seitenanzahl}'>
+                    <td class='site' title='{$msg[114]} {$seitenanzahl}'>
                     <a class='site'>
                     <form method='POST' action='' class='site'>
                     <input type='hidden' name='start' value='{$last_site}' />
                     <button class='lnk' style='color:initial'>{$seitenanzahl}</button>
                     </form>
                     </a></td>";
-            }
+            };
             $output .= "
                 <td>&nbsp;</td>
-                <td class='for' title='eine Seite vorwärts'>
+                <td class='for' title='{$msg[115]}'>
                 <a class='site'>
                 <form method='POST' action='' class='site'>
                 <input type='hidden' name='start' value='{$newStart_fwd}' />
                 <button class='lnk' style='color:initial'>&gt;</button>
                 </form>
                 </a></td>";
-
 /*
                 <td class='for'>
                 <a class='site' href={$_SERVER['PHP_SELF']}?start={$newStart_fwd}
                 title='eine Seite vorwärts'>&gt;</a></td>";
 */
-        } elseif ($seitenanzahl > 1) {
-            // akt.Seite = letzte Seite -> ohne Link/Symbol
-            $output .= "<td class='active'><a class='active'
-                        title='aktuelle Seite {$seitenanzahl}'>{$seitenanzahl}</a></td>";
-        }
 
-        $output .= "</tr></table></div>";   # ende < /SEITENAUSWAHL >
+        # akt.Seite = letzte Seite -> ohne Link/Symbol
+        } elseif ($seitenanzahl > 1) {
+            $output .= "<td class='active'><a class='active'
+                        title='{$msg[112]} {$seitenanzahl}'>{$seitenanzahl}</a></td>";
+        };
+
+        $output .= "</tr></table></div>";   // ende < /SEITENAUSWAHL >
 
 
         // Klassenwerte setzen
@@ -333,6 +349,7 @@ class TableNavi
      */
     public static function feldAnzeigewahl(): string
     {
+        $msg = self::MSG;
         $maxID = TablePrep::$maxID;
 
         // Datenanzeigebereich bestimmen
@@ -357,14 +374,14 @@ class TableNavi
             action=''>
             <label>
             <select class='form-dd' name='new_range' onchange='this.form.submit()'
-            title='Anzahl pro Seite festlegen'>";
+            title='{$msg[116]}'>";
             #padding-right:0.5em;
         foreach ($dd_options as $opt_val) {
-            ($opt_val == $proseite)
-                ? $value = "selected value=".$opt_val
-                : $value = "value=".$opt_val;
+            $value = ($opt_val == $proseite)
+                ? "selected value=".$opt_val
+                : "value=".$opt_val;
             $output .= "<option {$value}>{$opt_val}&nbsp;</option>";
-        }
+        };
         $output .= "
             </select></label>
             <label style=''> / ".number_format($maxID, 0, ',', '.')."</label></form>
@@ -383,27 +400,30 @@ class TableNavi
      */
     public static function feldThemenwahl(): string
     {
+        $msg = self::MSG;
         $sess_thema = TablePrep::$_session['thema'];
-        $theme_qry  = Data::getThemes();
+        $theme_qry  = TableData::getThemes();
         $theme_db   = ['- alle -'];
 
         foreach ($theme_qry AS $entry) {
             foreach ($entry AS $theme) {
                 array_push($theme_db, $theme);
-            }
-        }
+            };
+        };
         # &#10005; &#10006; &#10007; &#10008; &#10799 &#215;(&times;)
         $button1 = "<span class='btn_reset deaktiv2' style='font-size:80%'
                     title=''>&#10005;</span>";
-        if (!empty($sess_thema) && $sess_thema !== '- alle -') {
+        if (!empty($sess_thema)
+            && $sess_thema !== '- alle -')
+        {
             $button1 = "<button class='btn_reset' type='submit' name='thema'
-                        value='- alle -' title='Auswahl löschen'>&#10006;</button>";
-        }
+                        value='- alle -' title='{$msg[117]}'>&#10006;</button>";
+        };
 
         // -- Ausgabe --
         $output  = "
             <div class='navi_themenwahl'>
-            <form class='naviform theme' method='post' title='Filter wählen'><label>
+            <form class='naviform theme' method='post' title='{$msg[118]}'><label>
             <select class='filter-option' name='thema' onchange='this.form.submit()'>";
             #action=''
 
@@ -411,20 +431,22 @@ class TableNavi
             $theme = '- alle -';
             if (!empty($sess_thema)) {
                 $theme = $sess_thema;
-            }
+            };
 
             if ($opt_val === '- alle -') {
                 if ($opt_val === $theme) {
-                    $output .= "<option>Thema auswählen &hellip;&ensp;</option>";
-                }
+                    $output .= "<option>{$msg[119]} &hellip;&ensp;</option>";
+                };
                 $output .= "<hr>";
                 #echo"<optgroup label=''>";
             }
             else {
-                $value = ($opt_val === $theme) ? "'{$opt_val}' selected" : "'{$opt_val}'";
+                $value = ($opt_val === $theme)
+                    ? "'{$opt_val}' selected"
+                    : "'{$opt_val}'";
                 $output .= "<option value={$value}>{$opt_val}</option>";
-            }
-        }
+            };
+        };
         #echo"</optgroup>";
         $output .= "
             </select>{$button1}</label></form>
@@ -441,12 +463,13 @@ class TableNavi
      */
     public static function feldSuchen(): string
     {
+        $msg = self::MSG;
         $search = TablePrep::$_session['search'];
 
         $value = '';
-        $placeholder = "suchen &hellip;";
+        $placeholder = $msg[120]." &hellip;";
         $button1_img = "<img src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gU3ZnIFZlY3RvciBJY29ucyA6IGh0dHA6Ly93d3cub25saW5ld2ViZm9udHMuY29tL2ljb24gLS0+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMjU2IDI1NiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8bWV0YWRhdGE+IFN2ZyBWZWN0b3IgSWNvbnMgOiBodHRwOi8vd3d3Lm9ubGluZXdlYmZvbnRzLmNvbS9pY29uIDwvbWV0YWRhdGE+DQo8Zz48Zz48cGF0aCBmaWxsPSIjMDAwMDAwIiBkPSJNMTU5LjIsMTY1LjNjLTE1LjgsMTQuOC0zNy4xLDIzLjgtNjAuNSwyMy44Yy00OSwwLTg4LjctMzkuNy04OC43LTg4LjdzMzkuNy04OC43LDg4LjctODguN2M0OSwwLDg4LjcsMzkuNyw4OC43LDg4LjdjMCwyMS42LTcuOCw0MS41LTIwLjYsNTYuOWM3LjMsMC41LDE2LDQuNSwyMC44LDkuMkwyNDIsMjIxYzUuMiw1LjIsNS4zLDE0LDAsMTkuM2MtNS40LDUuNC0xNCw1LjMtMTkuMywwbC01NC41LTU0LjVDMTYzLjUsMTgxLjEsMTU5LjcsMTcyLjQsMTU5LjIsMTY1LjN6IE05OC43LDE2MS44YzMzLjksMCw2MS40LTI3LjUsNjEuNC02MS40YzAtMzMuOS0yNy41LTYxLjQtNjEuNC02MS40cy02MS40LDI3LjUtNjEuNCw2MS40QzM3LjMsMTM0LjMsNjQuOCwxNjEuOCw5OC43LDE2MS44eiIvPjwvZz48L2c+DQo8L3N2Zz4=' width='12' height='12'> ";
-        $button1 = "<button class='btn_search' title='Suche starten'>{$button1_img}</button>";
+        $button1 = "<button class='btn_search' title='{$msg[121]}'>{$button1_img}</button>";
         $button2 = "<span class='btn_reset deaktiv2' style='font-size:80%'
                     title=''>&#10005;</span>";
 
@@ -454,15 +477,15 @@ class TableNavi
             $placeholder = '';
             $value = $search;
             $button2 = "<button class='btn_reset' type='submit' name='reset'
-                        title='Suche löschen'>&#10006;</button>";
-        }
+                        title='{$msg[122]}'>&#10006;</button>";
+        };
 
         // -- Ausgabe --
         $output  = "
             <div class='navi_suche'>
             <form class='naviform suche' method='POST'>
             <input class='suchfeld2' type='search' name='search' value='{$value}' results='0'
-            title='Suchwörter eingeben' placeholder='{$placeholder}'/>
+            title='{$msg[123]}' placeholder='{$placeholder}'/>
             {$button1}{$button2}</form>
             </div>";   # ende < /FILTERAUSWAHL >
 

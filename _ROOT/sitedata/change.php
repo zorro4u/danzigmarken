@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\SiteData;
+namespace Dzg;
 use Dzg\Tools\Database;
 use PDO;
 use PDOException;
@@ -7,7 +7,7 @@ use PDOException;
 require_once __DIR__.'/../tools/database.php';
 
 
-class Change
+class ChangeData
 {
     /**
      * DropDown-Bezeichnungen holen für Thema, Frankatur, Ansicht, Attest

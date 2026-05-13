@@ -1,8 +1,8 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 use Dzg\PrivateData as My;
 
+require_once __DIR__.'/../sitemsg/impressum.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 require_once __DIR__.'/../private/account_data.php';
 
@@ -22,20 +22,21 @@ class About
      */
     private static function show_body(): void
     {
+        $msg = ImpressumMsg::MSG;
 ?>
 
 <div class='container main-container registration-form'>
 <br /><br />
 
 <p><span style='font-style:italic;text-decoration:underline'>
-verantwortlich:</span><br />
+<?= $msg[317] ?>:</span><br />
 <?= My\NAME ?><br />
 <?= My\TOWN ?><br />
-Deutschland</p>
+<?= $msg[311] ?></p>
 
 <p><span style='font-style:italic;text-decoration:underline'>
-Kontakt:</span><br />
-E-Mail:
+<?= $msg[312] ?>:</span><br />
+<?= $msg[313] ?>:
     <a href='/contact' title='Kontaktformular' style='background-color:transparent'>
     <img src='/assets/pic/email_danzigmarken.png'width='180' height='16'></a></p>
 
@@ -44,7 +45,7 @@ E-Mail:
 
 <br />
 <p><span style='font-style:italic;text-decoration:underline'>
-realisiert von:</span><br />
+<?= $msg[314] ?>:</span><br />
 Zorro4U
 &emsp;|&emsp;
 <a href='https://github.com/zorro4u/danzigmarken'
@@ -55,7 +56,7 @@ GitHub</a>&nbsp;
 
 <br />
 <p><span style='font-style:italic;text-decoration:underline'>
-Web-Hoster:</span><br />
+<?= $msg[315] ?>:</span><br />
 <a href='https://www.rainbow-web.com' title='Web-Hoster' rel='noopener noreferrer nofollow'
     target='_blank' style='background-color:transparent'>
 www.rainbow-web.com</a>&nbsp;

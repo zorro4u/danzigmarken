@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
+namespace Dzg;
 use Dzg\Tools\Auth;
 
 // IN ARBEIT \\
@@ -10,7 +10,7 @@ require_once __DIR__.'/../tools/auth.php';
 /**
  * Summary of Upload
  */
-class Upload
+class UploadPrep
 {
     protected static $show_form;
     protected static $error_msg;

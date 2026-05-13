@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SiteForm\Settings as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteform/settings.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
@@ -10,7 +8,7 @@ require_once __DIR__.'/../siteprep/loader_default.php';
 /**
  * Summary of Class Settings
  */
-class Settings extends Pre
+class Settings extends SettingsForm
 {
     public static function show(): void
     {
@@ -29,6 +27,7 @@ class Settings extends Pre
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $status_message = self::$status_message;
 
@@ -39,7 +38,7 @@ class Settings extends Pre
 
         # Seiten-Check okay, Seite anzeigen
         else:
-            $output .= "<h1>Einstellungen</h1>";
+            $output .= "<h1>{$msg[310]}</h1>";
             $output .= $status_message;
 
             $output .= "<div> ";    // START
@@ -69,29 +68,30 @@ class Settings extends Pre
 
     private static function tab_selection(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
 
         $output = <<<EOT
         <ul class='nav nav-tabs' role='tablist'>
         <li role='presentation' class='{$active['email']}'>
         <a href='#email' aria-controls='profile' role='tab' data-toggle='tab'>
-        Anmeldedaten</a></li>
+        {$msg[311]}</a></li>
 
         <li role='presentation' class='{$active['passwort']}'>
         <a href='#passwort' aria-controls='messages' role='tab' data-toggle='tab'>
-        Passwort</a></li>
+        {$msg[312]}</a></li>
 
         <li role='presentation' class='{$active['data']}'>
         <a href='#data' aria-controls='home' role='tab' data-toggle='tab'>
-        Persönliche Daten</a></li>
+        {$msg[313]}</a></li>
 
         <li role='presentation' class='{$active['autologin']}'>
         <a href='#autologin' aria-controls='autologin' role='tab' data-toggle='tab'>
-        Autologin</a></li>
+        {$msg[314]}</a></li>
 
         <li role='presentation' class='{$active['delete']}'>
         <a href='#delete' aria-controls='delete' role='tab' data-toggle='tab'>
-        Konto löschen</a></li>
+        {$msg[315]}</a></li>
         EOT;
 
         # wenn angemeldet als 'heinz' oder 'admin'
@@ -101,7 +101,7 @@ class Settings extends Pre
         $output .= <<<EOT
         <li role='presentation' class='{$active['download']}'>
         <a href='#download' aria-controls='download' role='tab' data-toggle='tab'>
-        Download</a></li>
+        {$msg[316]}</a></li>
         EOT;
 
         endif;
@@ -118,6 +118,7 @@ class Settings extends Pre
      */
     private static function tab_user(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $usr_data = self::$usr_data;
         $name = htmlentities($usr_data['username']);
@@ -128,38 +129,38 @@ class Settings extends Pre
         <div class='col-sm-10'>
 
         <br>
-        <p>Zum Ändern deiner Daten gib bitte zur Bestätigung dein aktuelles Passwort ein.</p>
+        <p>{$msg[317]}</p>
 
         <form action='?save=email&tab=email' method='POST' class='form-horizontal'>
 
         <div class='form-group'>
-        <label for='inputPW0' class='col-sm-2 control-label'>Passwort</label>
+        <label for='inputPW0' class='col-sm-2 control-label'>{$msg[318]}</label>
         <div class='col-sm-10 user-box'>
         <input id='inputPW0' type='password' name='passwort'
             class='form-control' autocomplete='current-password'
             spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw0' class='fas fa-eye'></i></span>
+            <i id='pw0' class='fas fa-eye-slash'></i></span>
         </div></div>
 
         <br>
         <div class='form-group'>
-        <label for='inputUser' class='col-sm-2 control-label'>Benutzername</label>
+        <label for='inputUser' class='col-sm-2 control-label'>{$msg[319]}</label>
         <div class='col-sm-10'>
         <input class='form-control' id='inputUser' name='username'
             type='text' value='{$name}' autocomplete='off' />
         </div></div>
 
         <div class='form-group'>
-        <label for='inputEmail' class='col-sm-2 control-label'>E-Mail</label>
+        <label for='inputEmail' class='col-sm-2 control-label'>{$msg[320]}</label>
         <div class='col-sm-10'>
         <input class='form-control' id='inputEmail' name='email'
             type='email' value='{$mail}' autocomplete='off' />
         </div></div>
 
         <div class='form-group'>
-        <label for='inputEmail2' class='col-sm-2 control-label'>E-Mail (wiederholen)</label>
+        <label for='inputEmail2' class='col-sm-2 control-label'>{$msg[321]}</label>
         <div class='col-sm-10'>
         <input class='form-control' id='inputEmail2' name='email2'
             type='email' autocomplete='off' />
@@ -168,7 +169,7 @@ class Settings extends Pre
         <br>
         <div class='form-group'>
         <div class='col-sm-offset-2 col-sm-10'>
-        <button type='submit' class='btn btn-primary'>Speichern</button>
+        <button type='submit' class='btn btn-primary'>{$msg[322]}</button>
         </div></div>
 
         </form></div></div>
@@ -182,6 +183,7 @@ class Settings extends Pre
      */
     private static function tab_pwd(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         # placeholder='Buchstaben/Zahlen !?,.:_=$%&#+*~^(@€µÄÜÖäüöß)<LEER>
 
@@ -190,46 +192,46 @@ class Settings extends Pre
         <div class='col-sm-10'>
 
         <br>
-        <p>Zum Änderen deines Passworts gib bitte zur Bestätigung dein aktuelles Passwort ein.</p>
+        <p>{$msg[323]}</p>
 
         <form action='?save=passwort&tab=passwort' method='POST' class='form-horizontal'>
 
         <div class='form-group'>
-        <label for='inputPW1' class='col-sm-2 control-label'>Aktuelles Passwort</label>
+        <label for='inputPW1' class='col-sm-2 control-label'>{$msg[324]}</label>
         <div class='col-sm-10 user-box'>
         <input id='inputPW1' type='password' name='passwortAlt'
             class='form-control' autocomplete='current-password'
             spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw1' class='fas fa-eye'></i></span>
+            <i id='pw1' class='fas fa-eye-slash'></i></span>
         </div></div>
 
         <br>
         <div class='form-group'>
-        <label for='inputPW2' class='col-sm-2 control-label'>Neues Passwort</label>
+        <label for='inputPW2' class='col-sm-2 control-label'>{$msg[325]}</label>
         <div class='col-sm-10 user-box'>
         <input id='inputPW2' type='password' name='passwortNeu'
             class='form-control' autocomplete='off' spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw2' class='fas fa-eye'></i></span>
+            <i id='pw2' class='fas fa-eye-slash'></i></span>
         </div></div>
 
         <div class='form-group'>
-        <label for='inputPasswortNeu2' class='col-sm-2 control-label'>Neues Passwort (wiederholen)</label>
+        <label for='inputPasswortNeu2' class='col-sm-2 control-label'>{$msg[326]}</label>
         <div class='col-sm-10'>
         <input id='inputPasswortNeu2' type='password' name='passwortNeu2'
             class='form-control' autocomplete='off' spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw3' class='fas fa-eye'></i></span>
+            <i id='pw3' class='fas fa-eye-slash'></i></span>
         </div></div>
 
         <br>
         <div class='form-group'>
         <div class='col-sm-offset-2 col-sm-10'>
-        <button type='submit' class='btn btn-primary'>Speichern</button>
+        <button type='submit' class='btn btn-primary'>{$msg[322]}</button>
         </div></div>
 
         </form></div></div>
@@ -243,6 +245,7 @@ class Settings extends Pre
      */
     private static function tab_data(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $usr_data = self::$usr_data;
         $vor  = htmlentities($usr_data['vorname']);
@@ -256,14 +259,14 @@ class Settings extends Pre
 
         <br><br>
         <div class='form-group'>
-        <label for='inputVorname' class='col-sm-2 control-label'>Vorname</label>
+        <label for='inputVorname' class='col-sm-2 control-label'>{$msg[327]}</label>
         <div class='col-sm-10'>
         <input class='form-control' id='inputVorname' name='vorname'
             type='text' value='{$vor}' autocomplete='off' />
         </div></div>
 
         <div class='form-group'>
-        <label for='inputNachname' class='col-sm-2 control-label'>Nachname</label>
+        <label for='inputNachname' class='col-sm-2 control-label'>{$msg[328]}</label>
         <div class='col-sm-10'>
         <input class='form-control' id='inputNachname' name='nachname'
             type='text' value='{$nach}' autocomplete='off' />
@@ -272,7 +275,7 @@ class Settings extends Pre
         <br>
         <div class='form-group'>
         <div class='col-sm-offset-2 col-sm-10'>
-        <button type='submit' class='btn btn-primary'>Speichern</button>
+        <button type='submit' class='btn btn-primary'>{$msg[322]}</button>
         </div></div>
 
         </form></div></div>
@@ -287,6 +290,7 @@ class Settings extends Pre
      */
     private static function tab_login(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
         $usr_data = self::$usr_data;
 
@@ -299,18 +303,18 @@ class Settings extends Pre
         if ($usr_data['count3']):
 
         $output .= <<<EOT
-        <p>Alle meine anderen Anmeldungen geräteübergreifend beenden ({$usr_data['count3']}x)</p>
+        <p>{$msg[329]} ({$usr_data['count3']}x)</p>
 
         <div class='col-sm-offset-2 col-sm-10'>
         <div><br>
         <form action='?save=autologin&tab=autologin' method='POST'>
-        <button class='btn btn-primary' type='submit'>Beenden</button>
+        <button class='btn btn-primary' type='submit'>{$msg[330]}</button>
         </form>
         </div></div>
         EOT;
 
         else:
-            $output .= "<p>Keine Autologins vorhanden.</p>";
+            $output .= "<p>{$msg[331]}</p>";
         endif;
 
         $output .= "</div></div>";
@@ -325,6 +329,7 @@ class Settings extends Pre
      */
     private static function tab_account(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
 
         return <<<EOT
@@ -332,18 +337,18 @@ class Settings extends Pre
         <div class='col-sm-10'>
 
         <br><br>
-        <p>Zum Löschen deines Kontos gib bitte zur Bestätigung dein aktuelles Passwort ein.</p><br>
+        <p>{$msg[332]}</p><br>
 
         <form action='?save=delete&tab=delete' method='POST' class='form-horizontal'>
         <div class='form-group'>
         <div class='col-sm-10 user-box'>
 
-        <input id='inputPW3' type='password' name='pw_delete' placeholder='Passwort'
+        <input id='inputPW3' type='password' name='pw_delete' placeholder='{$msg[318]}'
             class='form-control'  style='width:auto;' autocomplete='current-password'
             spellcheck='false' required />
-        <label for='inputPW3' class='col-sm-2 control-label sr-only'>Passwort</label>
+        <label for='inputPW3' class='col-sm-2 control-label sr-only'>{$msg[318]}</label>
 
-        <span class='password-toggle-icon' style='left:190px;right:unset'><i id='pw4' class='fas fa-eye'></i></span>
+        <span class='password-toggle-icon' style='left:190px;right:unset'><i id='pw4' class='fas fa-eye-slash'></i></span>
         </div></div>
 
         <br><br>
@@ -351,7 +356,7 @@ class Settings extends Pre
         <div class='form-group'>
         <div class='col-sm-offset-2 col-sm-10'>
 
-        <button type='submit' class='btn btn-primary btn-lg' onclick='return confirm('Wirklich das Konto  - L Ö S C H E N -  ?')'>mein Konto löschen</button>
+        <button type='submit' class='btn btn-primary btn-lg' onclick='return confirm(\"{$msg[333]}\")'>{$msg[334]}</button>
 
         </div></div>
         </form>
@@ -368,6 +373,7 @@ class Settings extends Pre
      */
     private static function tab_download(): string
     {
+        $msg = self::MSG;
         $active = self::$active;
 
         $file = "/download/dzg_90.pdf";     #  ./../test/pdf_down.php
@@ -380,16 +386,16 @@ class Settings extends Pre
         $output = <<<EOT
         <div role='tabpanel' class='tab-pane {$active['download']}' id='download'>
         <div class='col-sm-10'><br>
-        <p>Datenbank-Auszug als PDF-Datei ({$filesize}) ... </p>
+        <p>{$msg[335]} ({$filesize}) ... </p>
         <div class='col-sm-offset-2 col-sm-10'>
         <div><br>
 
         <form method='POST'>
         <button formaction='{$file}' class='btn btn-primary' type='submit'>
-        anzeigen</button>&emsp;&emsp;&emsp;
+        {$msg[336]}</button>&emsp;&emsp;&emsp;
 
         <button formaction='/test/pdf_down'class='btn btn-primary' type='submit'>
-        downloaden</button>
+        {$msg[337]}</button>
         </form>
         </div></div></div></div>
         EOT;
@@ -434,65 +440,65 @@ class Settings extends Pre
         togglePassword0.addEventListener('click', function () {
         if (passwordField0.type === 'password') {
             passwordField0.type = 'text';
-            togglePassword0.classList.remove('fa-eye');
-            togglePassword0.classList.add('fa-eye-slash');
+            togglePassword0.classList.remove('fa-eye-slash');
+            togglePassword0.classList.add('fa-eye');
 
         } else {
             passwordField0.type = 'password';
-            togglePassword0.classList.remove('fa-eye-slash');
-            togglePassword0.classList.add('fa-eye');
+            togglePassword0.classList.remove('fa-eye');
+            togglePassword0.classList.add('fa-eye-slash');
         }
         });
 
         togglePassword1.addEventListener('click', function () {
         if (passwordField1.type === 'password') {
             passwordField1.type = 'text';
-            togglePassword1.classList.remove('fa-eye');
-            togglePassword1.classList.add('fa-eye-slash');
+            togglePassword1.classList.remove('fa-eye-slash');
+            togglePassword1.classList.add('fa-eye');
 
         } else {
             passwordField1.type = 'password';
-            togglePassword1.classList.remove('fa-eye-slash');
-            togglePassword1.classList.add('fa-eye');
+            togglePassword1.classList.remove('fa-eye');
+            togglePassword1.classList.add('fa-eye-slash');
         }
         });
 
         togglePassword2.addEventListener('click', function () {
         if (passwordField2.type === 'password') {
             passwordField2.type = 'text';
-            togglePassword2.classList.remove('fa-eye');
-            togglePassword2.classList.add('fa-eye-slash');
+            togglePassword2.classList.remove('fa-eye-slash');
+            togglePassword2.classList.add('fa-eye');
 
         } else {
             passwordField2.type = 'password';
-            togglePassword2.classList.remove('fa-eye-slash');
-            togglePassword2.classList.add('fa-eye');
+            togglePassword2.classList.remove('fa-eye');
+            togglePassword2.classList.add('fa-eye-slash');
         }
         });
 
         togglePassword3.addEventListener('click', function () {
         if (passwordField3.type === 'password') {
             passwordField3.type = 'text';
-            togglePassword3.classList.remove('fa-eye');
-            togglePassword3.classList.add('fa-eye-slash');
+            togglePassword3.classList.remove('fa-eye-slash');
+            togglePassword3.classList.add('fa-eye');
 
         } else {
             passwordField3.type = 'password';
-            togglePassword3.classList.remove('fa-eye-slash');
-            togglePassword3.classList.add('fa-eye');
+            togglePassword3.classList.remove('fa-eye');
+            togglePassword3.classList.add('fa-eye-slash');
         }
         });
 
         togglePassword4.addEventListener('click', function () {
         if (passwordField4.type === 'password') {
             passwordField4.type = 'text';
-            togglePassword4.classList.remove('fa-eye');
-            togglePassword4.classList.add('fa-eye-slash');
+            togglePassword4.classList.remove('fa-eye-slash');
+            togglePassword4.classList.add('fa-eye');
 
         } else {
             passwordField4.type = 'password';
-            togglePassword4.classList.remove('fa-eye-slash');
-            togglePassword4.classList.add('fa-eye');
+            togglePassword4.classList.remove('fa-eye');
+            togglePassword4.classList.add('fa-eye-slash');
         }
         });
 

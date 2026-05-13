@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\SiteForm;
-use Dzg\SitePrep\Change as Prep;
-use Dzg\SiteData\Change as Data;
+namespace Dzg;
 use Dzg\Tools\Tools;
 
 require_once __DIR__.'/../siteprep/change.php';
@@ -12,7 +10,7 @@ require_once __DIR__.'/../tools/tools.php';
 /**
  * Auswertung der Formulareingabe
  */
-class Change extends Prep
+class ChangeForm extends ChangePrep
 {
     /**
      * ABBRUCH - Button
@@ -51,7 +49,7 @@ class Change extends Prep
             'id' => $akt_file_id,  # int
             'ip' => $remaddr,
             'by' => $userid ];     # int
-        Data::deleteFile($data);
+        ChangeData::deleteFile($data);
 
         // wenn nur 1 Datei, dann auch Gruppeneintrag löschen
         if ($max_file < 2) {
@@ -59,7 +57,7 @@ class Change extends Prep
                 'id' => $gid,
                 'ip' => $remaddr,
                 'by' => $userid ];
-            Data::deleteGroup($data);
+            ChangeData::deleteGroup($data);
         }
 
         // zum vorherigen Element wechseln
@@ -109,16 +107,16 @@ class Change extends Prep
             'id' => $akt_file_id,  # int
             'ip' => $remaddr,
             'by' => $userid ];     # int
-        Data::undeleteFile($data);
+        ChangeData::undeleteFile($data);
 
         // wenn nur 1 Datei, dann auch Gruppe wieder aktivieren
         if ($max_file < 2) {
             $data['id'] = $gid;
-            Data::undeleteGroup($data);
+            ChangeData::undeleteGroup($data);
         }
 
         self::$stamps[$akt_file_idx]['deakt'] = '0';
-        return 'wiederhergestellt';
+        return self::MSG[520];
     }
 
 
@@ -159,7 +157,7 @@ class Change extends Prep
                 ':kat17'    => $stamps[$akt_file_idx]['kat17'],
                 ':ip'       => $remaddr,
                 ':by'       => $userid ];
-            $result = Data::newGroup($data1);
+            $result = ChangeData::newGroup($data1);
 
             if(is_int($result)){
                 $new_gid = $result;
@@ -171,9 +169,9 @@ class Change extends Prep
                     'ip'      => $remaddr,
                     'by'      => $userid ];
                 $set = "id_group=:new_gid, chg_ip=:ip, chg_by=:by ";
-                Data::updateFile($set, $data);
+                ChangeData::updateFile($set, $data);
 
-                $success_msg = 'aus Gruppe gelöst';
+                $success_msg = self::MSG[521];
                 header ("Location: /change.php?id={$akt_file_id}");
             }
 
@@ -240,7 +238,7 @@ class Change extends Prep
                 if ($input_wert !== "" &&
                     preg_match_all($regex, $input_wert, $match))
                 {
-                    $error_arr []= 'unzulässige Zeichen eingegeben: " '.
+                    $error_arr []= self::MSG[522] . ': " '.
                         htmlentities(implode(" ", $match[0])).' "';
                 }
 
@@ -319,7 +317,7 @@ class Change extends Prep
             }
 */
             if (isset($input['thema'])) {
-                $id_theme = Data::getID($input['thema']);
+                $id_theme = ChangeData::getID($input['thema']);
                 $s['id_thema'] = $id_theme;
                 $d['id_thema'] = $id_theme;
             }
@@ -339,8 +337,8 @@ class Change extends Prep
                 // letzten 2 Zeichen (Komma) löschen, Leerz. anhängen
                 $set = substr($set, 0, -2)." ";
                 $data += ['id' => $gid];    # int
-                Data::updateGroup($set, $data);
-                $success_msg = 'Änderung ausgeführt.';
+                ChangeData::updateGroup($set, $data);
+                $success_msg = self::MSG[523];
             }
 
             // update datei
@@ -357,7 +355,7 @@ class Change extends Prep
                 // letzten 2 Zeichen (Komma) löschen, Leerz. anhängen
                 $set = substr($set, 0, -2)." ";
                 $data += ['id' => $akt_file_id];
-                Data::updateFile($set, $data);
+                ChangeData::updateFile($set, $data);
 
                 // wenn MarkenID geändert wird, und ($max_file < 2) dann auch Marke löschen
                 if (isset($input['gid']) && ($max_file < 2)) {
@@ -365,9 +363,9 @@ class Change extends Prep
                         'id' => $gid,
                         'ip' => $remaddr,
                         'by' => $userid ];
-                    Data::deleteGroup($data);
+                    ChangeData::deleteGroup($data);
                 }
-                $success_msg = 'Änderung ausgeführt.';
+                $success_msg = self::MSG[523];
             }
         }
 

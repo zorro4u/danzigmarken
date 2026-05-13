@@ -1,11 +1,10 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\SiteData\Admin as Data;
-use Dzg\Tools\{Auth, Tools, CheckIP};
+namespace Dzg;
+use Dzg\Tools\{Auth, CheckIP};
 
 require_once __DIR__.'/../sitedata/admin.php';
+require_once __DIR__.'/../sitemsg/admin.php';
 require_once __DIR__.'/../tools/auth.php';
-require_once __DIR__.'/../tools/tools.php';
 require_once __DIR__.'/../tools/checkip.php';
 
 
@@ -13,8 +12,9 @@ require_once __DIR__.'/../tools/checkip.php';
  * Summary of Admin
  * class A extends B implements C
  */
-class Admin
+class AdminPrep
 {
+    protected const MSG = AdminMsg::MSG;
     protected static string $error_msg;
     protected static array $usr_data;
     protected static array $user_list;
@@ -83,15 +83,15 @@ class Admin
             $identifier = self::$identifier;
 
             // --- TAB: Registrierung ---
-            $reglinks = Data::getDBregistryLink();
+            $reglinks = AdminData::getDBregistryLink();
 
 
             // --- TAB: Nutzer ---
-            $user_list = Data::getDBuserList($userid, $identifier);
+            $user_list = AdminData::getDBuserList($userid, $identifier);
 
 
             // --- TAB: Autologin / Info ---
-            $log_data = Data::get_log_data();
+            $log_data = AdminData::get_log_data();
 
 
             $ct10 = $ct11 = $ct12 = $ct13 = $ct21 = $ct20 = $ct22 = $ct23 = $ct24 = $ct25 = 0;

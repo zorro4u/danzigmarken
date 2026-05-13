@@ -1,6 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
-use Dzg\Tools\Tools;
+namespace Dzg;
 use Dzg\Mail\{MailConfig, AntiSpam};
 
 require_once __DIR__.'/../tools/tools.php';
@@ -17,7 +16,7 @@ require_once __DIR__.'/../mail/AntiSpam.php';
 /**
  * Webseite: Kontaktformular
  */
-class Contact
+class ContactPrep
 {
     protected static $question;
 

@@ -5,8 +5,7 @@
 /////// wird nicht weiter benötigt \\\\\\\\\\
 
 
-namespace Dzg\Sites;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 use Dzg\Tools\{Database, Auth, Tools};
 
 require_once __DIR__.'/../siteprep/loader_default.php';

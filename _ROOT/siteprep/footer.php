@@ -1,5 +1,5 @@
 <?php
-namespace Dzg\SitePrep;
+namespace Dzg;
 use Dzg\Tools\Database;
 
 require_once __DIR__.'/../tools/database.php';
@@ -42,9 +42,20 @@ class Footer
     }
 
 
-    /**
-     * Klassenvariablen / Eigenschaften
+
+    /*
+    <?= self::MSG[10] ?>
+    ".self::MSG[10]."
      */
+    protected const MSG = [
+        10 => "Nachricht an",
+        11 => "Kontakt",
+        12 => "Startseite",
+        13 => "Datenstand vom",
+        14 => "Webseite vom",
+    ];
+
+
     private const PROJECT_DIRS = ['',
         '/', '/account', '/assets/css',
         '/auth'];
@@ -194,8 +205,8 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/contact' title='Nachricht an danzigmarken.de'>
-            <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a>";
+            <a class='foot-link' href='/contact' title='".self::MSG[10]." danzigmarken.de'>
+            <i class='fa-regular fa-envelope'></i>&ensp;".self::MSG[11]."</a>";
 
         // die neueste/letzte Änderungszeit einer Kontakt-Projektdatei
         $txt['version'] = self::version();
@@ -227,7 +238,7 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/index' title='Startseite www.danzigmarken.de'>
+            <a class='foot-link' href='/index' title='".self::MSG[12]." www.danzigmarken.de'>
             <i class='fas fa-home'></i>&ensp;danzigmarken.de</a>";
 
         // die neueste/letzte Änderungszeit einer Kontakt-Projektdatei
@@ -249,8 +260,8 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/contact' title='Nachricht an danzigmarken.de'>
-            <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a>";
+            <a class='foot-link' href='/contact' title='".self::MSG[10]." danzigmarken.de'>
+            <i class='fa-regular fa-envelope'></i>&ensp;".self::MSG[11]."</a>";
 
         // die neueste/letzte Änderungszeit einer Auth-Projektdatei
         $project_dirs = ['/assets/css', '/auth'];
@@ -271,8 +282,8 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/contact' title='Nachricht an danzigmarken.de'>
-            <i class='fa-regular fa-envelope'></i>&ensp;Kontakt</a>";
+            <a class='foot-link' href='/contact' title='".self::MSG[10]." danzigmarken.de'>
+            <i class='fa-regular fa-envelope'></i>&ensp;".self::MSG[11]."</a>";
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
         $project_dirs = ['/assets/css', '/account'];
@@ -293,7 +304,7 @@ class Footer
 
         // Rechts
         $txt['rechts'] = "
-            <a class='foot-link' href='/index' title='Startseite www.danzigmarken.de'>
+            <a class='foot-link' href='/index' title='".self::MSG[12]." www.danzigmarken.de'>
             <i class='fas fa-home'></i>&ensp;danzigmarken.de</a>";
 
         // die neueste/letzte Änderungszeit einer Account-Projektdatei
@@ -339,12 +350,12 @@ class Footer
         $version = $txt['version'] ?? "";
 
         $li1 = isset($txt['version'])
-            ? "<a class='info' title='Datenstand vom {$version}'>
+            ? "<a class='info' title='".self::MSG[13]." {$version}'>
                <i class='fa fa-database'></i>&emsp;<i>{$version}</i></a>
                <br>"
             : "";
         $li2 = "
-            <a class='info' title='Webseite vom {$last}'>
+            <a class='info' title='".self::MSG[14]." {$last}'>
             <i class='fa fa-pencil'></i>&emsp;<i>{$last}</i></a>";
 
         return $li1.$li2;

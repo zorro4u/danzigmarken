@@ -1,7 +1,5 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SitePrep\Details as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 use Dzg\Tools\Auth;
 
 require_once __DIR__.'/../siteprep/details.php';
@@ -19,7 +17,7 @@ Controller,     Steuerung: Data <--> Ansicht
 /**
  * Summary of Class Details
  */
-class Details extends Pre
+class Details extends DetailsPrep
 {
     public static function show(): void
     {
@@ -32,11 +30,13 @@ class Details extends Pre
     }
 
 
+
     /**
      * HTML Ausgabe
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $status_message = self::$status_message;
         $output = "<div class='container'>";
@@ -132,7 +132,7 @@ class Details extends Pre
                     ? "<tr><td class='detail-key' style='".$tfoot."padding-top: 0px;'>
                         {$spalte_web}</td>
                         <td class='detail-val' style='".$tfoot."padding-top: 0px;'
-                        title='in Druckauswahl ja/nein'>
+                        title='{$msg[310]}'>
                         <input type='checkbox' name='{$spalte_db}' id='print' class='chkbx'
                         {$checked} onclick='prn_toogle(".$akt_file_id.",".$data_rev.")' />
                         <label for='print' ></label></td></tr></tfoot>"
@@ -182,7 +182,7 @@ class Details extends Pre
             if (!Auth::isCheckedIn()) {
                 $output .= "<a href='/".
                     htmlspecialchars($stamps[$akt_file_idx]['medium']).
-                    "' title='größere Ansicht'><img src='/".
+                    "' title='{$msg[311]}'><img src='/".
                     htmlspecialchars($stamps[$akt_file_idx]['small']).
                     "' width='300' height='' alt='".
                     htmlspecialchars($stamps[$akt_file_idx]['name'])."'></a>";
@@ -191,7 +191,7 @@ class Details extends Pre
             } else {
                 $output .= "<a href='/".
                     htmlspecialchars($stamps[$akt_file_idx]['large']).
-                    "' title='große Ansicht'><img src='/".
+                    "' title='{$msg[312]}'><img src='/".
                     htmlspecialchars($stamps[$akt_file_idx]['small']).
                     "' width='300' height='' alt='".
                     htmlspecialchars($stamps[$akt_file_idx]['name'])."'></a>";
@@ -297,10 +297,10 @@ class Details extends Pre
         $ziel = "print.php?id=".$akt_file_id;
         $btn_print0 = "<form action='{$ziel}' method='POST' style='display:inline'>".
                     "<button class='btn Xbtn-primary' type='submit' value='print'
-                    name='print'><i class='fas fa-print'>&ensp;</i>Drucken</button></form>";
+                    name='print'><i class='fas fa-print'>&ensp;</i>{$msg[313]}</button></form>";
 
         $btn_print = "<button onclick='window.print();' class='noprint btn print'
-                    title='Drucken'><i class='fas fa-print'>&ensp;</i>Drucken</button>";
+                    title='Drucken'><i class='fas fa-print'>&ensp;</i>{$msg[313]}</button>";
 
         $label = (empty($_SESSION['idx2'])) ? "Bild" : "Gruppe";
 
@@ -313,7 +313,7 @@ class Details extends Pre
             ($prev > -1)
                 ? $output .= "<div><a class='noprint' style='color:hsl(0, 0%, 45%);
                     background-color:transparent;' href={$_SERVER['PHP_SELF']}?id={$prev}
-                    title='{$label} zurück: #{$prev}'><i class='fas fa-long-arrow-left'
+                    title='{$label} {$msg[314]}: #{$prev}'><i class='fas fa-long-arrow-left'
                     style='font-size:16px; Xcolor:#9d9d9d;'></i></a></div>"
                 : $output .= "<div>&nbsp;</div>";
 
@@ -323,7 +323,7 @@ class Details extends Pre
             ($next > -1)
                 ? $output .= "<div><a class='noprint' style='color:hsl(0, 0%, 45%);
                     background-color:transparent;' href={$_SERVER['PHP_SELF']}?id={$next}
-                    title='{$label} vor: #{$next}'><i class='fas fa-long-arrow-right'
+                    title='{$label} {$msg[315]}: #{$next}'><i class='fas fa-long-arrow-right'
                     style='font-size:16px; Xcolor:#9d9d9d;'></i></a></div>"
                 : $output .= "<div>&nbsp;</div>";
         }

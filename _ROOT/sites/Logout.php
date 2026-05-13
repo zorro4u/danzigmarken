@@ -1,13 +1,11 @@
 <?php
-namespace Dzg\Sites;
-use Dzg\SitePrep\Logout as Pre;
-use Dzg\SitePrep\{Header, Footer};
+namespace Dzg;
 
 require_once __DIR__.'/../siteprep/logout.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
 
 
-class Logout extends Pre
+class Logout extends LogoutPrep
 {
     public static function show(): void
     {
@@ -24,13 +22,14 @@ class Logout extends Pre
      */
     private static function show_body(): void
     {
+        $msg = self::MSG;
         $show_form = self::$show_form;
         $root_site = self::$root_site;
         $status_message = self::$status_message;
 ?>
 
 <div class='container small-container-330 form-signin'>
-<h2 class='form-signin-heading'>Abmelden</h2>
+<h2 class='form-signin-heading'><?= $msg[310] ?></h2>
 <?= $status_message ?>
 
 <?php if ($show_form): ?>
@@ -43,13 +42,13 @@ class Logout extends Pre
 <div class='checkbox' style='padding-top: 15px;'>
 <label>
 <input type='checkbox' name='logout_all' value='1' autocomplete='off' />
-    geräteübergreifend alle meine Anmeldungen beenden (Grand Logout)
+<?= $msg[311] ?>
 </label></div>
 
 <?php endif;   // autologin ?>
 
 <button class='btn btn-lg btn-primary btn-block'
-    style='margin-top: 20px;' type='submit'>Logout</button>
+    style='margin-top: 20px;' type='submit'><?= $msg[312] ?></button>
 </form>
 
 <?php else: ?>
@@ -57,7 +56,7 @@ class Logout extends Pre
 <br><br><hr><br>
 <div><form action={$root_site} method='POST'>
 <button class='btn btn-lg btn-primary btn-block'
-    type='submit'>Startseite</button>
+    type='submit'><?= $msg[313] ?></button>
 </form></div>
 
 <?php endif;   // Seite anzeigen ?>
