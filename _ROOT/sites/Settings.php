@@ -141,7 +141,7 @@ class Settings extends SettingsForm
             spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw0' class='fas fa-eye-slash'></i></span>
+            <i id='pw0' class='fas fa-eye'></i></span>
         </div></div>
 
         <br>
@@ -204,7 +204,7 @@ class Settings extends SettingsForm
             spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw1' class='fas fa-eye-slash'></i></span>
+            <i id='pw1' class='fas fa-eye'></i></span>
         </div></div>
 
         <br>
@@ -215,7 +215,7 @@ class Settings extends SettingsForm
             class='form-control' autocomplete='off' spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw2' class='fas fa-eye-slash'></i></span>
+            <i id='pw2' class='fas fa-eye'></i></span>
         </div></div>
 
         <div class='form-group'>
@@ -225,7 +225,7 @@ class Settings extends SettingsForm
             class='form-control' autocomplete='off' spellcheck='false' required />
 
         <span class='password-toggle-icon' style='right:25px'>
-            <i id='pw3' class='fas fa-eye-slash'></i></span>
+            <i id='pw3' class='fas fa-eye'></i></span>
         </div></div>
 
         <br>
@@ -348,7 +348,7 @@ class Settings extends SettingsForm
             spellcheck='false' required />
         <label for='inputPW3' class='col-sm-2 control-label sr-only'>{$msg[318]}</label>
 
-        <span class='password-toggle-icon' style='left:190px;right:unset'><i id='pw4' class='fas fa-eye-slash'></i></span>
+        <span class='password-toggle-icon' style='left:190px;right:unset'><i id='pw4' class='fas fa-eye'></i></span>
         </div></div>
 
         <br><br>
@@ -440,65 +440,65 @@ class Settings extends SettingsForm
         togglePassword0.addEventListener('click', function () {
         if (passwordField0.type === 'password') {
             passwordField0.type = 'text';
-            togglePassword0.classList.remove('fa-eye-slash');
-            togglePassword0.classList.add('fa-eye');
+            togglePassword0.classList.remove('fa-eye');
+            togglePassword0.classList.add('fa-eye-slash');
 
         } else {
             passwordField0.type = 'password';
-            togglePassword0.classList.remove('fa-eye');
-            togglePassword0.classList.add('fa-eye-slash');
+            togglePassword0.classList.remove('fa-eye-slash');
+            togglePassword0.classList.add('fa-eye');
         }
         });
 
         togglePassword1.addEventListener('click', function () {
         if (passwordField1.type === 'password') {
             passwordField1.type = 'text';
-            togglePassword1.classList.remove('fa-eye-slash');
-            togglePassword1.classList.add('fa-eye');
+            togglePassword1.classList.remove('fa-eye');
+            togglePassword1.classList.add('fa-eye-slash');
 
         } else {
             passwordField1.type = 'password';
-            togglePassword1.classList.remove('fa-eye');
-            togglePassword1.classList.add('fa-eye-slash');
+            togglePassword1.classList.remove('fa-eye-slash');
+            togglePassword1.classList.add('fa-eye');
         }
         });
 
         togglePassword2.addEventListener('click', function () {
         if (passwordField2.type === 'password') {
             passwordField2.type = 'text';
-            togglePassword2.classList.remove('fa-eye-slash');
-            togglePassword2.classList.add('fa-eye');
+            togglePassword2.classList.remove('fa-eye');
+            togglePassword2.classList.add('fa-eye-slash');
 
         } else {
             passwordField2.type = 'password';
-            togglePassword2.classList.remove('fa-eye');
-            togglePassword2.classList.add('fa-eye-slash');
+            togglePassword2.classList.remove('fa-eye-slash');
+            togglePassword2.classList.add('fa-eye');
         }
         });
 
         togglePassword3.addEventListener('click', function () {
         if (passwordField3.type === 'password') {
             passwordField3.type = 'text';
-            togglePassword3.classList.remove('fa-eye-slash');
-            togglePassword3.classList.add('fa-eye');
+            togglePassword3.classList.remove('fa-eye');
+            togglePassword3.classList.add('fa-eye-slash');
 
         } else {
             passwordField3.type = 'password';
-            togglePassword3.classList.remove('fa-eye');
-            togglePassword3.classList.add('fa-eye-slash');
+            togglePassword3.classList.remove('fa-eye-slash');
+            togglePassword3.classList.add('fa-eye');
         }
         });
 
         togglePassword4.addEventListener('click', function () {
         if (passwordField4.type === 'password') {
             passwordField4.type = 'text';
-            togglePassword4.classList.remove('fa-eye-slash');
-            togglePassword4.classList.add('fa-eye');
+            togglePassword4.classList.remove('fa-eye');
+            togglePassword4.classList.add('fa-eye-slash');
 
         } else {
             passwordField4.type = 'password';
-            togglePassword4.classList.remove('fa-eye');
-            togglePassword4.classList.add('fa-eye-slash');
+            togglePassword4.classList.remove('fa-eye-slash');
+            togglePassword4.classList.add('fa-eye');
         }
         });
 
