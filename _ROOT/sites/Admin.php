@@ -1,9 +1,10 @@
 <?php
 namespace Dzg;
+use Dzg\Tools\CheckIP;
 
 require_once __DIR__.'/../siteform/admin.php';
 require_once __DIR__.'/../siteprep/loader_default.php';
-
+require_once __DIR__."/../tools/checkip.php";
 
 /**
  * Summary of Class Admin
@@ -181,6 +182,9 @@ class Admin extends AdminForm
         $out_nblck = (!empty(self::$new_blocked))
             ? "&nbsp;/&nbsp;+" . self::$new_blocked
             : "";
+        $out_nhtac = (!empty(self::$new_blocked_htaccess))
+            ? "&nbsp;/&nbsp;+" . self::$new_blocked_htaccess
+            : "";
 
         /*
         $out_token = (!empty($login_data['token_hash'])) ? htmlspecialchars($login_data['token_hash'], ENT_QUOTES) : "";
@@ -219,7 +223,7 @@ class Admin extends AdminForm
         <tr><td>log:&nbsp;</td>
             <td>{$out_group}&nbsp;/&nbsp;{$returns}%&nbsp;returns</td></tr>
         <tr><td>block:&nbsp;</td>
-            <td>{$out_block}{$out_nblck}</td></tr>
+            <td>{$out_block}{$out_nblck}{$out_nhtac}</td></tr>
         </table>
 
         <br><hr>

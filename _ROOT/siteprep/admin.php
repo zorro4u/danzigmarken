@@ -26,6 +26,7 @@ class AdminPrep
     protected static int $userid;
     protected static bool $show_form;
     protected static int $new_blocked;
+    protected static int $new_blocked_htaccess;
 
 
     /**
@@ -68,6 +69,18 @@ class AdminPrep
         self::$show_form = $show_form;
 
         self::$new_blocked = CheckIP::write_errorlog_into_DB();
+
+        if (!empty(self::$new_blocked)) {
+            // Error-Log IPs in Blackliste eintragen
+            #CheckIP::write_errorlog_into_DB();
+            self::$new_blocked_htaccess = CheckIP::write_DB_into_htaccess();
+
+            // nur einmalig zu Service-Zwecke
+            #CheckIP::write_htaccess_into_DB();
+            #CheckIP::clear_htaccess_ip();
+
+            #if (!empty($inserts)) echo "= htaccess: +". $inserts ." =<br><br>";
+        }
     }
 
 

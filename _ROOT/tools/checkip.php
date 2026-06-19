@@ -916,7 +916,7 @@ class CheckIP
     }
 
 
-    public static function write_DB_into_htaccess(): void
+    public static function write_DB_into_htaccess(): int
     {
         #$file = $_SERVER['DOCUMENT_ROOT']."/tools/.htaccess.txt";
         $file = $_SERVER['DOCUMENT_ROOT']."/.htaccess";
@@ -930,6 +930,7 @@ class CheckIP
 
         // IPs aus File lesen
         $file_str = [];
+        $ip_section_end = 0;
         foreach ($file_input as $line_num => $line) {
 
             // IP Zeile finden
@@ -997,8 +998,9 @@ class CheckIP
         };
 
 
-        // File neu schreiben
-        if ($write) {
+        // File neu schreiben, wenn mehr als 10 neue Einträge
+        $inserts = 0;
+        if (count($write) > 10) {
 
             // Datei-Inhalt erstellen (alt+neu)
             $new_file_arr = [];
@@ -1029,8 +1031,10 @@ class CheckIP
             #$out = htmlentities($file_input[$ip_section_end]);
             #var_dump(htmlspecialchars($file_input[2]));echo'<br>';
 
-            echo "= htaccess: +".count($new_file_arr)-count($file_input)." =<br><br>";
+            $inserts = count($new_file_arr)-count($file_input);
+            #echo "= htaccess: +". $inserts ." =<br><br>";
         };
+        return $inserts;
     }
 
 
