@@ -180,7 +180,7 @@ class Admin extends AdminForm
         $out_black = $log_data['ct_black'] ?? "0";
         $out_block = $log_data['ct_block'] ?? "0";
         $out_nblck = (!empty(self::$new_blocked))
-            ? "&nbsp;/&nbsp;+" . self::$new_blocked
+            ? "&nbsp;//&nbsp;+" . self::$new_blocked
             : "";
         $out_nhtac = (!empty(self::$new_blocked_htaccess))
             ? "&nbsp;/&nbsp;+" . self::$new_blocked_htaccess

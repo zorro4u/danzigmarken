@@ -999,8 +999,9 @@ class CheckIP
 
 
         // File neu schreiben, wenn mehr als 10 neue Einträge
+        $buffer  = 10;
         $inserts = 0;
-        if (count($write) > 10) {
+        if (count($write) > $buffer) {
 
             // Datei-Inhalt erstellen (alt+neu)
             $new_file_arr = [];

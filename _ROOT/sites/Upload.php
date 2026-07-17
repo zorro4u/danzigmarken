@@ -30,7 +30,7 @@ class Upload extends UploadPrep
     private static function show_body(): void
     {
 
-        $ausgabe = Tools::statusmeldungAusgeben();
+        $ausgabe = Tools::statusOut('', '');
         if (self::$show_form):
 
         $ausgabe .= '<div class="grid-container-detail">';

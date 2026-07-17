@@ -60,10 +60,10 @@ class AdminPrep
 
         // globale Variablen setzen
         if ($show_form) {
-            self::$identifier = $login_data['identifier'];
-            self::$userid = $usr_data['userid'];
             self::$login_data = $login_data;
+            self::$identifier = $login_data['identifier'];
             self::$usr_data = $usr_data;
+            self::$userid = $usr_data['userid'];
         }
         self::$error_msg = $error_msg;
         self::$show_form = $show_form;
